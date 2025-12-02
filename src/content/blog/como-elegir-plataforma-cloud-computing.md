@@ -53,9 +53,9 @@ Muy simplificando:
 
 En la práctica, tu empresa puede usar las tres cosas a la vez:
 
-- Un SaaS para CRM (por ejemplo, Salesforce),
-- un PaaS para tu web o app,
-- algo de IaaS para sistemas muy específicos.
+- Un SaaS para CRM (por ejemplo, Salesforce).
+- Un PaaS para tu web o app.
+- IaaS para sistemas muy específicos.
 
 ---
 
@@ -109,9 +109,9 @@ Ejemplos:
 ### 3.2. Tipo de proyecto y necesidades de escalado
 
 - Una **landing** o página corporativa no necesita lo mismo que:
-  - un SaaS con clientes en varios países,
-  - un e-commerce con picos muy fuertes,
-  - o una plataforma interna con datos muy sensibles.
+  - Un SaaS con clientes en varios países.
+  - Un e-commerce con picos muy fuertes.
+  - Una plataforma interna con datos muy sensibles.
 
 Pregúntate:
 
@@ -124,7 +124,7 @@ Si tu proyecto es una web “estándar” (blog, portfolio, landing, incluso una
 - Una plataforma “opinionated” tipo **Netlify / Vercel** para el frontend.
 - Un backend sencillo (serverless functions, APIs gestionadas, BaaS).
 
-que lanzarte directamente a montar una arquitectura compleja a base de servicios sueltos en AWS/Azure/GCP.
+Que lanzarte directamente a montar una arquitectura compleja a base de servicios sueltos en AWS/Azure/GCP.
 
 ---
 
@@ -135,13 +135,13 @@ La nube no es automáticamente “barata”. Es **flexible**: pagas por lo que u
 Fíjate en:
 
 - **Modelo de precios**:  
-  - Pago por uso (compute, almacenamiento, tráfico),
-  - planes por niveles,
-  - descuentos por compromiso (1–3 años).
+  - Pago por uso (compute, almacenamiento, tráfico).
+  - Planes por niveles.
+  - Descuentos por compromiso (1–3 años).
 
 - **Costes de salida**:
-  - Ancho de banda de salida (datos que sacas de la nube),
-  - migrar datos grandes a otra plataforma más adelante.
+  - Ancho de banda de salida (datos que sacas de la nube).
+  - Migrar datos grandes a otra plataforma más adelante.
 
 Recomendación práctica:
 
@@ -176,8 +176,8 @@ Algunas preguntas útiles:
 
 Cuanto más estratégico sea el proyecto para tu negocio, más conviene invertir en:
 
-- Un buen plan de soporte,
-- alguien (interno o externo) que entienda la plataforma y hable “tu idioma de negocio”.
+- Un buen plan de soporte.
+- Alguien (interno o externo) que entienda la plataforma y hable “tu idioma de negocio”.
 
 ---
 
@@ -189,37 +189,37 @@ Obviamente cada caso es un mundo, pero a modo de orientación:
 
 Necesidad:
 
-- Tener una web rápida y segura,
-- formularios de contacto,
-- quizá un pequeño blog.
+- Tener una web rápida y segura.
+- Formularios de contacto.
+- Quizá un pequeño blog.
 
 Opciones razonables:
 
 - **Netlify, Vercel u otro hosting especializado en sitios estáticos/JAMstack**, combinando:
-  - frontend en Astro/Next,
-  - CMS headless si lo necesitas,
-  - funciones serverless para formularios o lógica simple.
+  - Frontend en Astro/Next.
+  - CMS headless si lo necesitas.
+  - Funciones serverless para formularios o lógica simple.
 
 Ventajas:
 
-- Simplicidad,
-- despliegues automáticos desde Git,
+- Simplicidad.
+- Despliegues automáticos desde Git,
 - CDN y certificados integrados.
 
 ### Caso B: startup con producto digital propio
 
 Necesidad:
 
-- Aplicación web o móvil en crecimiento,
-- iteración rápida,
-- escalado a medio plazo.
+- Aplicación web o móvil en crecimiento.
+- Iteración rápida.
+- Escalado a medio plazo.
 
 Opciones habituales:
 
 - AWS, Azure o GCP, combinando:
-  - servicios gestionados (bases de datos, colas, almacenamiento),
-  - funciones serverless,
-  - contenedores si el proyecto lo pide.
+  - Servicios gestionados (bases de datos, colas, almacenamiento).
+  - Funciones serverless.
+  - Contenedores si el proyecto lo pide.
 
 Recomendación:
 
@@ -231,19 +231,19 @@ Recomendación:
 
 Necesidad:
 
-- Conectar sistemas antiguos con nuevos servicios cloud,
-- migrar poco a poco sin parar el negocio.
+- Conectar sistemas antiguos con nuevos servicios cloud.
+- Migrar poco a poco sin parar el negocio.
 
 Opciones:
 
 - Suele pesar mucho la **historia previa**:
-  - si ya hay mucho Microsoft → Azure,
-  - si ya hay acuerdos con AWS u otro proveedor, se suele seguir esa línea.
+  - Si ya hay mucho Microsoft → Azure.
+  - Si ya hay acuerdos con AWS u otro proveedor, se suele seguir esa línea.
 
 En estos contextos, lo que marca la diferencia es:
 
-- Un buen plan de **adopción por fases**,
-- y alinear a IT, negocio y proveedores externos.
+- Un buen plan de **adopción por fases**.
+- Alinear a IT, negocio y proveedores externos.
 
 ---
 
@@ -254,8 +254,8 @@ Verás muchos términos: **multi-cloud**, **cloud híbrida**, etc.
 - **Multi-cloud**  
   Usar varias nubes a la vez (por ejemplo, AWS y GCP).  
   Suele tener sentido en empresas grandes que quieren:
-  - evitar dependencia extrema de un proveedor,
-  - o aprovechar servicios muy concretos de cada uno.
+  - Evitar dependencia extrema de un proveedor.
+  - Aprovechar servicios muy concretos de cada uno.
 
 - **Cloud híbrida**  
   Combinar infraestructura propia (on-premise) con la nube.  
@@ -263,8 +263,8 @@ Verás muchos términos: **multi-cloud**, **cloud híbrida**, etc.
 
 Para pymes y proyectos pequeños/medios, muchas veces lo más sensato es:
 
-> Empezar **muy bien con un solo proveedor**  
-> y solo plantearse multi-cloud cuando haya razones de peso.
+> Empezar **muy bien con un solo proveedor**.  
+> Sólo plantearse multi-cloud cuando haya razones de peso.
 
 ---
 
@@ -279,18 +279,18 @@ En vez de perderte en fichas de producto, puedes seguir esta secuencia:
    Escríbelo en 2–3 frases claras.
 
 2. **Lista requisitos mínimos**  
-   - Lenguajes y tecnologías que usas,  
-   - región de datos (por ejemplo, Europa),  
-   - nivel de soporte necesario.
+   - Lenguajes y tecnologías que usas.  
+   - Región de datos (por ejemplo, Europa).  
+   - Nivel de soporte necesario.
 
 3. **Descarta opciones que no cumplan requisitos básicos**  
    Si necesitas X cosa sí o sí (por ejemplo, integración nativa con algo muy específico), corta por lo sano.
 
 4. **Haz una prueba pequeña (piloto)**  
    Monta un entorno de prueba en 1–2 plataformas candidatas:
-   - deploy,
-   - integración con tu código actual,
-   - métricas básicas de coste y rendimiento.
+   - Deploy.
+   - Integración con tu código actual.
+   - Métricas básicas de coste y rendimiento.
 
 5. **Evalúa experiencia de tu equipo**  
    Pregunta de forma honesta:
@@ -299,9 +299,9 @@ En vez de perderte en fichas de producto, puedes seguir esta secuencia:
 
 6. **Decide y documenta**  
    Elige, pero deja por escrito:
-   - por qué se ha elegido esa plataforma,
-   - qué riesgos asumís (por ejemplo, lock-in),
-   - cómo se podría migrar en el futuro si hiciera falta.
+   - Por qué se ha elegido esa plataforma.
+   - Qué riesgos asumís (por ejemplo, lock-in).
+   - Cómo se podría migrar en el futuro si hiciera falta.
 
 ---
 
@@ -319,5 +319,4 @@ Si tuviera que reducirlo a una sola idea sería:
 
 ¿Te gustaría que revisemos tu situación concreta (tamaño de negocio, tech stack, objetivos) y aterricemos una recomendación más personalizada?
 
-Si quieres,  
-**[escríbeme](/contact)** y vemos qué combinación de nube y arquitectura tiene más sentido para tu caso real.
+Si quieres, **[escríbeme](/contact)** y vemos qué combinación de nube y arquitectura tiene más sentido para tu caso real.
