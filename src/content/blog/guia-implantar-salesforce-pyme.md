@@ -38,9 +38,9 @@ En lugar de “queremos digitalizar la empresa”, apunta cosas como:
 
 Cuanto más concretos sean los objetivos, más fácil será:
 
-- configurar Salesforce,
-- priorizar funcionalidades,
-- y decidir qué es “fuera de alcance” en la primera fase.
+- Configurar Salesforce.
+- Priorizar funcionalidades.
+- Decidir qué es “fuera de alcance” en la primera fase.
 
 ### 1.2 Identifica procesos clave
 
@@ -70,14 +70,14 @@ Un error muy común en pymes es “esto es cosa de informática”.
 Necesitas:
 
 - Un/a **responsable interno/a de proyecto** (Product Owner, si quieres usar palabras de moda):
-  - que conozca el negocio,
-  - tenga autoridad para tomar decisiones,
-  - y pueda dedicar tiempo (aunque sea parcial) a reuniones, pruebas y formación.
+  - Que conozca el negocio.
+  - Tenga autoridad para tomar decisiones.
+  - Pueda dedicar tiempo (aunque sea parcial) a reuniones, pruebas y formación.
 
 Esa persona será el puente entre:
 
-- la pyme (dirección, usuarios),
-- y el consultor/partner o equipo técnico que implemente Salesforce.
+- La pyme (dirección, usuarios).
+- El consultor/partner o equipo técnico que implemente Salesforce.
 
 ---
 
@@ -123,19 +123,18 @@ Intentar meter todo a la vez suele llevar a proyectos de meses que se desinflan.
 
 Pregunta clave:
 
-> “Si solo pudiéramos implantar una parte en 2–3 meses,  
-> ¿qué nos daría **más valor inmediato**?”
+> “Si solo pudiéramos implantar una parte en 2–3 meses, ¿qué nos daría **más valor inmediato**?”
 
 Ejemplos de MVP para una pyme:
 
 - Tener todos los **leads y oportunidades** en Salesforce, con:
-  - pipeline visible,
-  - tareas y recordatorios de seguimiento,
-  - informes básicos de ventas.
+  - Pipeline visible.
+  - Tareas y recordatorios de seguimiento.
+  - Informes básicos de ventas.
 
 - Centralizar todas las **incidencias de clientes** en casos:
-  - con estados y responsables claros,
-  - tiempos de resolución medibles.
+  - Con estados y responsables claros.
+  - Tiempos de resolución medibles.
 
 No hace falta automatizar todo el universo en la primera fase. Lo importante es que, al poco tiempo, el equipo vea que **Salesforce les facilita el día a día**.
 
@@ -149,8 +148,8 @@ En vez de diseñarlo todo “en despacho”, funciona mucho mejor:
 
 Beneficio:
 
-- Ajustas Salesforce a la realidad del negocio,
-- y generas **adopción temprana**: la gente siente que ha participado.
+- Ajustas Salesforce a la realidad del negocio.
+- Generas **adopción temprana**: la gente siente que ha participado.
 
 ### 3.3 Configuración básica: campos, procesos, permisos
 
@@ -160,14 +159,14 @@ En la primera fase se suelen tocar cosas como:
 - **Layouts de página** sencillos (sin saturar).
 - **Reglas de validación** para cuidar la calidad de datos (no dejar campos críticos en blanco).
 - **Reglas de negocio simples**:
-  - asignación de leads por comercial,
-  - estados estándar para oportunidades y casos.
+  - Asignación de leads por comercial.
+  - Estados estándar para oportunidades y casos.
 
 Y por debajo:
 
 - Un esquema básico de **perfiles y roles**:
-  - quién puede ver qué,
-  - qué usuarios pueden editar datos sensibles,
+  - Quién puede ver qué.
+  - Qué usuarios pueden editar datos sensibles.
   - etc.
 
 ### 3.4 Formación y acompañamiento
@@ -178,15 +177,15 @@ Plan mínimo de adopción:
 
 - Sesión de presentación al inicio del proyecto: explicar **por qué** se implanta y qué se espera.
 - Formación práctica cerca del go-live:
-  - cómo dar de alta un lead,
-  - cómo registrar una llamada,
-  - cómo actualizar una oportunidad,
-  - cómo ver su lista de tareas.
+  - Cómo dar de alta un lead.
+  - Cómo registrar una llamada.
+  - Cómo actualizar una oportunidad.
+  - Cómo ver su lista de tareas.
 
 Las pymes donde Salesforce funciona mejor suelen:
 
-- Tener pequeñas guías internas (paso a paso),
-- y alguien de referencia al que preguntar dudas los primeros meses.
+- Tener pequeñas guías internas (paso a paso).
+- Alguien de referencia al que preguntar dudas los primeros meses.
 
 ---
 
@@ -198,20 +197,20 @@ Una vez tienes lo básico funcionando, llega la parte que hace que el equipo dig
 
 - **Correo electrónico y calendario**  
   Integrar Salesforce con Outlook/Gmail para:
-  - registrar correos importantes como actividades,
-  - crear contactos y oportunidades desde el correo,
-  - tener reuniones vinculadas a cuentas y oportunidades.
+  - Registrar correos importantes como actividades.
+  - Crear contactos y oportunidades desde el correo.
+  - Tener reuniones vinculadas a cuentas y oportunidades.
 
 - **Formularios web**  
   Que un formulario de contacto en tu web cree:
-  - un **lead** en Salesforce,
-  - con datos básicos (nombre, email, origen de la campaña),
-  - y que salte un aviso automático al comercial correspondiente.
+  - Un **lead** en Salesforce.
+  - Con datos básicos (nombre, email, origen de la campaña).
+  - Que salte un aviso automático al comercial correspondiente.
 
 - **Slack u otras herramientas de colaboración**  
-  - Notificaciones cuando se crea una oportunidad grande,
-  - avisos de casos urgentes,
-  - canales por cliente importante.
+  - Notificaciones cuando se crea una oportunidad grande.
+  - Avisos de casos urgentes.
+  - Canales por cliente importante.
 
 El objetivo no es “conectar cosas por conectar”, sino que **la información relevante aparezca en el sitio donde tus equipos ya trabajan**.
 
@@ -244,38 +243,38 @@ Implantar Salesforce no se acaba el día del go-live. De hecho, ahí es donde em
 ### 5.1 Métricas clave para ventas
 
 - **Tiempo de respuesta a leads**:
-  - desde que entra el lead hasta la primera llamada/email.
+  - Desde que entra el lead hasta la primera llamada/email.
 - **Tasa de conversión de leads a oportunidades**:
-  - cuántos leads pasan a ser oportunidades reales.
+  - Cuántos leads pasan a ser oportunidades reales.
 - **Ratio de cierre de oportunidades**:
-  - cuántas se ganan frente a las que se pierden.
+  - Cuántas se ganan frente a las que se pierden.
 - **Valor del pipeline por etapa y por comercial**:
-  - ventas previstas a 30/60/90 días.
+  - Ventas previstas a 30/60/90 días.
 
 ### 5.2 Métricas para atención al cliente
 
 - **Tiempo medio de primera respuesta**:
-  - desde que entra el caso hasta que alguien responde.
+  - Desde que entra el caso hasta que alguien responde.
 - **Tiempo medio de resolución**:
-  - cuánto tardas en resolver una incidencia.
+  - Cuánto tardas en resolver una incidencia.
 - **Casos abiertos por cliente**:
-  - detectar clientes con muchos problemas recurrentes.
+  - Detectar clientes con muchos problemas recurrentes.
 
 ### 5.3 Métricas para marketing
 
 - **Leads por origen**:
-  - web, campañas, ferias, recomendaciones, etc.
+  - Web, campañas, ferias, recomendaciones, etc.
 - **Leads cualificados (MQL/SQL)**:
-  - cuántos cumplen criterios que de verdad interesan a ventas.
+  - Cuántos cumplen criterios que de verdad interesan a ventas.
 - **Ingresos atribuidos a campañas**:
-  - saber qué acciones traen negocio, no solo clicks.
+  - Saber qué acciones traen negocio, no solo clicks.
 
 Con estas métricas, puedes ajustar:
 
-- campos,
-- procesos,
-- automatizaciones,
-- e incluso la estrategia comercial.
+- Campos.
+- Procesos.
+- Automatizaciones.
+- La estrategia comercial.
 
 ---
 
@@ -313,9 +312,9 @@ Problema:
 Con Salesforce (Service Cloud):
 
 - Todas las incidencias entran como **casos**:
-  - desde un formulario web,
-  - desde un correo,
-  - o creados manualmente tras una llamada.
+  - Desde un formulario web.
+  - Desde un correo.
+  - Creados manualmente tras una llamada.
 - Colas por prioridad, producto o tipo de cliente.
 - Panel para ver tiempos de respuesta y resolución.
 
@@ -327,16 +326,16 @@ Resultado: menos quejas, mejor organización interna y capacidad de justificar q
 
 Problema:
 
-- Muchas campañas y acciones,
-- pero poca trazabilidad hacia ventas reales.
+- Muchas campañas y acciones.
+- Poca trazabilidad hacia ventas reales.
 
 Con Salesforce (Sales Cloud + integraciones básicas):
 
 - Leads de campañas se crean directamente en Salesforce.
 - Cada lead lleva el **origen de campaña**.
 - Cuando se cierra una oportunidad, se puede ver:
-  - de qué campaña vino,
-  - cuánto ingreso generó.
+  - De qué campaña vino.
+  - Cuánto ingreso generó.
 
 Resultado: la agencia y la pyme pueden decidir con datos qué campañas repetir y cuáles no.
 
@@ -371,5 +370,4 @@ Si tuvieras que quedarte con una secuencia simple, podría ser:
 
 ¿Estás valorando implantar Salesforce en tu pyme y no tienes claro por dónde empezar o cuánto alcance tiene sentido para la primera fase?
 
-Si quieres una **hoja de ruta adaptada a tu caso real** (sector, tamaño, equipo),  
-**[escríbeme](/contact)** y vemos juntos cómo plantear el proyecto sin convertirlo en un monstruo imposible de mantener.
+Si quieres una **hoja de ruta adaptada a tu caso real** (sector, tamaño, equipo), **[escríbeme](/contact)** y vemos juntos cómo plantear el proyecto sin convertirlo en un monstruo imposible de mantener.
