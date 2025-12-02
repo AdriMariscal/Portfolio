@@ -35,9 +35,9 @@ En esta guía vamos a ver, paso a paso:
 
 - Se ejecutan en un entorno similar a **Node.js**.
 - Ideales para:
-  - hablar con APIs externas,
-  - tareas de backend “puntuales” (enviar un email, guardar algo en una base externa, generar un fichero…),
-  - lógica que no necesita estar pegada al request en el edge.
+  - Hablar con APIs externas.
+  - Tareas de backend “puntuales” (enviar un email, guardar algo en una base externa, generar un fichero…).
+  - Lógica que no necesita estar pegada al request en el edge.
 
 Piensa en ellas como **mini-endpoints** tipo `/api/*` que se ejecutan bajo demanda.
 
@@ -45,13 +45,13 @@ Piensa en ellas como **mini-endpoints** tipo `/api/*` que se ejecutan bajo deman
 
 - Se ejecutan **en el borde de la red (edge)**, muy cerca del usuario.
 - Funcionan como un **middleware** sobre la petición:
-  - puedes redirigir, reescribir, añadir cabeceras,
-  - proteger rutas, hacer A/B testing ligero, añadir cookies, etc.
+  - Puedes redirigir, reescribir, añadir cabeceras.
+  - Proteger rutas, hacer A/B testing ligero, añadir cookies, etc.
 - Ideales para:
-  - **proteger entornos de staging**,  
-  - aplicar reglas de acceso según IP/país,  
-  - inyectar cabeceras de seguridad,  
-  - reescribir rutas sin pasar por un servidor central.
+  - **Proteger entornos de staging**.
+  - Aplicar reglas de acceso según IP/país.  
+  - Inyectar cabeceras de seguridad.
+  - Reescribir rutas sin pasar por un servidor central.
 
 En resumen:
 
@@ -84,8 +84,8 @@ Algunos puntos clave:
 - Las **Functions** viven por defecto en `netlify/functions/`.
 - Las **Edge Functions** en `netlify/edge-functions/`.
 - En `netlify.toml` defines:
-  - el directorio de funciones (si cambias el defecto),
-  - qué Edge Function se aplica a qué rutas.
+  - El directorio de funciones (si cambias el defecto).
+  - Qué Edge Function se aplica a qué rutas.
 
 Ejemplo mínimo de `netlify.toml`:
 
@@ -335,8 +335,8 @@ export { handler };
 
 Desde Astro, podrías:
 
-- Llamar a esta Function desde un botón “Descargar borrador”,  
-- o incluso desde el servidor (en `getStaticPaths`/`get` si necesitas pre-generar algo).
+- Llamar a esta Function desde un botón “Descargar borrador”.  
+- Incluso desde el servidor (en `getStaticPaths`/`get` si necesitas pre-generar algo).
 
 Ejemplo de llamada desde el cliente:
 
@@ -432,14 +432,14 @@ Con esto:
 
 La gracia de usar Functions y Edge Functions con Astro es que:
 
-- Puedes mantener la **mayor parte del sitio estático**,
-- y solo añadir JS donde hace falta interactividad real.
+- Puedes mantener la **mayor parte del sitio estático**.
+- Solo añadir JS donde hace falta interactividad real.
 
 Patrones recomendados:
 
 - Formularios que:
-  - usan HTML estándar,
-  - y un pequeño script para llamar a la Function.
+  - Usan HTML estándar.
+  - Un pequeño script para llamar a la Function.
 - Páginas que cargan datos dinámicos **bajo demanda**:
   - ej. botón “Generar borrador”, “Enviar correo”, “Descargar PDF”.
 - Edge Functions que actúan como **middleware de seguridad o routing** sin tocar tu código Astro.
@@ -484,11 +484,10 @@ Para cerrar, una lista rápida de cosas a revisar al trabajar con Netlify Functi
 
 Si ya estás usando Astro y Netlify para tu portfolio o tus proyectos, añadir Functions y Edge Functions es el siguiente paso natural para:
 
-- conectar APIs externas,
-- proteger entornos de staging,
-- y construir pequeños servicios dinámicos sin mantener un servidor 24/7.
+- Conectar APIs externas.
+- Proteger entornos de staging.
+- Construir pequeños servicios dinámicos sin mantener un servidor 24/7.
 
 ¿Te gustaría que bajemos esto a tu caso concreto (por ejemplo, proteger otras secciones de tu sitio, o montar un pequeño servicio de generación de documentos legales con Functions)?
 
-Si quieres,  
-**[escríbeme](/contact)** y diseñamos juntos la arquitectura más sencilla posible que cubra tus necesidades reales.
+Si quieres, **[escríbeme](/contact)** y diseñamos juntos la arquitectura más sencilla posible que cubra tus necesidades reales.
