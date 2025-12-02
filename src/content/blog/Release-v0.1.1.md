@@ -47,4 +47,4 @@ Funcionalidad completa para:
 
 ---
 
-Si te interesa el detalle técnico o has visto algún fallo, ¡escríbeme por el formulario!
+Si te interesa el detalle técnico o has visto algún fallo, ¡**[Escríbeme](/contact)** por el formulario!

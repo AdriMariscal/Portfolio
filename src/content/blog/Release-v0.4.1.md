@@ -89,5 +89,5 @@ Algunos detalles bajo el capó:
 
 ## ¿Necesitas algo parecido?
 
-Si quieres un **portfolio rápido, accesible y optimizado** (Astro + Netlify / Vercel) o una **página corporativa con cumplimiento legal** (LSSI/RGPD) y buen SEO técnico, cuéntame qué necesitas desde la [página de contacto](/contact).
+Si quieres un **portfolio rápido, accesible y optimizado** (Astro + Netlify / Vercel) o una **página corporativa con cumplimiento legal** (LSSI/RGPD) y buen SEO técnico, cuéntame qué necesitas desde la **[página de contacto](/contact)**.
 
