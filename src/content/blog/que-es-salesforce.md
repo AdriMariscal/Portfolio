@@ -216,4 +216,5 @@ Si te ronda la idea de implantar Salesforce o mejorar una organización que ya t
 
 ---
 
-¿Quieres que valore si Salesforce encaja en tu empresa o que te ayude a optimizar tu org actual? **[Escríbeme](/contact)**.
+¿Quieres que valore si Salesforce encaja en tu empresa o que te ayude a optimizar tu org actual?  
+**[Escríbeme](/contact)**.
