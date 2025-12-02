@@ -123,8 +123,8 @@ Ahí verás:
 
 Idea práctica:
 
-> Usa Lighthouse para probar cambios rápidos mientras desarrollas  
-> y PageSpeed Insights para comprobar cómo se comporta **la web real** con tus usuarios.
+> Usa Lighthouse para probar cambios rápidos mientras desarrollas.  
+> PageSpeed Insights para comprobar cómo se comporta **la web real** con tus usuarios.
 
 ---
 
@@ -136,8 +136,8 @@ Vamos ahora a la parte que te interesa de verdad: **qué tocar en tu código y e
 
 LCP, prácticamente siempre, está marcado por:
 
-- La **imagen principal** (hero),
-- o el bloque grande de texto / sección principal en el fold inicial.
+- La **imagen principal** (hero).
+- El bloque grande de texto / sección principal en el fold inicial.
 
 Con Astro y Netlify tienes varias ventajas: render estático, CDN, caché… pero hay que usarlas bien.
 
@@ -146,12 +146,12 @@ Con Astro y Netlify tienes varias ventajas: render estático, CDN, caché… per
 1. **Optimizar la imagen LCP**
 
    - Usa el sistema de imágenes de Astro (`<Image />` o `Astro.assets`) para:
-     - generar versiones adaptadas (`srcset`, `sizes`),
-     - servir formatos modernos (AVIF/WEBP cuando sea posible),
-     - aplicar `loading="lazy"` a las que no sean LCP.
+     - Generar versiones adaptadas (`srcset`, `sizes`).
+     - Servir formatos modernos (AVIF/WEBP cuando sea posible).
+     - Aplicar `loading="lazy"` a las que no sean LCP.
    - Para la **imagen principal (hero)**:
-     - evita el lazy-loading,
-     - puedes usar `priority` o un preload del recurso.
+     - Evita el lazy-loading.
+     - Puedes usar `priority` o un preload del recurso.
 
 2. **CDN y caché en Netlify**
 
@@ -162,11 +162,11 @@ Con Astro y Netlify tienes varias ventajas: render estático, CDN, caché… per
 3. **Reducir CSS y JS bloqueantes**
 
    - En Astro, intenta mantener el CSS **ligero y modular**:
-     - evita frameworks gigantes si no los necesitas,
-     - apóyate en utilidades (Tailwind) bien configuradas para tree-shaking.
+     - Evita frameworks gigantes si no los necesitas.
+     - Apóyate en utilidades (Tailwind) bien configuradas para tree-shaking.
    - Evita hidratar componentes innecesarios:
-     - si algo es puramente estático, que se quede como **HTML estático**.
-     - reserva `client:load` para lo que realmente tenga lógica de cliente.
+     - Si algo es puramente estático, que se quede como **HTML estático**.
+     - Reserva `client:load` para lo que realmente tenga lógica de cliente.
 
 4. **Preload de fuentes e imágenes críticas**
 
@@ -202,16 +202,16 @@ Astro tiene aquí una ventaja enorme: su filosofía de **islas** y “menos JS p
 2. **Dividir componentes complejos**
 
    - Si tienes un componente con mucha lógica, separa:
-     - el render estático,
-     - de la parte interactiva que realmente necesita JS.
+     - El render estático.
+     - De la parte interactiva que realmente necesita JS.
    - Usa estados y efectos con cabeza: evita recalcular cosas pesadas en cada click o keypress.
 
 3. **Eliminar scripts y terceros innecesarios**
 
    - Píxeles, trackers, widgets… todo suma.
    - Si no aportan valor claro, elimínalos o al menos:
-     - cárgalos de forma diferida,
-     - o solo en páginas concretas.
+     - Cárgalos de forma diferida.
+     - Solo en páginas concretas.
 
 4. **Evitar “trabajo pesado” justo tras la interacción**
 
@@ -229,9 +229,9 @@ Astro tiene aquí una ventaja enorme: su filosofía de **islas** y “menos JS p
 
 CLS se dispara cuando el contenido se mueve mientras la página ya está visible:
 
-- Imágenes sin tamaño definido,
-- banners que aparecen tarde,
-- anuncios o iframes que empujan el contenido hacia abajo.
+- Imágenes sin tamaño definido.
+- Banners que aparecen tarde.
+- Anuncios o iframes que empujan el contenido hacia abajo.
 
 #### Estrategias clave para CLS
 
@@ -249,8 +249,8 @@ CLS se dispara cuando el contenido se mueve mientras la página ya está visible
 
    - Usa `font-display: swap` para evitar parones largos sin texto.
    - Si una fuente cambia mucho las proporciones, valora:
-     - usar el sistema de preajuste (fallback parecido),
-     - o cargar la fuente después del contenido crítico.
+     - Usar el sistema de preajuste (fallback parecido).
+     - Cargar la fuente después del contenido crítico.
 
 4. **Astro layouts coherentes**
 
@@ -298,5 +298,4 @@ La buena noticia es que, si ya trabajas con **Astro + Netlify**, tienes una base
 
 ¿Te gustaría que revisemos juntos los Core Web Vitals de tu sitio (o de un proyecto Astro/Netlify que tengas en marcha) y saquemos una lista de mejoras concretas?
 
-Si quieres una revisión con ejemplos de tu código real,  
-**[escríbeme](/contact)** y lo vemos paso a paso.
+Si quieres una revisión con ejemplos de tu código real, **[escríbeme](/contact)** y lo vemos paso a paso.
