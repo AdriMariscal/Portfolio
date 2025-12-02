@@ -120,8 +120,8 @@ Ideal para:
 
 Ideal para:
 
-- Catálogos de productos,
-- portfolios,
+- Catálogos de productos.
+- Portfolios.
 - listados con cierto volumen pero donde quieres mantener buen SEO.
 
 ---
@@ -460,8 +460,8 @@ Algunos puntos para que paginación, «Cargar más» e infinite scroll sean acce
 3. **Evitar scroll infinito sin control**  
    - Algunos usuarios pueden necesitar llegar al footer (contacto, avisos legales).  
    - Con infinite scroll, plantéate:
-     - un límite máximo de páginas cargadas automáticamente,  
-     - y a partir de ahí, obligar a pulsar un botón.
+     - Un límite máximo de páginas cargadas automáticamente.  
+     - A partir de ahí, obligar a pulsar un botón.
 
 4. **Mantener el contexto**  
    - Si el usuario hace clic en un artículo y luego vuelve atrás, idealmente debería volver al mismo punto del listado.  
@@ -501,9 +501,9 @@ Para que Google y otros buscadores no se pierdan:
 Si tuviera que resumir una estrategia razonable sería:
 
 1. **Empieza por paginación clásica**:
-   - URLs claras (`/blog/page/2`),
-   - navegación accesible,
-   - enlaces `rel="next"` y `rel="prev"`.
+   - URLs claras (`/blog/page/2`).
+   - Navegación accesible.
+   - Enlaces `rel="next"` y `rel="prev"`.
 
 2. **Añade «Cargar más» como mejora progresiva**:
    - Usa un endpoint (`/api/posts.json?page=N`),
@@ -514,13 +514,12 @@ Si tuviera que resumir una estrategia razonable sería:
    - Mantén URLs paginadas y accesibles por debajo.
 
 4. **Cuida accesibilidad y SEO**:
-   - `aria-label`, regions `aria-live` si las necesitas,
-   - títulos y meta descripciones coherentes,
-   - no ocultar todo el contenido detrás de JavaScript.
+   - `aria-label`, regions `aria-live` si las necesitas.
+   - Títulos y meta descripciones coherentes.
+   - No ocultar todo el contenido detrás de JavaScript.
 
 ---
 
 ¿Te gustaría que adaptara estos ejemplos al paginado concreto de tu blog o al listado de proyectos de tu portfolio en Astro?
 
-Si quieres que lo veamos aplicado a tu código real (rutas, componentes y estilos),  
-**[escríbeme](/contact)** y lo diseñamos a medida.
+Si quieres que lo veamos aplicado a tu código real (rutas, componentes y estilos), **[escríbeme](/contact)** y lo diseñamos a medida.
