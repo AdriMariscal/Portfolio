@@ -52,16 +52,16 @@ Uno de los errores más comunes: textos claros sobre fondos claros (o oscuros so
 
 - Evita textos en gris muy claro sobre blanco (#aaa sobre #fff, por ejemplo).
 - Usa herramientas de comprobación de contraste:
-  - Extensiones de navegador,
-  - la sección de **Accessibility** en las DevTools,
-  - o herramientas online específicas de contraste.
+  - Extensiones de navegador.
+  - La sección de **Accessibility** en las DevTools.
+  - Herramientas online específicas de contraste.
 
 ### Tip básico de diseño
 
 Si tienes dudas, tira hacia:
 
-- **Texto más oscuro** y fondo más claro, o
-- fondo oscuro y texto muy claro.
+- **Texto más oscuro** y fondo más claro.
+- Fondo oscuro y texto muy claro.
 
 Es mejor pecar de “un poco sobrio” que de ilegible.
 
@@ -237,10 +237,10 @@ No hace falta ir a ciegas. Hay varias herramientas que te ayudan a detectar prob
 
 - Disponible como **extensión de navegador**.
 - Muestra:
-  - errores (en rojo),
-  - avisos (en amarillo),
-  - información sobre títulos, landmarks (`<main>`, `<nav>`, etc.),
-  - problemas de contraste.
+  - Errores (en rojo).
+  - Avisos (en amarillo).
+  - Información sobre títulos, landmarks (`<main>`, `<nav>`, etc.).
+  - Problemas de contraste.
 - Es muy visual: ideal para revisar páginas concretas.
 
 Forma de usarla:
@@ -257,9 +257,9 @@ Si ya estás usando **Lighthouse** (como hemos visto en otra entrada), tendrás 
 
 - Te da una **nota de 0 a 100** en accesibilidad.
 - Lista problemas típicos:
-  - Falta de texto alternativo,
-  - contraste insuficiente,
-  - botones sin nombre accesible,
+  - Falta de texto alternativo.
+  - Contraste insuficiente.
+  - Botones sin nombre accesible.
   - etc.
 
 Úsalo como:
@@ -275,9 +275,9 @@ Si ya estás usando **Lighthouse** (como hemos visto en otra entrada), tendrás 
 
 - Integrado en las **DevTools** (como una pestaña más).
 - Muy potente para:
-  - filtrar por tipos de problema,
-  - ver el código exacto donde ocurre,
-  - entender el impacto.
+  - Filtrar por tipos de problema.
+  - Ver el código exacto donde ocurre.
+  - Entender el impacto.
 
 Es una buena herramienta para desarrolladores que ya están cómodos con el inspector del navegador.
 
@@ -289,8 +289,8 @@ Además de las herramientas, hay pruebas manuales que cuentan mucho:
 
 - **Navegar toda la página solo con teclado** (Tab, Shift+Tab, Enter, Space, Escape).
 - Probar la página con:
-  - tamaño de texto aumentado,
-  - zoom al 200 %.
+  - Tamaño de texto aumentado.
+  - Zoom al 200 %.
 - Escuchar cómo la lee un lector de pantalla (NVDA en Windows, VoiceOver en Mac).
 
 ---
@@ -347,5 +347,4 @@ Y no hace falta hacerlo perfecto desde el día 1: basta con que, en cada iteraci
 
 ¿Te gustaría que revisemos juntos tu web desde el punto de vista de accesibilidad y preparemos una lista de mejoras priorizadas?
 
-Si quieres una auditoría práctica (no solo teoría),  
-**[escríbeme](/contact)** y vemos tu caso paso a paso.
+Si quieres una auditoría práctica (no solo teoría), **[escríbeme](/contact)** y vemos tu caso paso a paso.
