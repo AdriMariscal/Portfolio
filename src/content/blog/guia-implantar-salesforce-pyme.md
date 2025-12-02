@@ -3,7 +3,7 @@ title: "Guía práctica para implantar Salesforce en una pyme: pasos, herramient
 description: "Hoja de ruta clara para implantar Salesforce en una pyme: cómo prepararse, elegir nubes, planificar fases, conectar herramientas, automatizar procesos y medir resultados."
 tags: ["salesforce", "crm", "pymes", "negocio", "estrategia"]
 published: true
-date: 2025-11-20
+date: 2025-11-25
 ---
 
 Si ya has leído la introducción de **“[qué es Salesforce](/blog/que-es-salesforce)”** y estás pensando en dar el paso en tu empresa, seguramente te estés preguntando:
