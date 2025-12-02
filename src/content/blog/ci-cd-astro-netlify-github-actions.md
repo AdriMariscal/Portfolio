@@ -6,13 +6,14 @@ published: true
 date: 2025-11-04
 ---
 
-Tener una web rápida, accesible y con buen SEO **no es cuestión de suerte**.  
+Tener una web rápida, accesible y con buen SEO **no es cuestión de suerte**.
+
 Si trabajas con **Astro** y despliegas en **Netlify**, lo normal es que el proyecto vaya creciendo, entren más cambios y, poco a poco, aparezcan regresiones:
 
-- Páginas que se vuelven más lentas,
-- pequeños errores en producción,
-- estilos rotos,
-- o una caída en las notas de Lighthouse.
+- Páginas que se vuelven más lentas.
+- Pequeños errores en producción.
+- Estilos rotos.
+- Una caída en las notas de Lighthouse.
 
 La solución es montar un **pipeline de integración continua (CI)** que revise cada cambio antes de desplegarlo.
 
@@ -266,8 +267,8 @@ Con este workflow, GitHub Actions se convierte en tu **paso de validación**:
 
 1. Abres un **pull request** hacia `main` o `staging`.  
 2. GitHub Actions ejecuta:
-   - tests y linters (matriz de Node),
-   - build de Astro,
+   - Tests y linters (matriz de Node).
+   - Build de Astro.
    - Lighthouse.
 3. Si algo falla, el PR aparece como **fallido** y no deberías hacer merge.
 
@@ -326,13 +327,13 @@ Algunos consejos para mantener este CI/CD sano a largo plazo:
 - **Empieza sencillo** y ve añadiendo cosas: tests, luego linters, luego Lighthouse…  
 - Ajusta Lighthouse a la realidad: que el objetivo sea mejorar la **experiencia real**, no perseguir un “100” a toda costa.
 - Usa **artefactos** al menos para:
-  - el build (`dist`),
-  - informes de tests (coverage),
-  - informes de Lighthouse.
+  - El build (`dist`).
+  - Informes de tests (coverage).
+  - Informes de Lighthouse.
 - Revisa regularmente:
-  - si hay pasos que ya no se usan,  
-  - si puedes cachear más (por ejemplo, `cache: 'npm'`),  
-  - o si conviene dividir el workflow en varios (por ejemplo, uno diario solo para Lighthouse sobre producción).
+  - Si hay pasos que ya no se usan.  
+  - Si puedes cachear más (por ejemplo, `cache: 'npm'`).
+  - Si conviene dividir el workflow en varios (por ejemplo, uno diario solo para Lighthouse sobre producción).
 - Documenta en el README cómo funciona el pipeline, para que cualquier persona del equipo sepa **qué se ejecuta antes de desplegar**.
 
 ---
@@ -343,11 +344,12 @@ Un buen pipeline es, en la práctica, una **red de seguridad**: te permite mover
 
 Si quieres:
 
-- adaptar este ejemplo a tu proyecto Astro/Netlify,  
-- añadir validaciones específicas (por ejemplo, tests de formularios o rutas críticas),  
-- o revisar tus notas de Lighthouse y planificar mejoras,
+- Adaptar este ejemplo a tu proyecto Astro/Netlify.  
+- Añadir validaciones específicas (por ejemplo, tests de formularios o rutas críticas).  
+- Revisar tus notas de Lighthouse y planificar mejoras.
 
 puedo ayudarte a diseñar un pipeline a medida.
 
 ¿Te interesa?  
+
 **[Escríbeme](/contact)** y vemos tu caso paso a paso.
