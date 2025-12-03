@@ -19,8 +19,9 @@ const {
   ogType,
 } = Astro.props as Props;
 
-// Canonical absoluto de la URL actual
-const canonical = Astro.url?.href ?? new URL("/", SITE.url).href;
+// Canonical absoluto usando siempre el dominio canónico del config de Astro
+// (Astro.site se construye a partir de la opción `site` de astro.config.mjs)
+const canonical = new URL(Astro.url?.pathname ?? "/", Astro.site).href;
 
 // Detecta tipo automáticamente: 'article' en /blog/*, 'website' en el resto
 const autoType = Astro.url?.pathname?.startsWith("/blog/") ? "article" : "website";
