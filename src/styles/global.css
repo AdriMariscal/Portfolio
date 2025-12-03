@@ -345,6 +345,19 @@ h1,h2,h3,strong{color:var(--am-ink)}
 .legal__body p{margin:.5rem 0}
 .legal__body ul{margin:.5rem 0 1rem 1.25rem}
 
+/* Lista numerada de términos: usamos los números del h2,
+   así que ocultamos el marcador del <ol> */
+.legal__list{
+  list-style: none;      /* oculta el "1." pequeño del <ol> */
+  margin: 1rem 0 0;
+  padding-left: 0;       /* alinea con el resto del contenido */
+}
+
+.legal__list > li{
+  margin: 0 0 .85rem 0;  /* un poco de aire entre apartados */
+}
+
+
 /* ====== PROYECTOS: Ficha & Changelog ====== */
 
 /* Contenedor y tarjetas, alineados a los mismos anchos que el blog */
