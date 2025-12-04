@@ -43,6 +43,29 @@ const siteName = SITE.siteName ?? "Portfolio - Adrián Mariscal";
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <script>
+      // Tema inicial: respeta localStorage y luego prefers-color-scheme
+      (function () {
+        const storageKey = 'am-theme';
+        const root = document.documentElement;
+
+        try {
+          const stored = window.localStorage.getItem(storageKey);
+          if (stored === 'light' || stored === 'dark') {
+            root.dataset.theme = stored;
+            return;
+          }
+        } catch (e) {
+          /* si localStorage falla, seguimos con prefers-color-scheme */
+        }
+
+        const prefersDark = window.matchMedia &&
+          window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        root.dataset.theme = prefersDark ? 'dark' : 'light';
+      })();
+    </script>
+
     <title>{title} — Adrián Mariscal</title>
     <meta name="description" content={description} />
     <meta name="theme-color" content={THEME.color} />
