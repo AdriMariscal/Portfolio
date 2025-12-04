@@ -12,15 +12,15 @@ const updatedAt = new Date().toLocaleDateString("es-ES", {
 ---
 
 <BaseLayout title="Aviso legal">
-  <main class="section">
+  <main class="section section--legal">
     <div class="wrap">
       <!-- Ojo: estas clases vienen de global.css -->
       <article class="card card--soft legal__card">
         <div class="legal__body">
-          <header style="margin:0 0 .5rem 0">
-            <h1 style="margin:0">Aviso legal</h1>
-            <p class="muted" style="margin:.25rem 0 0 0">Última actualización: {updatedAt}</p>
-        </header>
+          <header class="legal__header">
+            <h1>Aviso legal</h1>
+            <p class="muted legal__meta">Última actualización: {updatedAt}</p>
+          </header>
 
         <!-- 1. Identificación del titular (art. 10 LSSI) -->
           <section>

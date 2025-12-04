@@ -41,6 +41,15 @@ a{color:inherit;text-decoration:none}
   --am-accent-soft:#E6FAF6;
   --am-accent-border:#BFEAE1;
 
+    /* Acentos adicionales y superficies */
+  --am-accent-warm:#F97316;        /* naranja cálido para detalles */
+  --am-accent-soft-warm:#FFF7ED;   /* fondo suave cálido */
+  --am-accent-cool:#0EA5E9;        /* azul para enlaces dentro de contenido */
+
+  --am-surface:#ffffff;            /* superficie base (tarjetas, inputs, etc.) */
+  --am-surface-alt:#EDF2FF;        /* secciones destacadas en claro */
+
+
   /* Contenedores blog/tags (coherente con home) */
   --container-max:1120px;
   --space-5:1.25rem;
@@ -61,7 +70,56 @@ h1,h2,h3,strong{color:var(--am-ink)}
    ========================================================================== */
 .wrap{max-width:var(--am-maxw);margin-inline:auto;padding-inline:16px}
 .section{padding-block:var(--section-pad)}
-.h2{font-size:1.75rem;font-weight:700;margin-bottom:16px}
+.section--alt{
+  background:
+    radial-gradient(circle at top left,rgba(148,163,184,0.18),transparent 55%),
+    radial-gradient(circle at bottom right,rgba(249,115,22,0.14),transparent 55%),
+    var(--am-surface-alt);
+}
+
+.h2{
+  font-size:1.75rem;
+  font-weight:700;
+  margin:0 0 0; /* el margen lo gestionamos en .section__title */
+}
+
+/* Títulos de sección con acento vertical + subrayado corto */
+.section__title{
+  position:relative;
+  display:inline-flex;
+  align-items:flex-end;
+  padding-left:1.75rem;   /* hueco para la barra vertical */
+  margin-bottom:24px;     /* un poco más de aire sobre el contenido */
+}
+
+/* Barra vertical de color (protagonista, estilo “sección editorial”) */
+.section__title::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:50%;
+  transform:translateY(-50%);
+  width:4px;
+  height:1.6em;
+  border-radius:999px;
+  background:linear-gradient(180deg,var(--am-accent),var(--am-accent-warm));
+  box-shadow:0 8px 20px rgba(15,23,42,0.18);
+}
+
+/* Subrayado corto bajo el texto que refuerza la línea de lectura */
+.section__title::after{
+  content:"";
+  position:absolute;
+  left:1.75rem;
+  bottom:-6px;
+  width:56px;
+  height:2px;
+  border-radius:999px;
+  background:var(--am-accent);
+  opacity:.6;  /* sigue siendo decorativo, sin competir con el texto */
+}
+
+
 .muted{color:var(--am-graphite)}
 .stack{display:flex;flex-direction:column;gap:var(--stack-gap,16px)}
 .grid{display:grid;gap:16px}
@@ -69,11 +127,12 @@ h1,h2,h3,strong{color:var(--am-ink)}
 @media (max-width:900px){.grid--3{grid-template-columns:1fr}}
 
 .card{
-  background:#fff;
+  background:var(--am-surface);
   border:1px solid var(--am-border);
   border-radius:var(--am-radius);
   box-shadow:var(--am-shadow);
 }
+
 .card__body{padding:18px}
 .card__title{font-size:1.25rem;font-weight:700;color:var(--am-ink)}
 
@@ -224,11 +283,54 @@ h1,h2,h3,strong{color:var(--am-ink)}
   }
 }
 
+.theme-toggle{
+  margin-left:12px;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid transparent;
+  background:rgba(15,23,42,0.04);
+  font-size:.85rem;
+  font-weight:600;
+  color:var(--am-graphite);
+  cursor:pointer;
+  transition:background .15s ease, transform .05s ease, box-shadow .15s ease;
+}
+
+.theme-toggle__icon{
+  width:18px;
+  height:18px;
+  border-radius:999px;
+  background:linear-gradient(135deg,var(--am-accent),var(--am-accent-warm));
+  flex-shrink:0;
+}
+
+.theme-toggle:hover{
+  background:rgba(15,23,42,0.07);
+  transform:translateY(-1px);
+  box-shadow:0 8px 18px rgba(15,23,42,0.12);
+}
+
+@media (max-width:768px){
+  .theme-toggle{
+    align-self:flex-start;
+    margin-top:4px;
+  }
+}
+
 
 /* ==========================================================================
    Hero
    ========================================================================== */
-.hero{background:var(--am-cloud)}
+.hero{
+  background:
+    radial-gradient(circle at top left,rgba(16,86,80,.14),transparent 55%),
+    radial-gradient(circle at bottom right,rgba(11,31,59,.16),transparent 55%),
+    var(--am-cloud);
+}
+
 .hero__title{
   font-family:var(--font-display);
   font-size:clamp(2rem,2vw+2rem,3rem);
@@ -248,7 +350,13 @@ h1,h2,h3,strong{color:var(--am-ink)}
   font-weight:600;border:1px solid transparent;transition:.15s ease;
   cursor:pointer;
 }
-.btn--primary{background:var(--am-ink);color:#fff;border-color:var(--am-ink);box-shadow:var(--am-shadow)}
+.btn--primary{
+  background:linear-gradient(135deg,var(--am-ink),var(--am-accent));
+  color:#fff;
+  border-color:var(--am-ink);
+  box-shadow:var(--am-shadow);
+}
+
 .btn--primary:hover{filter:brightness(0.97)}
 .btn--secondary{background:#fff;color:var(--am-ink);border-color:var(--am-ink)}
 .btn--secondary:hover{background:var(--am-cloud)}
@@ -260,8 +368,10 @@ h1,h2,h3,strong{color:var(--am-ink)}
 .badge{
   display:inline-flex;align-items:center;height:26px;padding:0 10px;
   border-radius:var(--am-radius-pill);font-size:.82rem;
-  border:1px solid var(--am-border);color:var(--am-graphite);background:#fff
+  border:1px solid var(--am-border);color:var(--am-graphite);
+  background:var(--am-surface);
 }
+
 .badge--active{
   border-color:var(--am-accent);
   color:var(--am-accent);
@@ -296,7 +406,10 @@ h1,h2,h3,strong{color:var(--am-ink)}
 /* ==========================================================================
    Fichas (layout y tipografía ligera)
    ========================================================================== */
-.section--tight{padding-top:24px;padding-bottom:0}
+.section--tight{
+  padding-top:24px;
+  padding-bottom:24px;
+}
 .stack{list-style:none;padding:0;margin:0}
 .prose h2{font-size:1.25rem;margin:12px 0 8px}
 .prose h3{font-size:1.05rem;margin:10px 0 6px}
@@ -306,13 +419,69 @@ h1,h2,h3,strong{color:var(--am-ink)}
 .prose code{background:#f3f5f9;border:1px solid var(--am-border);border-radius:6px;padding:0 .25rem;font-size:.9em}
 .prose-list{margin-top:.5rem;padding-left:1.25rem;list-style:disc}
 
+/* ========================================================================== */
+/*   Projects index (listado)                                                 */
+/* ========================================================================== */
+
+/* Banda superior de la página de proyectos:
+   usa el mismo fondo que el hero pero con algo menos de altura */
+.section--projects-hero{
+  padding-block:40px 44px; /* un pelín más compacto que el hero de la home */
+}
+
+/* Cabecera alineada con el resto de páginas de contenido */
+.projects-header{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.projects-header .hero__lead{
+  max-width:52ch;          /* no se hace una línea eterna en pantallas anchas */
+}
+
+/* Secciones de listado de proyectos: mismos laterales que el blog */
+.projects-section .wrap{
+  max-width:var(--container-max);
+  margin-inline:auto;
+  padding-inline:clamp(1rem,4vw,var(--space-6));
+}
+
+/* Espaciado consistente entre tarjetas de proyectos */
+.projects-list{
+  --stack-gap:18px;
+}
+
 /* ==========================================================================
    Blog / tarjetas (listados)
    ========================================================================== */
+/* Sección de blog con fondo suave, coherente con home/proyectos */
+.section--blog{
+  background:
+    radial-gradient(circle at top left,rgba(148,163,184,0.12),transparent 55%),
+    radial-gradient(circle at bottom right,rgba(249,115,22,0.08),transparent 55%),
+    var(--am-bg);
+}
+
+/* Ajuste para usar la misma viñeta también en el h1 de página */
+.section__title--page::before{
+  height:1.4em;
+}
+
+.section__title--page::after{
+  width:72px;
+}
+
 .card--post .card__body{padding:22px}
 .card--post .postcard__title{margin:0 0 10px}
 .postcard__excerpt{margin:0 0 12px;color:var(--am-graphite)}
 .card--post .tags{margin-top:10px}
+.postcard__date{
+  font-size:.85rem;
+  color:var(--text-muted,#5b6572);
+  margin:0 0 6px;
+}
+
 
 /* Listado base (3–2–1) */
 .posts-grid{
@@ -325,14 +494,48 @@ h1,h2,h3,strong{color:var(--am-ink)}
 @media (max-width:640px){.posts-grid{grid-template-columns:1fr;gap:1rem}}
 
 /* Paginación */
-.pagination{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;justify-content:center;margin-top:2rem}
-.pagination a,.pagination span{
-  display:inline-flex;align-items:center;justify-content:center;
-  padding:.5rem .75rem;border:1px solid var(--border,#e5e7eb);border-radius:.5rem;
-  text-decoration:none;font-weight:500
+.pagination{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.5rem;
+  align-items:center;
+  justify-content:center;
+  margin-top:2rem;
 }
-.pagination a:hover{background:#f3f4f6}
-.pagination .is-active{background:#eff6ff;border-color:#93c5fd}
+
+.pagination a,
+.pagination span{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:2.25rem;
+  padding:.4rem .9rem;
+  border-radius:999px;
+  border:1px solid var(--am-border);
+  background:var(--am-surface);
+  color:var(--am-ink);
+  font-weight:600;
+  font-size:.9rem;
+  text-decoration:none;
+}
+
+.pagination a:hover{
+  background:var(--am-cloud);
+}
+
+/* Página actual */
+.pagination .is-active{
+  background:var(--am-accent-soft);
+  border-color:var(--am-accent);
+  color:var(--am-accent);
+}
+
+/* Botones deshabilitados (inicio/fin) */
+.pagination .is-disabled{
+  opacity:.55;
+  cursor:default;
+}
+
 
 /* Blog & Tags: título y grid con márgenes coherentes a home */
 .section .section__header{
@@ -340,7 +543,10 @@ h1,h2,h3,strong{color:var(--am-ink)}
   margin:0 auto 1rem;
   padding-inline:clamp(1rem,4vw,var(--space-6));
 }
-.section .section__header .h1{margin:0 0 .55rem}
+.section .section__header .h1{
+  margin:0 0 .9rem;  /* antes: 0 0 .55rem */
+}
+
 .section .section__header .lead{color:var(--am-graphite);margin:0 0 1.1rem}
 
 /* Grid centrado con mismos laterales que home */
@@ -359,12 +565,33 @@ h1,h2,h3,strong{color:var(--am-ink)}
 .post-card{display:flex;flex-direction:column;min-height:260px}
 .post-card .tag-list{margin-top:.75rem;gap:.5rem}
 
-/* ==========================================================================
-   Post (detalle)
-   ========================================================================== */
-.post .wrap{max-width:980px}
-.post__card{margin:8px auto 48px}
-.post__body{padding:28px 28px 32px}
+/* ========================================================================== */
+/*   Post (detalle)                                                           */
+/* ========================================================================== */
+
+/* Fondo suave, coherente con blog y ficha de proyecto */
+.post{
+  background:
+    radial-gradient(circle at top left,rgba(148,163,184,0.16),transparent 55%),
+    radial-gradient(circle at bottom right,rgba(249,115,22,0.10),transparent 55%),
+    var(--am-bg);
+}
+
+/* Contenedor centrado y un poco más estrecho */
+.post .wrap{
+  max-width:980px;
+  margin-inline:auto;
+}
+
+/* Un pelín más de aire alrededor de la tarjeta */
+.post__card{
+  margin:16px auto 40px;
+}
+
+/* El padding del cuerpo lo dejamos igual por ahora */
+.post__body{
+  padding:28px 28px 32px;
+}
 
 /* más aire bajo el título */
 .post__title{font-size:clamp(28px,3.2vw,34px);line-height:1.2;margin:0 0 .65rem}
@@ -381,11 +608,35 @@ h1,h2,h3,strong{color:var(--am-ink)}
 .post__meta{display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px;margin:4px 0 18px}
 .post__date{font-size:14px;color:var(--text-muted,#5b6572)}
 
+.post__actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.5rem;
+  margin:.5rem 0 0;
+}
+
 /* Tags pequeñas en post */
 .tags--sm .tag{font-size:12.5px;padding:4px 10px;border-radius:999px}
 
 /* Contenido MD */
-.post__prose{margin-top:10px;line-height:1.7}
+.post__prose{
+  margin-top:10px;
+  line-height:1.7;
+  max-width:72ch; /* limita el ancho de lectura para que no parezca "folio infinito" */
+}
+
+.post__prose a{
+  color:var(--am-accent-cool);
+  text-decoration:underline;
+  text-underline-offset:0.12em;
+  font-weight:500;
+}
+
+.post__prose a:hover{
+  color:var(--am-accent);
+  text-decoration-thickness:2px;
+}
+
 .post__prose p{margin:0 0 1rem}
 .post__prose h2{font-size:22px;margin:1.6rem 0 .6rem}
 .post__prose h3{font-size:18px;margin:1.2rem 0 .5rem}
@@ -473,10 +724,119 @@ h1,h2,h3,strong{color:var(--am-ink)}
   }
 }
 
+/* ========================================================================== */
+/*   Ficha de proyecto (detalle)                                              */
+/* ========================================================================== */
+
+.project-detail{
+  /* Fondo con degradado suave, similar al hero pero más ligero */
+  background:
+    radial-gradient(circle at top left,rgba(148,163,184,0.16),transparent 55%),
+    radial-gradient(circle at bottom right,rgba(249,115,22,0.10),transparent 55%),
+    var(--am-bg);
+}
+
+.project-detail .wrap{
+  max-width:980px;
+}
+
+/* Tarjeta principal con banda de color arriba */
+.project-detail .post__card{
+  margin:16px auto 40px;
+  border-radius:20px;
+  border:1px solid var(--am-border);
+  box-shadow:0 18px 40px rgba(15,23,42,0.10);
+  overflow:hidden;
+  padding:0; /* porque la banda superior va fuera del body */
+}
+
+.project-detail .post__card::before{
+  content:"";
+  display:block;
+  height:4px;
+  background:linear-gradient(90deg,var(--am-accent),var(--am-accent-warm));
+}
+
+/* Ajuste de padding interno, ya sin el margen de la banda */
+.project-detail .post__body{
+  padding:24px 28px 28px;
+}
+
+@media (min-width:900px){
+  .project-detail .post__body{
+    padding:32px 36px 36px;
+  }
+}
+
+/* Meta: Estado + Última versión */
+.project-detail__meta{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:.4rem .6rem;
+}
+
+.project-detail__meta-label{
+  font-weight:600;
+  color:var(--am-graphite);
+}
+
+/* Estado inactivo con contraste suficiente AA */
+.badge--inactive{
+  border-color:#d1d5db;
+  background:#f3f4f6;
+  color:#374151;
+}
+
+/* Limitar ancho de texto para que no parezca "folio infinito" */
+.project-detail .post__prose{
+  max-width:72ch;
+}
+
+/* Acento suave en los grandes bloques h2 del markdown */
+.project-detail .post__prose h2{
+  position:relative;
+  padding-top:16px;
+  margin-top:28px;
+}
+
+.project-detail .post__prose h2::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:0;
+  width:40px;
+  height:2px;
+  border-radius:999px;
+  background:var(--am-accent-soft-warm);
+}
+
+/* Sección de Changelog con fondo algo destacado */
+.project-detail__changelog{
+  background:
+    radial-gradient(circle at top left,rgba(148,163,184,0.14),transparent 55%),
+    radial-gradient(circle at bottom right,rgba(249,115,22,0.08),transparent 55%),
+    var(--am-bg);
+}
+
+/* Asegura que las tarjetas del changelog usan el mismo ancho que la ficha */
+.project-detail__changelog .card.card--soft{
+  max-width:980px;
+  margin-inline:auto;
+}
+
 
 /* ==========================================================================
    Contacto
    ========================================================================== */
+
+/* Sección de contacto con fondo coherente con blog/proyectos */
+.section--contact{
+  background:
+    radial-gradient(circle at top left,rgba(148,163,184,0.16),transparent 55%),
+    radial-gradient(circle at bottom right,rgba(16,86,80,0.18),transparent 55%),
+    var(--am-bg);
+}
 
 /* Encabezado y formulario comparten ancho y centrado */
 .contact__intro,
@@ -499,8 +859,21 @@ h1,h2,h3,strong{color:var(--am-ink)}
   display:inline-block;font-weight:600;color:var(--am-ink);margin:6px 0 6px
 }
 .input{
-  width:100%;background:#fff;border:1px solid var(--am-border);border-radius:10px;padding:.75rem .9rem
+  width:100%;
+  background:var(--am-surface);
+  border:1px solid var(--am-border);
+  border-radius:10px;
+  padding:.75rem .9rem;
+
+  /* 👇 Nuevo: texto siempre con el color de la interfaz */
+  color:var(--am-text);
+  caret-color:var(--am-text);
 }
+.input::placeholder{
+  color:var(--am-graphite);
+  opacity:.9; /* evita que el navegador lo haga demasiado clarito */
+}
+
 .input:focus{
   outline:none;border-color:var(--am-ink);box-shadow:0 0 0 3px rgba(11,31,59,.10)
 }
@@ -512,34 +885,85 @@ h1,h2,h3,strong{color:var(--am-ink)}
   .contact__form{ max-width: 100%; }
 }
 
+/* ========================================================================== */
+/*   Thanks / pantalla de confirmación                                       */
+/* ========================================================================== */
+
+/* Fondo suave, en la línea de contacto y proyectos */
+.section--thanks{
+  background:
+    radial-gradient(circle at top left, rgba(148,163,184,0.16), transparent 55%),
+    radial-gradient(circle at bottom right, rgba(16,86,80,0.18), transparent 55%),
+    var(--am-bg);
+}
 
 /* ==========================================================================
    Gracias
    ========================================================================== */
-.thanks__card{max-width:780px;margin:24px auto 44px}
-.thanks__body{padding:28px 32px}
-@media (min-width:900px){.thanks__body{padding:36px 40px}}
-.thanks__title{
-  font-family:var(--font-display);font-weight:800;
-  font-size:clamp(28px,2.6vw,36px);margin:6px 0 10px;color:var(--am-ink)
-}
-.thanks__desc{margin:0 0 18px}
-.thanks__body .btn{margin-top:6px}
+ .thanks__card{
+   max-width:780px;
+   margin:32px auto 56px;
+   position:relative;
+   overflow:hidden; /* para que la banda superior siga el radio de la tarjeta */
+ }
 
-/* ==========================================================================
+ .thanks__card::before{
+   content:"";
+   position:absolute;
+   inset:0 auto auto 0;
+   height:4px;
+   width:100%;
+   background:linear-gradient(90deg,var(--am-accent),var(--am-accent-warm));
+ }
+
+ .thanks__body{
+   padding:28px 32px;
+   text-align:center;  /* centra título, texto y botón */
+ }
+ @media (min-width:900px){.thanks__body{padding:36px 40px}}
+ .thanks__title{
+   font-family:var(--font-display);font-weight:800;
+   font-size:clamp(28px,2.6vw,36px);margin:6px 0 10px;color:var(--am-ink)
+ }
+ .thanks__desc{margin:0 0 18px}
+ .thanks__body .btn{margin-top:6px}
+
+/* ====================================
    Legal
    ========================================================================== */
 .card--soft{
   background:#fff;border:1px solid var(--am-border,#e6e8eb);
   border-radius:var(--am-radius,14px);box-shadow:var(--am-shadow,0 8px 24px rgba(0,0,0,.06))
 }
+
 .legal__card{max-width:940px;margin:24px auto 64px}
 .legal__body{padding:28px 28px 32px}
 @media (min-width:1024px){.legal__body{padding:40px 48px}}
-.legal__body h1{margin:0 0 .75rem}
+
+/* Tipografía base dentro del cuerpo legal */
+.legal__body h1{margin:0}
 .legal__body h2{margin:1.25rem 0 .5rem}
 .legal__body p{margin:.5rem 0}
 .legal__body ul{margin:.5rem 0 1rem 1.25rem}
+
+/* Fondo suave para todas las páginas legales:
+   recuerda al resto del sitio pero es más neutro */
+.section--legal{
+  background:
+    radial-gradient(circle at top left, rgba(148,163,184,.12), transparent 55%),
+    radial-gradient(circle at bottom right, rgba(148,163,184,.08), transparent 55%),
+    var(--am-bg);
+}
+
+/* Cabecera legal coherente */
+.legal__header{
+  margin:0 0 1.5rem 0;
+}
+
+.legal__meta{
+  margin:.2rem 0 0 0;
+  font-size:.95rem;
+}
 
 /* Lista numerada de términos: usamos los números del h2,
    así que ocultamos el marcador del <ol> */
@@ -748,3 +1172,254 @@ h1,h2,h3,strong{color:var(--am-ink)}
 .link:hover{
   text-decoration-thickness:2px;
 }
+
+/* ========================================================================== */
+/*   404 / Página no encontrada                                              */
+/* ========================================================================== */
+
+/* Fondo suave, coherente con contacto, gracias y proyectos */
+.section--404{
+  background:
+    radial-gradient(circle at top left, rgba(148,163,184,0.16), transparent 55%),
+    radial-gradient(circle at bottom right, rgba(16,86,80,0.18), transparent 55%),
+    var(--am-bg);
+}
+
+/* Tarjeta principal del 404 */
+.error-card{
+  max-width:780px;
+  margin:32px auto 64px;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+
+/* Banda superior en degradado, igual familia que Thanks/Proyecto */
+.error-card::before{
+  content:"";
+  position:absolute;
+  inset:0 auto auto 0;
+  height:4px;
+  width:100%;
+  background:linear-gradient(90deg,var(--am-accent-warm),var(--am-accent-cool));
+}
+
+.error-card__body{
+  padding:28px 32px 32px;
+}
+
+@media (min-width:900px){
+  .error-card__body{ padding:36px 40px; }
+}
+
+/* Icono/emoji con fondo suave */
+.error-card__icon{
+  font-size:2.5rem;
+  width:72px;
+  height:72px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:50%;
+  background:var(--am-accent-soft);
+  border:1px solid var(--am-accent-border);
+  margin:4px auto 12px;
+}
+
+/* Título grande con la display font */
+.error-card__title{
+  font-family:var(--font-display);
+  font-weight:800;
+  font-size:clamp(2.25rem, 5vw, 3.5rem);
+  margin:4px 0 8px;
+  color:var(--am-ink);
+}
+
+.error-card__text{
+  margin:0 0 12px;
+}
+
+.error-card__actions{
+  margin-top:.75rem;
+  align-items:center;
+}
+
+.error-card__links{
+  margin:0;
+}
+
+/* ========================================================================== */
+/*   Modo oscuro: se activa con html[data-theme="dark"]                       */
+/* ========================================================================== */
+
+html[data-theme="dark"]{
+  --am-bg:#020617;
+  --am-ink:#E5E7EB;
+  --am-graphite:#9CA3AF;
+  --am-cloud:#020617;
+  --am-text:#E5E7EB;
+  --am-border:#1F2937;
+
+  --am-accent:#22C55E;
+  --am-accent-soft:#052e16;
+  --am-accent-border:#14532d;
+
+  --am-accent-warm:#F97316;
+  --am-accent-soft-warm:#451a03;
+  --am-accent-cool:#38BDF8;
+
+  --am-surface:#020617;
+  --am-surface-alt:#020617;
+}
+
+html[data-theme="dark"],
+html[data-theme="dark"] body{
+  background:var(--am-bg);
+  color:var(--am-text);
+}
+
+/* ==========================================================
+   Fondos en modo oscuro (home y secciones principales)
+   ========================================================== */
+
+/* Hero + secciones de la home comparten el MISMO lienzo */
+html[data-theme="dark"] .hero,
+html[data-theme="dark"] .section--home-projects,
+html[data-theme="dark"] .section--home-latest{
+  background:
+    radial-gradient(circle at top left, rgba(34,197,94,0.16), transparent 55%),
+    radial-gradient(circle at bottom right, rgba(56,189,248,0.12), transparent 55%),
+    #020617;
+}
+
+/* Blog, contacto, thanks, secciones alternas y legales
+   reutilizan el mismo patrón pero aún un pelín más suave */
+html[data-theme="dark"] .section--blog,
+html[data-theme="dark"] .section--contact,
+html[data-theme="dark"] .section--thanks,
+html[data-theme="dark"] .section--alt,
+html[data-theme="dark"] .section--404,
+html[data-theme="dark"] .section--legal{
+  background:
+    radial-gradient(circle at top left, rgba(34,197,94,0.14), transparent 55%),
+    radial-gradient(circle at bottom right, rgba(56,189,248,0.10), transparent 55%),
+    #020617;
+}
+
+/* Separador muy sutil entre bloques de la home:
+   no cambia el color, solo marca la transición */
+html[data-theme="dark"] .section--home-projects,
+html[data-theme="dark"] .section--home-latest{
+  box-shadow:0 -1px 0 rgba(15,23,42,0.85) inset;
+}
+
+
+/* Tarjetas y superficies elevadas */
+html[data-theme="dark"] .card,
+html[data-theme="dark"] .card--soft,
+html[data-theme="dark"] .content-card{
+  /* superficie algo más clara que el fondo global */
+  background:#020617;              /* “gris” muy oscuro, diferente del bg puro */
+  border-color:#1F2937;
+  box-shadow:0 14px 32px rgba(15,23,42,0.55);
+}
+
+/* Botón principal en modo oscuro:
+   verde protagonista pero con texto oscuro para cumplir contraste AA */
+html[data-theme="dark"] .btn--primary{
+  background:linear-gradient(135deg,#22C55E,#16A34A);
+  color:#052e16;             /* verde muy oscuro (mismo tono que --am-accent-soft) */
+  border-color:#16A34A;
+  box-shadow:0 10px 24px rgba(22,163,74,0.45);
+}
+
+html[data-theme="dark"] .btn--primary:hover{
+  filter:brightness(1.02);
+  transform:translateY(-1px);
+}
+
+
+/* Botón secundario en modo oscuro: estilo “ghost” */
+html[data-theme="dark"] .btn--secondary{
+  background:transparent;
+  color:var(--am-ink);
+  border-color:rgba(148,163,184,0.7);
+}
+
+html[data-theme="dark"] .btn--secondary:hover{
+  background:rgba(15,23,42,0.85);
+}
+
+
+/* Header y hero en oscuro */
+html[data-theme="dark"] .header{
+  background:rgba(15,23,42,0.92);
+  border-bottom-color:rgba(15,23,42,0.85);
+}
+
+/* Nav activa en oscuro */
+html[data-theme="dark"] .nav__link[aria-current="true"]{
+  background:rgba(148,163,184,0.24);
+  color:#E5E7EB;
+}
+
+/* Footer en oscuro */
+html[data-theme="dark"] .footer{
+  border-top-color:var(--am-border);
+}
+
+/* Paginación en modo oscuro */
+html[data-theme="dark"] .pagination a,
+html[data-theme="dark"] .pagination span{
+  border-color:var(--am-border);
+  background:#020617;          /* misma superficie que las cards */
+  color:var(--am-text);
+}
+
+html[data-theme="dark"] .pagination a:hover{
+  background:#030712;
+}
+
+/* Página actual en oscuro: verde consistente con el resto del tema */
+html[data-theme="dark"] .pagination .is-active{
+  background:#16A34A;
+  border-color:#16A34A;
+  color:#F9FAFB;               /* alto contraste sobre el verde */
+}
+
+/* Inline code / texto resaltado dentro de los posts en modo oscuro */
+html[data-theme="dark"] .post__prose :not(pre) > code{
+  background:var(--am-accent-soft);    /* verde muy oscuro, coherente con la paleta dark */
+  border-color:var(--am-accent-border);
+  color:#bbf7d0;                       /* verde muy claro: buen contraste sobre el fondo */
+}
+
+/* Por seguridad, si hay otros .prose code sueltos fuera de post__prose */
+html[data-theme="dark"] .prose code{
+  background:#020617;
+  border-color:#1f2937;
+  color:var(--am-text);
+}
+
+/* ==========================================================
+   Home: jerarquía de secciones en modo oscuro
+   ========================================================== */
+
+/* Menú móvil en modo oscuro: que no “salte” al blanco */
+html[data-theme="dark"] .nav{
+  background:rgba(15,23,42,0.98);
+  border-bottom-color:#111827;
+  box-shadow:0 14px 28px rgba(15,23,42,0.85);
+}
+
+/* Toggle de tema en oscuro ligeramente más integrado */
+html[data-theme="dark"] .theme-toggle{
+  background:rgba(15,23,42,0.7);
+  color:var(--am-graphite);
+}
+
+html[data-theme="dark"] .theme-toggle:hover{
+  background:rgba(15,23,42,0.9);
+}
+
+

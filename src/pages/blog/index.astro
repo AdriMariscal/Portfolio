@@ -25,10 +25,12 @@ const totalPages = Math.max(1, Math.ceil(posts.length / VISIBLE));
 ---
 
 <BaseLayout title="Blog" description="Artículos sobre Salesforce, Astro, DevOps y más.">
-  <section class="container section">
+  <section class="section section--blog">
     <header class="section__header">
-      <h1 class="h1">Blog</h1>
-      <p class="lead">Últimos artículos, ordenados del más nuevo al más antiguo.</p>
+      <h1 class="h1 section__title section__title--page">Blog</h1>
+      <p class="lead">
+        Artículos sobre Salesforce, Astro, DevOps y negocio digital.
+      </p>
     </header>
 
     <div class="posts-grid">
