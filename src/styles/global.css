@@ -531,12 +531,33 @@ h1,h2,h3,strong{color:var(--am-ink)}
 .post-card{display:flex;flex-direction:column;min-height:260px}
 .post-card .tag-list{margin-top:.75rem;gap:.5rem}
 
-/* ==========================================================================
-   Post (detalle)
-   ========================================================================== */
-.post .wrap{max-width:980px}
-.post__card{margin:8px auto 48px}
-.post__body{padding:28px 28px 32px}
+/* ========================================================================== */
+/*   Post (detalle)                                                           */
+/* ========================================================================== */
+
+/* Fondo suave, coherente con blog y ficha de proyecto */
+.post{
+  background:
+    radial-gradient(circle at top left,rgba(148,163,184,0.16),transparent 55%),
+    radial-gradient(circle at bottom right,rgba(249,115,22,0.10),transparent 55%),
+    var(--am-bg);
+}
+
+/* Contenedor centrado y un poco más estrecho */
+.post .wrap{
+  max-width:980px;
+  margin-inline:auto;
+}
+
+/* Un pelín más de aire alrededor de la tarjeta */
+.post__card{
+  margin:16px auto 40px;
+}
+
+/* El padding del cuerpo lo dejamos igual por ahora */
+.post__body{
+  padding:28px 28px 32px;
+}
 
 /* más aire bajo el título */
 .post__title{font-size:clamp(28px,3.2vw,34px);line-height:1.2;margin:0 0 .65rem}
@@ -564,7 +585,12 @@ h1,h2,h3,strong{color:var(--am-ink)}
 .tags--sm .tag{font-size:12.5px;padding:4px 10px;border-radius:999px}
 
 /* Contenido MD */
-.post__prose{margin-top:10px;line-height:1.7}
+.post__prose{
+  margin-top:10px;
+  line-height:1.7;
+  max-width:72ch; /* limita el ancho de lectura para que no parezca "folio infinito" */
+}
+
 .post__prose a{
   color:var(--am-accent-cool);
   text-decoration:underline;
