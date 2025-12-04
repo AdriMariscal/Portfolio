@@ -886,20 +886,42 @@ h1,h2,h3,strong{color:var(--am-ink)}
  .thanks__desc{margin:0 0 18px}
  .thanks__body .btn{margin-top:6px}
 
-/* ==========================================================================
+/* ====================================
    Legal
    ========================================================================== */
 .card--soft{
   background:#fff;border:1px solid var(--am-border,#e6e8eb);
   border-radius:var(--am-radius,14px);box-shadow:var(--am-shadow,0 8px 24px rgba(0,0,0,.06))
 }
+
 .legal__card{max-width:940px;margin:24px auto 64px}
 .legal__body{padding:28px 28px 32px}
 @media (min-width:1024px){.legal__body{padding:40px 48px}}
-.legal__body h1{margin:0 0 .75rem}
+
+/* Tipografía base dentro del cuerpo legal */
+.legal__body h1{margin:0}
 .legal__body h2{margin:1.25rem 0 .5rem}
 .legal__body p{margin:.5rem 0}
 .legal__body ul{margin:.5rem 0 1rem 1.25rem}
+
+/* Fondo suave para todas las páginas legales:
+   recuerda al resto del sitio pero es más neutro */
+.section--legal{
+  background:
+    radial-gradient(circle at top left, rgba(148,163,184,.12), transparent 55%),
+    radial-gradient(circle at bottom right, rgba(148,163,184,.08), transparent 55%),
+    var(--am-bg);
+}
+
+/* Cabecera legal coherente */
+.legal__header{
+  margin:0 0 1.5rem 0;
+}
+
+.legal__meta{
+  margin:.2rem 0 0 0;
+  font-size:.95rem;
+}
 
 /* Lista numerada de términos: usamos los números del h2,
    así que ocultamos el marcador del <ol> */
@@ -1110,6 +1132,81 @@ h1,h2,h3,strong{color:var(--am-ink)}
 }
 
 /* ========================================================================== */
+/*   404 / Página no encontrada                                              */
+/* ========================================================================== */
+
+/* Fondo suave, coherente con contacto, gracias y proyectos */
+.section--404{
+  background:
+    radial-gradient(circle at top left, rgba(148,163,184,0.16), transparent 55%),
+    radial-gradient(circle at bottom right, rgba(16,86,80,0.18), transparent 55%),
+    var(--am-bg);
+}
+
+/* Tarjeta principal del 404 */
+.error-card{
+  max-width:780px;
+  margin:32px auto 64px;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+
+/* Banda superior en degradado, igual familia que Thanks/Proyecto */
+.error-card::before{
+  content:"";
+  position:absolute;
+  inset:0 auto auto 0;
+  height:4px;
+  width:100%;
+  background:linear-gradient(90deg,var(--am-accent-warm),var(--am-accent-cool));
+}
+
+.error-card__body{
+  padding:28px 32px 32px;
+}
+
+@media (min-width:900px){
+  .error-card__body{ padding:36px 40px; }
+}
+
+/* Icono/emoji con fondo suave */
+.error-card__icon{
+  font-size:2.5rem;
+  width:72px;
+  height:72px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:50%;
+  background:var(--am-accent-soft);
+  border:1px solid var(--am-accent-border);
+  margin:4px auto 12px;
+}
+
+/* Título grande con la display font */
+.error-card__title{
+  font-family:var(--font-display);
+  font-weight:800;
+  font-size:clamp(2.25rem, 5vw, 3.5rem);
+  margin:4px 0 8px;
+  color:var(--am-ink);
+}
+
+.error-card__text{
+  margin:0 0 12px;
+}
+
+.error-card__actions{
+  margin-top:.75rem;
+  align-items:center;
+}
+
+.error-card__links{
+  margin:0;
+}
+
+/* ========================================================================== */
 /*   Modo oscuro: se activa con html[data-theme="dark"]                       */
 /* ========================================================================== */
 
@@ -1200,3 +1297,11 @@ html[data-theme="dark"] .nav__link[aria-current="true"]{
 html[data-theme="dark"] .footer{
   border-top-color:var(--am-border);
 }
+
+html[data-theme="dark"] .section--404{
+  background:
+    radial-gradient(circle at top left, rgba(34,197,94,0.20), transparent 55%),
+    radial-gradient(circle at bottom right, rgba(56,189,248,0.20), transparent 55%),
+    #020617;
+}
+
