@@ -99,9 +99,10 @@ const jsonLd = {
   </article>
 
   <!-- JSON-LD Article -->
-  <script type="application/ld+json">
-    {JSON.stringify(jsonLd)}
-  </script>
+  <script
+    type="application/ld+json"
+    set:html={JSON.stringify(jsonLd, null, 2)}
+  />
 
   <!-- Lógica cliente: botón Volver + botones de copiado en los bloques de código -->
   <script>
