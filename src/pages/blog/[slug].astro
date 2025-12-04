@@ -103,9 +103,51 @@ const jsonLd = {
     {JSON.stringify(jsonLd)}
   </script>
 
-  <!-- Fallback en cliente: si hay referer real, usamos ese para el botón -->
+  <!-- Lógica cliente: botón Volver + botones de copiado en los bloques de código -->
   <script>
-    const a = document.querySelector('[data-back]');
-    if (a && document.referrer) a.setAttribute('href', document.referrer);
+    // Botón "Volver": usa el referer si existe
+    const backLink = document.querySelector('[data-back]');
+    if (backLink && document.referrer) {
+      backLink.setAttribute('href', document.referrer);
+    }
+
+    // Botón de copiado en bloques de código
+    (function () {
+      if (!('clipboard' in navigator)) return;
+
+      const codeBlocks = document.querySelectorAll('.post__prose pre code');
+
+      codeBlocks.forEach((codeEl) => {
+        const pre = codeEl.parentElement;
+        if (!pre || pre.querySelector('.codeblock__copy')) return;
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'codeblock__copy';
+        btn.setAttribute('aria-label', 'Copiar código');
+        btn.textContent = 'Copiar';
+
+        btn.addEventListener('click', async () => {
+          try {
+            await navigator.clipboard.writeText(codeEl.innerText);
+            btn.textContent = 'Copiado';
+            btn.classList.add('codeblock__copy--success');
+            setTimeout(() => {
+              btn.textContent = 'Copiar';
+              btn.classList.remove('codeblock__copy--success');
+            }, 1500);
+          } catch {
+            btn.textContent = 'Error';
+            setTimeout(() => {
+              btn.textContent = 'Copiar';
+            }, 1500);
+          }
+        });
+
+        pre.appendChild(btn);
+      });
+    })();
   </script>
+</BaseLayout>
+
 </BaseLayout>
