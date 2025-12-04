@@ -5,9 +5,17 @@ import sitemap from '@astrojs/sitemap';
 import tailwind from '@tailwindcss/vite'; // Tailwind v4 (plugin de Vite)
 
 export default defineConfig({
-  // Dominio canónico en producción: se usa para sitemap y URLs canónicas
-  // https://docs.astro.build/en/reference/configuration-reference/#site
+  // Dominio canónico en producción
   site: 'https://adrianmariscal.es',
+
+  // ⬇️ NUEVO: configuración de Markdown/Shiki
+  markdown: {
+    // Shiki es el motor por defecto; aquí solo cambiamos el tema
+    shikiConfig: {
+      // Elige el que prefieras: 'dracula', 'dark-plus', 'one-light', etc.
+      theme: 'dracula',
+    },
+  },
 
   integrations: [
     mdx(),

@@ -391,14 +391,88 @@ h1,h2,h3,strong{color:var(--am-ink)}
 .post__prose h3{font-size:18px;margin:1.2rem 0 .5rem}
 .post__prose ul,.post__prose ol{margin:.5rem 0 1.1rem 1.2rem;padding-left:1rem}
 .post__prose li{margin:.25rem 0}
-.post__prose blockquote{margin:1.2rem 0;padding:.8rem 1rem;border-left:4px solid rgba(0,0,0,.08);background:rgba(0,0,0,.03);border-radius:8px}
-.post__prose pre{margin:1.1rem 0;padding:.85rem 1rem;background:#0f172a10;border-radius:10px;overflow:auto}
-.post__prose code{
+.post__prose blockquote{
+  margin:1.2rem 0;
+  padding:.8rem 1rem;
+  border-left:4px solid rgba(0,0,0,.08);
+  background:rgba(0,0,0,.03);
+  border-radius:8px;
+}
+
+/* Bloques de código multi-línea */
+.post__prose pre{
+  margin:1.25rem 0;
+  padding:1rem 1.25rem;
+  border-radius:12px;
+  border:1px solid rgba(15,23,42,.72);
+  box-shadow:0 18px 40px rgba(15,23,42,.25);
+  overflow:auto;
+  position:relative;
+  background:#020617; /* fondo oscuro de contraste; el tema Shiki ajusta los colores del código */
+}
+
+/* Código dentro del bloque (multi-línea) */
+.post__prose pre code{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
+  font-size:.9rem;
+  line-height:1.6;
+  background:none;
+  border:none;
+  padding:0;
+}
+
+/* Código en línea dentro del texto del post:
+   mantiene el estilo de .prose code pero forzamos monospace coherente */
+.post__prose :not(pre) > code{
   font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
   font-size:.95em;
 }
+
 .post__prose img,.post__prose video,.post__prose iframe{max-width:100%;height:auto;border-radius:10px;margin:.6rem 0}
 .post__prose hr{border:0;height:1px;background:rgba(0,0,0,.08);margin:1.6rem 0}
+
+/* Botón de copiado rápido para bloques de código */
+.codeblock__copy{
+  position:absolute;
+  top:.6rem;
+  right:.6rem;
+  z-index:1;
+  padding:.25rem .6rem;
+  font-size:.75rem;
+  font-weight:600;
+  border-radius:999px;
+  background:rgba(15,23,42,.96);
+  color:#f9fafb;
+  border:1px solid rgba(148,163,184,.9);
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  gap:.25rem;
+  transition:background .15s ease,transform .05s ease,box-shadow .15s ease;
+}
+
+.codeblock__copy:hover{
+  transform:translateY(-1px);
+  box-shadow:0 10px 22px rgba(15,23,42,.35);
+}
+
+.codeblock__copy:focus-visible{
+  outline:2px solid var(--am-accent);
+  outline-offset:2px;
+}
+
+.codeblock__copy--success{
+  background:var(--am-success);
+  border-color:var(--am-success);
+}
+
+@media (max-width:640px){
+  .codeblock__copy{
+    font-size:.7rem;
+    padding:.2rem .45rem;
+  }
+}
+
 
 /* ==========================================================================
    Contacto
