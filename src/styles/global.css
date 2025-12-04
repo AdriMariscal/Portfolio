@@ -879,6 +879,27 @@ h1,h2,h3,strong{color:var(--am-ink)}
 }
 .btn--block{width:100%}
 
+
+/* Bloque de acciones en el formulario de contacto:
+   botón de envío + texto legal de privacidad */
+.contact__actions{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  margin-top:4px;
+}
+
+.contact__legal{
+  font-size:.85rem;
+  line-height:1.5;
+}
+
+@media (min-width:640px){
+  .contact__actions{
+    align-items:flex-start;
+  }
+}
+
 /* Ajuste responsive */
 @media (max-width: 900px){
   .contact__intro,
