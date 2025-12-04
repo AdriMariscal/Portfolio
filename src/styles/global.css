@@ -843,19 +843,48 @@ h1,h2,h3,strong{color:var(--am-ink)}
   .contact__form{ max-width: 100%; }
 }
 
+/* ========================================================================== */
+/*   Thanks / pantalla de confirmación                                       */
+/* ========================================================================== */
+
+/* Fondo suave, en la línea de contacto y proyectos */
+.section--thanks{
+  background:
+    radial-gradient(circle at top left, rgba(148,163,184,0.16), transparent 55%),
+    radial-gradient(circle at bottom right, rgba(16,86,80,0.18), transparent 55%),
+    var(--am-bg);
+}
 
 /* ==========================================================================
    Gracias
    ========================================================================== */
-.thanks__card{max-width:780px;margin:24px auto 44px}
-.thanks__body{padding:28px 32px}
-@media (min-width:900px){.thanks__body{padding:36px 40px}}
-.thanks__title{
-  font-family:var(--font-display);font-weight:800;
-  font-size:clamp(28px,2.6vw,36px);margin:6px 0 10px;color:var(--am-ink)
-}
-.thanks__desc{margin:0 0 18px}
-.thanks__body .btn{margin-top:6px}
+ .thanks__card{
+   max-width:780px;
+   margin:32px auto 56px;
+   position:relative;
+   overflow:hidden; /* para que la banda superior siga el radio de la tarjeta */
+ }
+
+ .thanks__card::before{
+   content:"";
+   position:absolute;
+   inset:0 auto auto 0;
+   height:4px;
+   width:100%;
+   background:linear-gradient(90deg,var(--am-accent),var(--am-accent-warm));
+ }
+
+ .thanks__body{
+   padding:28px 32px;
+   text-align:center;  /* centra título, texto y botón */
+ }
+ @media (min-width:900px){.thanks__body{padding:36px 40px}}
+ .thanks__title{
+   font-family:var(--font-display);font-weight:800;
+   font-size:clamp(28px,2.6vw,36px);margin:6px 0 10px;color:var(--am-ink)
+ }
+ .thanks__desc{margin:0 0 18px}
+ .thanks__body .btn{margin-top:6px}
 
 /* ==========================================================================
    Legal
@@ -1143,6 +1172,13 @@ html[data-theme="dark"] .section--contact{
   background:
     radial-gradient(circle at top left,rgba(34,197,94,0.20),transparent 55%),
     radial-gradient(circle at bottom right,rgba(56,189,248,0.20),transparent 55%),
+    #020617;
+}
+
+html[data-theme="dark"] .section--thanks{
+  background:
+    radial-gradient(circle at top left, rgba(34,197,94,0.20), transparent 55%),
+    radial-gradient(circle at bottom right, rgba(56,189,248,0.20), transparent 55%),
     #020617;
 }
 
