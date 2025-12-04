@@ -95,17 +95,135 @@ h1,h2,h3,strong{color:var(--am-ink)}
    Header
    ========================================================================== */
 .header{
-  position:sticky;top:0;z-index:10;
+  position:sticky;
+  top:0;
+  z-index:10;
   background:rgba(248,250,252,0.7);
   backdrop-filter:saturate(140%) blur(12px);
   -webkit-backdrop-filter:saturate(140%) blur(12px);
   border-bottom:1px solid var(--am-border);
 }
-.header__inner{display:flex;align-items:center;justify-content:space-between;height:64px}
-.brand{font-family:var(--font-display);font-weight:800;letter-spacing:.2px;color:var(--am-ink)}
-.nav{display:flex;gap:18px}
-.nav__link{padding:8px 10px;border-radius:10px;color:var(--am-graphite)}
-.nav__link[aria-current="true"]{background:rgba(11,31,59,.08);color:var(--am-ink)}
+
+.header__inner{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  height:64px;
+  position:relative; /* para posicionar el menú móvil debajo */
+}
+
+.brand{
+  font-family:var(--font-display);
+  font-weight:800;
+  letter-spacing:.2px;
+  color:var(--am-ink);
+}
+
+/* Navegación escritorio (por defecto) */
+.nav{
+  display:flex;
+  gap:18px;
+}
+
+.nav__link{
+  padding:8px 10px;
+  border-radius:10px;
+  color:var(--am-graphite);
+}
+
+.nav__link[aria-current="true"]{
+  background:rgba(11,31,59,.08);
+  color:var(--am-ink);
+}
+
+/* Botón hamburguesa: oculto en escritorio */
+.nav-toggle{
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:8px;
+  margin-left:auto;
+  border:1px solid transparent;
+  border-radius:10px;
+  background:transparent;
+  cursor:pointer;
+}
+
+.nav-toggle:focus-visible{
+  outline:2px solid var(--am-ink);
+  outline-offset:2px;
+}
+
+/* Icono de las tres rayas */
+.nav-toggle__icon,
+.nav-toggle__icon::before,
+.nav-toggle__icon::after{
+  display:block;
+  width:20px;
+  height:2px;
+  border-radius:999px;
+  background:var(--am-ink);
+  position:relative;
+  transition:transform .18s ease, opacity .18s ease, background .18s ease;
+}
+
+.nav-toggle__icon::before,
+.nav-toggle__icon::after{
+  content:"";
+  position:absolute;
+  left:0;
+}
+
+.nav-toggle__icon::before{ top:-6px; }
+.nav-toggle__icon::after{ top:6px; }
+
+/* Animación a "X" cuando el menú está abierto */
+.nav-toggle--open .nav-toggle__icon{
+  background:transparent;
+}
+
+.nav-toggle--open .nav-toggle__icon::before{
+  transform:translateY(6px) rotate(45deg);
+}
+
+.nav-toggle--open .nav-toggle__icon::after{
+  transform:translateY(-6px) rotate(-45deg);
+}
+
+/* ======================
+   Versión móvil
+   ====================== */
+@media (max-width: 768px){
+  /* el botón aparece en móviles */
+  .nav-toggle{
+    display:inline-flex;
+  }
+
+  /* el menú cuelga del header y ocupa el ancho */
+  .nav{
+    position:absolute;
+    left:0;
+    right:0;
+    top:100%;
+    padding:8px 16px 16px;
+    background:rgba(248,250,252,0.98);
+    border-bottom:1px solid var(--am-border);
+    box-shadow:0 10px 25px rgba(15,23,42,0.08);
+    flex-direction:column;
+    gap:8px;
+    display:none; /* cerrado por defecto */
+  }
+
+  .nav.nav--open{
+    display:flex;
+  }
+
+  /* enlaces algo más grandes y cómodos de pulsar */
+  .nav__link{
+    padding:10px 12px;
+  }
+}
+
 
 /* ==========================================================================
    Hero
