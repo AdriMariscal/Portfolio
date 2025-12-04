@@ -119,6 +119,34 @@ h1,h2,h3,strong{color:var(--am-ink)}
   opacity:.6;  /* sigue siendo decorativo, sin competir con el texto */
 }
 
+.skip-link{
+  position:absolute;
+  top:8px;
+  left:50%;
+  transform:translateX(-50%);
+  padding:8px 14px;
+  border-radius:var(--am-radius-pill);
+  font-weight:600;
+  background:#0b1f3b;      /* fondo oscuro, alto contraste en claro */
+  color:#f9fafb;
+  z-index:999;
+}
+
+/* Oculto visualmente salvo cuando recibe foco,
+   pero sigue siendo accesible para lectores de pantalla */
+.skip-link:not(:focus){
+  clip:rect(0 0 0 0);
+  clip-path:inset(50%);
+  width:1px;
+  height:1px;
+  overflow:hidden;
+  white-space:nowrap;
+}
+
+html[data-theme="dark"] .skip-link{
+  background:#f9fafb;  /* invertimos para mantener contraste */
+  color:#020617;
+}
 
 .muted{color:var(--am-graphite)}
 .stack{display:flex;flex-direction:column;gap:var(--stack-gap,16px)}

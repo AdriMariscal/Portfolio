@@ -12,7 +12,11 @@ const legalLinks = [
   { href: '/legal/terminos', label: 'Términos' },
 ];
 ---
-<footer class="footer">
+<footer
+  class="footer"
+  role="contentinfo"
+  aria-label="Información del sitio"
+>
   <div class="wrap footer__inner">
     <nav class="footer__nav" aria-label="Información legal">
       {legalLinks.map((l) => (
