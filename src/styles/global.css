@@ -494,14 +494,48 @@ h1,h2,h3,strong{color:var(--am-ink)}
 @media (max-width:640px){.posts-grid{grid-template-columns:1fr;gap:1rem}}
 
 /* Paginación */
-.pagination{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;justify-content:center;margin-top:2rem}
-.pagination a,.pagination span{
-  display:inline-flex;align-items:center;justify-content:center;
-  padding:.5rem .75rem;border:1px solid var(--border,#e5e7eb);border-radius:.5rem;
-  text-decoration:none;font-weight:500
+.pagination{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.5rem;
+  align-items:center;
+  justify-content:center;
+  margin-top:2rem;
 }
-.pagination a:hover{background:#f3f4f6}
-.pagination .is-active{background:#eff6ff;border-color:#93c5fd}
+
+.pagination a,
+.pagination span{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:2.25rem;
+  padding:.4rem .9rem;
+  border-radius:999px;
+  border:1px solid var(--am-border);
+  background:var(--am-surface);
+  color:var(--am-ink);
+  font-weight:600;
+  font-size:.9rem;
+  text-decoration:none;
+}
+
+.pagination a:hover{
+  background:var(--am-cloud);
+}
+
+/* Página actual */
+.pagination .is-active{
+  background:var(--am-accent-soft);
+  border-color:var(--am-accent);
+  color:var(--am-accent);
+}
+
+/* Botones deshabilitados (inicio/fin) */
+.pagination .is-disabled{
+  opacity:.55;
+  cursor:default;
+}
+
 
 /* Blog & Tags: título y grid con márgenes coherentes a home */
 .section .section__header{
@@ -830,6 +864,14 @@ h1,h2,h3,strong{color:var(--am-ink)}
   border:1px solid var(--am-border);
   border-radius:10px;
   padding:.75rem .9rem;
+
+  /* 👇 Nuevo: texto siempre con el color de la interfaz */
+  color:var(--am-text);
+  caret-color:var(--am-text);
+}
+.input::placeholder{
+  color:var(--am-graphite);
+  opacity:.9; /* evita que el navegador lo haga demasiado clarito */
 }
 
 .input:focus{
@@ -1236,55 +1278,83 @@ html[data-theme="dark"] body{
   color:var(--am-text);
 }
 
+/* ==========================================================
+   Fondos en modo oscuro (home y secciones principales)
+   ========================================================== */
+
+/* Hero + secciones de la home comparten el MISMO lienzo */
+html[data-theme="dark"] .hero,
+html[data-theme="dark"] .section--home-projects,
+html[data-theme="dark"] .section--home-latest{
+  background:
+    radial-gradient(circle at top left, rgba(34,197,94,0.16), transparent 55%),
+    radial-gradient(circle at bottom right, rgba(56,189,248,0.12), transparent 55%),
+    #020617;
+}
+
+/* Blog, contacto, thanks, secciones alternas y legales
+   reutilizan el mismo patrón pero aún un pelín más suave */
+html[data-theme="dark"] .section--blog,
+html[data-theme="dark"] .section--contact,
+html[data-theme="dark"] .section--thanks,
+html[data-theme="dark"] .section--alt,
+html[data-theme="dark"] .section--404,
+html[data-theme="dark"] .section--legal{
+  background:
+    radial-gradient(circle at top left, rgba(34,197,94,0.14), transparent 55%),
+    radial-gradient(circle at bottom right, rgba(56,189,248,0.10), transparent 55%),
+    #020617;
+}
+
+/* Separador muy sutil entre bloques de la home:
+   no cambia el color, solo marca la transición */
+html[data-theme="dark"] .section--home-projects,
+html[data-theme="dark"] .section--home-latest{
+  box-shadow:0 -1px 0 rgba(15,23,42,0.85) inset;
+}
+
+
 /* Tarjetas y superficies elevadas */
 html[data-theme="dark"] .card,
 html[data-theme="dark"] .card--soft,
 html[data-theme="dark"] .content-card{
-  background:var(--am-surface);
-  border-color:var(--am-border);
-  box-shadow:0 18px 40px rgba(15,23,42,0.7);
+  /* superficie algo más clara que el fondo global */
+  background:#020617;              /* “gris” muy oscuro, diferente del bg puro */
+  border-color:#1F2937;
+  box-shadow:0 14px 32px rgba(15,23,42,0.55);
 }
+
+/* Botón principal en modo oscuro:
+   verde protagonista pero con texto oscuro para cumplir contraste AA */
+html[data-theme="dark"] .btn--primary{
+  background:linear-gradient(135deg,#22C55E,#16A34A);
+  color:#052e16;             /* verde muy oscuro (mismo tono que --am-accent-soft) */
+  border-color:#16A34A;
+  box-shadow:0 10px 24px rgba(22,163,74,0.45);
+}
+
+html[data-theme="dark"] .btn--primary:hover{
+  filter:brightness(1.02);
+  transform:translateY(-1px);
+}
+
+
+/* Botón secundario en modo oscuro: estilo “ghost” */
+html[data-theme="dark"] .btn--secondary{
+  background:transparent;
+  color:var(--am-ink);
+  border-color:rgba(148,163,184,0.7);
+}
+
+html[data-theme="dark"] .btn--secondary:hover{
+  background:rgba(15,23,42,0.85);
+}
+
 
 /* Header y hero en oscuro */
 html[data-theme="dark"] .header{
   background:rgba(15,23,42,0.92);
   border-bottom-color:rgba(15,23,42,0.85);
-}
-
-html[data-theme="dark"] .hero{
-  background:
-    radial-gradient(circle at top left,rgba(34,197,94,0.20),transparent 55%),
-    radial-gradient(circle at bottom right,rgba(56,189,248,0.20),transparent 55%),
-    #020617;
-}
-
-html[data-theme="dark"] .section--blog{
-  background:
-    radial-gradient(circle at top left,rgba(34,197,94,0.20),transparent 55%),
-    radial-gradient(circle at bottom right,rgba(56,189,248,0.20),transparent 55%),
-    #020617;
-}
-
-html[data-theme="dark"] .section--contact{
-  background:
-    radial-gradient(circle at top left,rgba(34,197,94,0.20),transparent 55%),
-    radial-gradient(circle at bottom right,rgba(56,189,248,0.20),transparent 55%),
-    #020617;
-}
-
-html[data-theme="dark"] .section--thanks{
-  background:
-    radial-gradient(circle at top left, rgba(34,197,94,0.20), transparent 55%),
-    radial-gradient(circle at bottom right, rgba(56,189,248,0.20), transparent 55%),
-    #020617;
-}
-
-/* Sección alterna */
-html[data-theme="dark"] .section--alt{
-  background:
-    radial-gradient(circle at top left,rgba(34,197,94,0.20),transparent 55%),
-    radial-gradient(circle at bottom right,rgba(56,189,248,0.20),transparent 55%),
-    #020617;
 }
 
 /* Nav activa en oscuro */
@@ -1298,10 +1368,58 @@ html[data-theme="dark"] .footer{
   border-top-color:var(--am-border);
 }
 
-html[data-theme="dark"] .section--404{
-  background:
-    radial-gradient(circle at top left, rgba(34,197,94,0.20), transparent 55%),
-    radial-gradient(circle at bottom right, rgba(56,189,248,0.20), transparent 55%),
-    #020617;
+/* Paginación en modo oscuro */
+html[data-theme="dark"] .pagination a,
+html[data-theme="dark"] .pagination span{
+  border-color:var(--am-border);
+  background:#020617;          /* misma superficie que las cards */
+  color:var(--am-text);
 }
+
+html[data-theme="dark"] .pagination a:hover{
+  background:#030712;
+}
+
+/* Página actual en oscuro: verde consistente con el resto del tema */
+html[data-theme="dark"] .pagination .is-active{
+  background:#16A34A;
+  border-color:#16A34A;
+  color:#F9FAFB;               /* alto contraste sobre el verde */
+}
+
+/* Inline code / texto resaltado dentro de los posts en modo oscuro */
+html[data-theme="dark"] .post__prose :not(pre) > code{
+  background:var(--am-accent-soft);    /* verde muy oscuro, coherente con la paleta dark */
+  border-color:var(--am-accent-border);
+  color:#bbf7d0;                       /* verde muy claro: buen contraste sobre el fondo */
+}
+
+/* Por seguridad, si hay otros .prose code sueltos fuera de post__prose */
+html[data-theme="dark"] .prose code{
+  background:#020617;
+  border-color:#1f2937;
+  color:var(--am-text);
+}
+
+/* ==========================================================
+   Home: jerarquía de secciones en modo oscuro
+   ========================================================== */
+
+/* Menú móvil en modo oscuro: que no “salte” al blanco */
+html[data-theme="dark"] .nav{
+  background:rgba(15,23,42,0.98);
+  border-bottom-color:#111827;
+  box-shadow:0 14px 28px rgba(15,23,42,0.85);
+}
+
+/* Toggle de tema en oscuro ligeramente más integrado */
+html[data-theme="dark"] .theme-toggle{
+  background:rgba(15,23,42,0.7);
+  color:var(--am-graphite);
+}
+
+html[data-theme="dark"] .theme-toggle:hover{
+  background:rgba(15,23,42,0.9);
+}
+
 

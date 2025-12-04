@@ -34,7 +34,7 @@ const totalProjects = await countProjects();
 <BaseLayout title="Inicio">
   <Hero totalProjects={totalProjects} />
 
-  <section class="section">
+  <section class="section section--home-projects">
     <div class="wrap">
       <h2 class="h2 section__title">Proyectos destacados</h2>
       <div class="grid grid--3" style="--stack-gap:16px">
@@ -43,7 +43,7 @@ const totalProjects = await countProjects();
     </div>
   </section>
 
-  <section class="section section--alt">
+  <section class="section section--alt section--home-latest">
     <div class="wrap">
       <h2 class="h2 section__title">Últimos artículos</h2>
       <div class="grid grid--3" style="--stack-gap:16px">
@@ -51,5 +51,4 @@ const totalProjects = await countProjects();
       </div>
     </div>
   </section>
-
 </BaseLayout>

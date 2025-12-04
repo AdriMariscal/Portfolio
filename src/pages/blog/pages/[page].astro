@@ -59,22 +59,28 @@ const pagePosts = posts.slice(start, start + PER_PAGE);
       {current > 1 ? (
         <a
           href={current === 2 ? "/blog" : `/blog/pages/${current - 1}`}
-          aria-label="Anterior"
+          aria-label="Página anterior"
         >
           ← Anterior
         </a>
       ) : (
-        <span>← Anterior</span>
+        <span class="is-disabled" aria-disabled="true">← Anterior</span>
       )}
-      <span class="is-active">{current}</span>
+
+      <span class="is-active" aria-current="page">{current}</span>
+
       {current < totalPages ? (
-        <a href={`/blog/pages/${current + 1}`} aria-label="Siguiente">
+        <a
+          href={`/blog/pages/${current + 1}`}
+          aria-label="Página siguiente"
+        >
           Siguiente →
         </a>
       ) : (
-        <span>Siguiente →</span>
+        <span class="is-disabled" aria-disabled="true">Siguiente →</span>
       )}
     </nav>
+
   </section>
 </BaseLayout>
 
