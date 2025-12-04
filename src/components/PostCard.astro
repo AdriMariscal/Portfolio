@@ -1,5 +1,4 @@
 ---
-// src/components/PostCard.astro
 import type { CollectionEntry } from "astro:content";
 
 const { entry, maxTags = 6 } = Astro.props as {
@@ -8,11 +7,31 @@ const { entry, maxTags = 6 } = Astro.props as {
 };
 
 const { data, slug } = entry;
+
 const tags: string[] = Array.isArray(data.tags) ? data.tags : [];
 const tagSlice = tags.slice(0, maxTags);
 
 const slugifyTag = (t: string) =>
-  t.toLowerCase().trim().normalize("NFD").replace(/\p{Diacritic}/gu, "").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  t
+    .toLowerCase()
+    .trim()
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+
+// Fecha formateada (si existe en el frontmatter)
+// En tu MD la fecha viene como `date: 2025-11-27`, que Astro parsea a Date.
+const rawDate = (data as any).date;
+const date = rawDate ? new Date(rawDate as any) : undefined;
+
+const formattedDate = date
+  ? date.toLocaleDateString("es-ES", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    })
+  : null;
 ---
 
 <article class="card card--post">
@@ -20,6 +39,12 @@ const slugifyTag = (t: string) =>
     <h3 class="card__title postcard__title">
       <a href={`/blog/${slug}/`}>{data.title}</a>
   </h3>
+
+    {formattedDate && date && (
+      <p class="postcard__date">
+        <time datetime={date.toISOString()}>{formattedDate}</time>
+      </p>
+    )}
 
     {data.description && (
       <p class="postcard__excerpt">{data.description}</p>
@@ -29,7 +54,9 @@ const slugifyTag = (t: string) =>
       <ul class="taglist" aria-label="Etiquetas">
         {tagSlice.map((t) => (
           <li>
-            <a class="tag" href={`/blog/tags/${slugifyTag(t)}/`}>#{t}</a>
+            <a class="tag" href={`/blog/tags/${slugifyTag(t)}/`}>
+              #{t}
+            </a>
           </li>
       ))}
     </ul>

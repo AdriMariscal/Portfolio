@@ -455,10 +455,33 @@ h1,h2,h3,strong{color:var(--am-ink)}
 /* ==========================================================================
    Blog / tarjetas (listados)
    ========================================================================== */
+/* Sección de blog con fondo suave, coherente con home/proyectos */
+.section--blog{
+  background:
+    radial-gradient(circle at top left,rgba(148,163,184,0.12),transparent 55%),
+    radial-gradient(circle at bottom right,rgba(249,115,22,0.08),transparent 55%),
+    var(--am-bg);
+}
+
+/* Ajuste para usar la misma viñeta también en el h1 de página */
+.section__title--page::before{
+  height:1.4em;
+}
+
+.section__title--page::after{
+  width:72px;
+}
+
 .card--post .card__body{padding:22px}
 .card--post .postcard__title{margin:0 0 10px}
 .postcard__excerpt{margin:0 0 12px;color:var(--am-graphite)}
 .card--post .tags{margin-top:10px}
+.postcard__date{
+  font-size:.85rem;
+  color:var(--text-muted,#5b6572);
+  margin:0 0 6px;
+}
+
 
 /* Listado base (3–2–1) */
 .posts-grid{
@@ -486,7 +509,10 @@ h1,h2,h3,strong{color:var(--am-ink)}
   margin:0 auto 1rem;
   padding-inline:clamp(1rem,4vw,var(--space-6));
 }
-.section .section__header .h1{margin:0 0 .55rem}
+.section .section__header .h1{
+  margin:0 0 .9rem;  /* antes: 0 0 .55rem */
+}
+
 .section .section__header .lead{color:var(--am-graphite);margin:0 0 1.1rem}
 
 /* Grid centrado con mismos laterales que home */
@@ -1071,6 +1097,14 @@ html[data-theme="dark"] .hero{
     radial-gradient(circle at bottom right,rgba(56,189,248,0.20),transparent 55%),
     #020617;
 }
+
+html[data-theme="dark"] .section--blog{
+  background:
+    radial-gradient(circle at top left,rgba(34,197,94,0.20),transparent 55%),
+    radial-gradient(circle at bottom right,rgba(56,189,248,0.20),transparent 55%),
+    #020617;
+}
+
 
 /* Sección alterna */
 html[data-theme="dark"] .section--alt{
