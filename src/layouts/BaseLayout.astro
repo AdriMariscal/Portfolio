@@ -89,8 +89,16 @@ const siteName = SITE.siteName ?? "Portfolio - Adrián Mariscal";
     <meta name="twitter:image" content={ogImageAbs} />
   </head>
   <body>
+    <a class="skip-link" href="#main-content">
+      Saltar al contenido principal
+    </a>
+
     <Header />
-    <main>
+    <main
+      id="main-content"
+      tabindex="-1"
+      aria-label="Contenido principal"
+    >
       <slot />
     </main>
     <Footer />

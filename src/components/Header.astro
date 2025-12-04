@@ -14,7 +14,7 @@ const isActive = (href: string) => {
 };
 ---
 
-<header class="header">
+<header class="header" role="banner">
   <div class="wrap header__inner">
     <a class="brand" href="/">Adrián Mariscal</a>
 
@@ -29,7 +29,11 @@ const isActive = (href: string) => {
       <span class="nav-toggle__icon" aria-hidden="true"></span>
     </button>
 
-    <nav class="nav" data-nav>
+    <nav
+      class="nav"
+      data-nav
+      aria-label="Navegación principal"
+    >
       <a class="nav__link" href="/" aria-current={isActive("/")}>Inicio</a>
       <a class="nav__link" href="/projects" aria-current={isActive("/projects")}>Proyectos</a>
       <a class="nav__link" href="/blog" aria-current={isActive("/blog")}>Blog</a>

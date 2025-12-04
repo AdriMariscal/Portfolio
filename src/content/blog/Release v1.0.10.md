@@ -84,4 +84,4 @@ Con Astro v4 llegan los **content collections tipados** que permiten definir esq
 4. **Analítica**: Integrar medición conforme a la normativa (AEPD) y revisar la política de cookies cuando se active.
 
 ---
-Esta versión marca un hito: el portfolio deja de ser un experimento y se convierte en un producto completo. Si quieres saber más detalles técnicos o necesitas un desarrollo a medida con Astro, Netlify y buenas prácticas de SEO/accesibilidad, no dudes en **[escríbeme](/contact)**.
+Esta versión marca un hito: el portfolio deja de ser un experimento y se convierte en un producto completo. Si quieres saber más detalles técnicos o necesitas un desarrollo a medida con Astro, Netlify y buenas prácticas de SEO/accesibilidad, no dudes en **[escribirme](/contact)**.
