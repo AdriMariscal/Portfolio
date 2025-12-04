@@ -33,13 +33,13 @@ const updatedAt = new Date().toLocaleDateString("es-ES", {
             <li><strong>Titular:</strong> {SITE_OWNER.name}</li>
               <li><strong>NIF:</strong> {SITE_OWNER.nif}</li>
               <li><strong>Domicilio:</strong> {SITE_OWNER.address}</li>
-            <li><strong>Email:</strong> <a href={`mailto:${SITE_OWNER.email}`}>{SITE_OWNER.email}</a></li>
+            <li><strong>Email:</strong> <a class="link" href={`mailto:${SITE_OWNER.email}`}>{SITE_OWNER.email}</a></li>
             {SITE_OWNER.phone && <li><strong>Teléfono:</strong> {SITE_OWNER.phone}</li>}
             <li><strong>Nombre de dominio:</strong> {SITE_OWNER.domain}</li>
           </ul>
             <p class="muted" style="font-size:.92rem">
               Base jurídica:
-              <a
+              <a class="link"
                 href="https://noticias.juridicas.com/base_datos/Admin/l34-2002.t1.html#a10"
                 target="_blank"
                 rel="noopener"
@@ -101,9 +101,9 @@ const updatedAt = new Date().toLocaleDateString("es-ES", {
           <p>
               El tratamiento de datos personales (finalidades, base jurídica, plazos y derechos) se describe en la
               {" "}
-              <a href="/legal/privacidad">Política de privacidad</a>. El uso de cookies y tecnologías similares se detalla en la
+              <a class="link" href="/legal/privacidad">Política de privacidad</a>. El uso de cookies y tecnologías similares se detalla en la
               {" "}
-              <a href="/legal/cookies">Política de cookies</a>.
+              <a class="link" href="/legal/cookies">Política de cookies</a>.
           </p>
         </section>
 
@@ -118,7 +118,7 @@ const updatedAt = new Date().toLocaleDateString("es-ES", {
               litigios en línea (ODR) fue clausurada y el Reglamento (UE) 524/2013 quedó derogado en 2025; por ello, deben
               utilizarse las vías nacionales de consumo.
               {" "}
-              <a
+              <a class="link"
                 href="https://www.juntadeandalucia.es/temas/consumo/consultas/odr.html"
                 target="_blank"
                 rel="noopener"
@@ -133,7 +133,7 @@ const updatedAt = new Date().toLocaleDateString("es-ES", {
           <p>
             Este sitio utiliza cookies propias y/o de terceros con las finalidades indicadas en la
               {" "}
-              <a href="/legal/cookies">Política de cookies</a>, donde puedes consultar la configuración, cambio o retirada del consentimiento.
+              <a class="link" href="/legal/cookies">Política de cookies</a>, donde puedes consultar la configuración, cambio o retirada del consentimiento.
           </p>
         </section>
 
@@ -152,16 +152,9 @@ const updatedAt = new Date().toLocaleDateString("es-ES", {
           <p>
             Para cualquier consulta relacionada con este aviso legal, escribe a
               {" "}
-              <a href={`mailto:${SITE_OWNER.email}`}>{SITE_OWNER.email}</a>.
+              <a class="link" href={`mailto:${SITE_OWNER.email}`}>{SITE_OWNER.email}</a>.
           </p>
         </section>
-
-        <hr class="sep" />
-        <nav class="legal-nav">
-          <a href="/legal/privacidad">Privacidad</a> ·
-          <a href="/legal/cookies">Cookies</a> ·
-          <a href="/legal/aviso-legal">Aviso legal</a>
-        </nav>
         </div>
       </article>
     </div>
