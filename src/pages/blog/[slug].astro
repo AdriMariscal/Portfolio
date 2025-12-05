@@ -34,7 +34,29 @@ const canonical = Astro.url?.href ?? new URL(`/blog/${post.slug}/`, SITE.url).hr
 
 // Imagen principal (absoluta): prioriza la del post si existe
 const rawImage = (post.data.image ?? post.data.heroImage ?? SITE.ogImage ?? '/og-default.png') as string;
-const imageAbs = rawImage?.startsWith('http') ? rawImage : new URL(rawImage, SITE.url).href;
+const imageAbs = rawImage?.startsWith('http')
+  ? rawImage
+  : new URL(rawImage, SITE.url).href;
+
+// Hero dentro del artículo: solo si el frontmatter define `image`
+const heroImage =
+  typeof (post.data as any).image === "string" &&
+  (post.data as any).image.trim().length > 0
+    ? (post.data as any).image.trim()
+    : null;
+
+// Alt y figcaption opcionales desde el frontmatter
+const heroAlt =
+  typeof (post.data as any).imageAlt === "string" &&
+  (post.data as any).imageAlt.trim().length > 0
+    ? (post.data as any).imageAlt.trim()
+    : title;
+
+const heroCaption =
+  typeof (post.data as any).imageCaption === "string" &&
+  (post.data as any).imageCaption.trim().length > 0
+    ? (post.data as any).imageCaption.trim()
+    : "";
 
 // Fechas del frontmatter (acepta Date o string)
 const toISO = (d: unknown) => {
@@ -102,6 +124,23 @@ const jsonLd = {
         <div class="post__actions" style="display:flex; gap:.5rem; flex-wrap:wrap; margin:.5rem 0 0">
           <a class="btn btn--secondary btn--sm post__back" href="/blog" data-back>← Volver</a>
         </div>
+
+      {/* Imagen principal del artículo (hero), si el frontmatter define `image` */}
+      {heroImage && (
+        <figure class="post__hero">
+          <img
+            src={heroImage}
+            alt={heroAlt}
+            loading="eager"
+            decoding="async"
+          />
+          {heroCaption && (
+            <figcaption class="post__hero-caption">
+              {heroCaption}
+            </figcaption>
+          )}
+        </figure>
+      )}        
 
         {showToc && (
           <nav class="post__toc" aria-label="Índice de contenidos">
@@ -187,6 +226,15 @@ const jsonLd = {
         pre.appendChild(btn);
       });
     })();
+
+    // Lazy loading para todas las imágenes dentro del contenido del post
+    const contentImages = document.querySelectorAll('.post__prose img');
+    contentImages.forEach((img) => {
+      if (!img.hasAttribute('loading')) {
+        img.setAttribute('loading', 'lazy');
+        img.setAttribute('decoding', 'async');
+      }
+    });    
   </script>
 </BaseLayout>
 
