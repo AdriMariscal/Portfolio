@@ -732,6 +732,25 @@ html[data-theme="dark"] .blog-search__empty {
   border-radius:8px;
 }
 
+/* Imagen hero del post (frontmatter: image) */
+.post__hero{
+  margin: 1rem 0 1.75rem;
+}
+
+.post__hero img{
+  display:block;
+  width:100%;
+  height:auto;
+  border-radius:12px;
+  box-shadow:0 12px 28px rgba(15,23,42,.10);
+}
+
+.post__hero-caption{
+  margin-top:.35rem;
+  font-size:.85rem;
+  color:var(--am-graphite);
+}
+
 .post__toc{
   margin:1rem 0 1.75rem;
   padding:.85rem 1rem 1rem;

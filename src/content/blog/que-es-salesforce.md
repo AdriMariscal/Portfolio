@@ -5,6 +5,8 @@ tags: ["salesforce", "crm", "nube", "negocio", "desarrollo"]
 published: true
 date: 2025-10-30
 image: "/images/blog/Salesforce-logo.jpg"
+imageAlt: "Logotipo de Salesforce sobre fondo azul"
+imageCaption: "Salesforce, la plataforma CRM líder para gestionar clientes y procesos de negocio."
 robots: "max-snippet:-1, max-image-preview:large"
 ---
 
