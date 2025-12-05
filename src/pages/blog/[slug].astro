@@ -41,6 +41,12 @@ const dateModifiedISO = toISO(post.data.updated ?? post.data.date ?? null);
 // Etiquetas (solo se mostrarán al final)
 const tags = Array.isArray(post.data.tags) ? post.data.tags : [];
 
+// Directivas opcionales de robots por post (frontmatter: robots: "max-snippet:..., max-image-preview:...")
+const robots =
+  typeof (post.data as any).robots === "string"
+    ? (post.data as any).robots
+    : undefined;
+
 // JSON-LD Article
 const jsonLd = {
   "@context": "https://schema.org",
@@ -55,10 +61,21 @@ const jsonLd = {
   ...(dateModifiedISO ? { "dateModified": dateModifiedISO } : {}),
   "author": { "@type": "Person", "name": SITE.author },
   ...(tags.length ? { "keywords": tags.join(", ") } : {}),
+  ...(tags.length ? { "articleSection": tags[0] } : {}),  
 };
 ---
 
-<BaseLayout title={title} description={description} ogImage={imageAbs} ogType="article">
+<BaseLayout
+  title={title}
+  description={description}
+  ogImage={imageAbs}
+  ogType="article"
+  articleAuthor={SITE.author}
+  articleTags={tags}
+  articleSection={tags[0] ?? "Blog"}
+  robots={robots}
+  twitterCreator={SITE.twitterCreator}
+>
   <article class="section post">
     <div class="wrap post__card card card--soft">
       <div class="post__body">
