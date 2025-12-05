@@ -3,10 +3,11 @@ export const SITE = {
   title: "Adrián Mariscal",
   siteName: "Portfolio - Adrián Mariscal",
   description: "Arquitecto Salesforce & dev web ligero. Proyectos, blog y contacto.",
-  url: "https://adrianmariscal.netlify.app", // mantén en sync con astro.config.mjs (opción `site`)
+  url: "https://adrianmariscal.es",
   lang: "es",
   author: "Adrián Mariscal",
-  ogImage: "/og-default.png", // imagen OG por defecto (colócala en /public)
+  ogImage: "/og-default.png",
+  twitterCreator: "",
 };
 
 export const THEME = {

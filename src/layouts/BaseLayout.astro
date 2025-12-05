@@ -8,8 +8,13 @@ import { SITE, THEME } from "../lib/config";
 type Props = {
   title?: string;
   description?: string;
-  ogImage?: string;    // permite sobreescribir la imagen OG por página
-  ogType?: string;     // opcional: 'article' para posts
+  ogImage?: string;
+  ogType?: string;
+  articleAuthor?: string;
+  articleTags?: string[];
+  articleSection?: string;
+  robots?: string;
+  twitterCreator?: string;  
 };
 
 const {
@@ -17,10 +22,16 @@ const {
   description = "Arquitecto Salesforce y desarrollo web ligero.",
   ogImage,
   ogType,
+  articleAuthor,
+  articleTags,
+  articleSection,
+  robots,
+  twitterCreator,  
 } = Astro.props as Props;
 
-// Canonical absoluto de la URL actual
-const canonical = Astro.url?.href ?? new URL("/", SITE.url).href;
+// Canonical absoluto usando siempre el dominio canónico del config de Astro
+// (Astro.site se construye a partir de la opción `site` de astro.config.mjs)
+const canonical = new URL(Astro.url?.pathname ?? "/", Astro.site).href;
 
 // Detecta tipo automáticamente: 'article' en /blog/*, 'website' en el resto
 const autoType = Astro.url?.pathname?.startsWith("/blog/") ? "article" : "website";
@@ -42,11 +53,35 @@ const siteName = SITE.siteName ?? "Portfolio - Adrián Mariscal";
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <script>
+      // Tema inicial: respeta localStorage y luego prefers-color-scheme
+      (function () {
+        const storageKey = 'am-theme';
+        const root = document.documentElement;
+
+        try {
+          const stored = window.localStorage.getItem(storageKey);
+          if (stored === 'light' || stored === 'dark') {
+            root.dataset.theme = stored;
+            return;
+          }
+        } catch (e) {
+          /* si localStorage falla, seguimos con prefers-color-scheme */
+        }
+
+        const prefersDark = window.matchMedia &&
+          window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        root.dataset.theme = prefersDark ? 'dark' : 'light';
+      })();
+    </script>
+
     <title>{title} — Adrián Mariscal</title>
     <meta name="description" content={description} />
     <meta name="theme-color" content={THEME.color} />
     <link rel="icon" href="/favicon.svg" />
     <link rel="canonical" href={canonical} />
+    {robots && <meta name="robots" content={robots} />}    
 
     <!-- Open Graph -->
     <meta property="og:locale" content={locale} />
@@ -58,15 +93,43 @@ const siteName = SITE.siteName ?? "Portfolio - Adrián Mariscal";
     <meta property="og:image" content={ogImageAbs} />
     <meta property="og:image:alt" content={title} />
 
+    {type === "article" && (
+      <>
+        <meta
+          property="article:author"
+          content={articleAuthor ?? SITE.author}
+        />
+        {Array.isArray(articleTags) &&
+          articleTags.map((tag) => (
+            <meta property="article:tag" content={tag} />
+          ))}
+        <meta
+          property="article:section"
+          content={articleSection ?? "Blog"}
+        />
+      </>
+    )}    
+
     <!-- Twitter (compatible con X/Twitter cards) -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageAbs} />
+    {twitterCreator && (
+      <meta name="twitter:creator" content={twitterCreator} />
+    )}    
   </head>
   <body>
+    <a class="skip-link" href="#main-content">
+      Saltar al contenido principal
+    </a>
+
     <Header />
-    <main>
+    <main
+      id="main-content"
+      tabindex="-1"
+      aria-label="Contenido principal"
+    >
       <slot />
     </main>
     <Footer />

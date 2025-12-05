@@ -42,31 +42,264 @@ const { posts, totalPages } = Astro.props as {
 const current = Math.max(1, Math.min(Number(Astro.params.page ?? 1), totalPages));
 const start = (current - 1) * PER_PAGE;
 const pagePosts = posts.slice(start, start + PER_PAGE);
+const visibleNow = pagePosts.length;
 ---
 
 <BaseLayout title={`Blog — página ${current}`} description="Artículos del blog paginados.">
-  <section class="container section">
+  <section class="section section--blog">
     <header class="section__header">
-      <h1 class="h1">Blog</h1>
+      <h1 class="h1 section__title section__title--page">Blog</h1>
       <p class="lead">Página {current} de {totalPages}</p>
     </header>
 
-    <div class="posts-grid">
+    {/* Buscador del blog (idéntico al de /blog) */}
+    <form
+      class="blog-search"
+      role="search"
+      aria-label="Buscar en el blog"
+      data-blog-search-form
+    >
+      <div class="blog-search__field">
+        <label class="blog-search__label" for="blog-search-input">
+          Buscar artículos
+        </label>
+        <input
+          id="blog-search-input"
+          class="input blog-search__input"
+          type="search"
+          name="q"
+          placeholder="Busca por título, descripción o etiqueta…"
+          autocomplete="off"
+          data-blog-search-input
+          aria-describedby="blog-search-hint"
+        />
+      </div>
+      <p class="blog-search__hint" id="blog-search-hint">
+        Se buscará en todos los artículos del blog, no solo en esta página.
+      </p>
+    </form>
+
+    <p
+      class="blog-search__count"
+      aria-live="polite"
+      data-blog-search-count
+    >
+      Mostrando {visibleNow} artículos de un total de {posts.length}.
+    </p>
+
+    <div class="posts-grid" data-blog-results>
       {pagePosts.map((entry) => (<PostCard entry={entry} />))}
     </div>
 
-    <nav class="pagination" aria-label="Paginación del blog">
+    <nav class="pagination" aria-label="Paginación del blog" data-blog-pagination>
       {current > 1 ? (
-        <a href={current === 2 ? '/blog' : `/blog/pages/${current - 1}`} aria-label="Anterior">← Anterior</a>
+        <a
+          href={current === 2 ? "/blog" : `/blog/pages/${current - 1}`}
+          aria-label="Página anterior"
+        >
+          ← Anterior
+        </a>
       ) : (
-        <span>← Anterior</span>
+        <span class="is-disabled" aria-disabled="true">← Anterior</span>
       )}
-      <span class="is-active">{current}</span>
+
+      <span class="is-active" aria-current="page">{current}</span>
+
       {current < totalPages ? (
-        <a href={`/blog/pages/${current + 1}`} aria-label="Siguiente">Siguiente →</a>
+        <a
+          href={`/blog/pages/${current + 1}`}
+          aria-label="Página siguiente"
+        >
+          Siguiente →
+        </a>
       ) : (
-        <span>Siguiente →</span>
+        <span class="is-disabled" aria-disabled="true">Siguiente →</span>
       )}
     </nav>
+
   </section>
+
+  {/* Reutilizamos exactamente el mismo script de búsqueda que en /blog */}
+  <script>
+    (function () {
+      const form = document.querySelector('[data-blog-search-form]');
+      const input = document.querySelector('[data-blog-search-input]');
+      const grid = document.querySelector('[data-blog-results]');
+      const pagination = document.querySelector('[data-blog-pagination]');
+      const countEl = document.querySelector('[data-blog-search-count]');
+
+      if (!form || !input || !grid) return;
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+      });
+
+      const initialHtml = grid.innerHTML;
+      const initialCountText = countEl ? (countEl.textContent || '') : '';
+      const initialPaginationHidden = pagination ? pagination.hidden : false;
+
+      let index = null;
+      let loading = false;
+
+      const normalize = (value) =>
+        (value || '')
+          .toString()
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/\p{Diacritic}/gu, '')
+          .replace(/[^a-z0-9]+/g, ' ')
+          .trim();
+
+      async function loadIndex() {
+        if (index || loading) return index;
+        loading = true;
+        try {
+          const res = await fetch('/blog/search-index.json');
+          if (!res.ok) throw new Error('Error al cargar el índice');
+          index = await res.json();
+        } catch (err) {
+          console.error('[Blog search] No se pudo cargar el índice', err);
+          index = [];
+        } finally {
+          loading = false;
+        }
+        return index;
+      }
+
+      function matches(post, q) {
+        if (!q) return true;
+        const haystack = [
+          post.title || '',
+          post.description || '',
+          Array.isArray(post.tags) ? post.tags.join(' ') : '',
+        ].join(' ');
+        return normalize(haystack).includes(q);
+      }
+
+      function slugifyTag(tag) {
+        return tag
+          .toString()
+          .toLowerCase()
+          .trim()
+          .normalize('NFD')
+          .replace(/\p{Diacritic}/gu, '')
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/(^-|-$)/g, '');
+      }
+
+      function renderResults(list) {
+        grid.innerHTML = '';
+
+        if (!list.length) {
+          const p = document.createElement('p');
+          p.className = 'blog-search__empty';
+          p.textContent = 'No se han encontrado artículos para esta búsqueda.';
+          grid.appendChild(p);
+
+          if (pagination) pagination.hidden = true;
+          if (countEl) countEl.textContent = 'Sin resultados para esta búsqueda.';
+          return;
+        }
+
+        const frag = document.createDocumentFragment();
+
+        list.forEach((post) => {
+          const article = document.createElement('article');
+          article.className = 'card card--post post-card';
+
+          const body = document.createElement('div');
+          body.className = 'card__body';
+
+          const h3 = document.createElement('h3');
+          h3.className = 'card__title postcard__title';
+
+          const link = document.createElement('a');
+          link.href = `/blog/${post.slug}/`;
+          link.textContent = post.title || 'Artículo sin título';
+
+          h3.appendChild(link);
+          body.appendChild(h3);
+
+          if (post.date) {
+            const dt = new Date(post.date);
+            if (!Number.isNaN(dt.getTime())) {
+              const pDate = document.createElement('p');
+              pDate.className = 'postcard__date';
+
+              const time = document.createElement('time');
+              time.dateTime = dt.toISOString();
+              time.textContent = dt.toLocaleDateString('es-ES', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric',
+              });
+
+              pDate.appendChild(time);
+              body.appendChild(pDate);
+            }
+          }
+
+          if (post.description) {
+            const pDesc = document.createElement('p');
+            pDesc.className = 'postcard__excerpt';
+            pDesc.textContent = post.description;
+            body.appendChild(pDesc);
+          }
+
+          if (Array.isArray(post.tags) && post.tags.length) {
+            const ul = document.createElement('ul');
+            ul.className = 'taglist';
+            ul.setAttribute('aria-label', 'Etiquetas');
+
+            post.tags.slice(0, 6).forEach((t) => {
+              const li = document.createElement('li');
+              const a = document.createElement('a');
+              a.className = 'tag';
+              a.href = `/blog/tags/${slugifyTag(t)}/`;
+              a.textContent = `#${t}`;
+              li.appendChild(a);
+              ul.appendChild(li);
+            });
+
+            body.appendChild(ul);
+          }
+
+          article.appendChild(body);
+          frag.appendChild(article);
+        });
+
+        grid.appendChild(frag);
+
+        if (pagination) pagination.hidden = true;
+        if (countEl) {
+          const n = list.length;
+          countEl.textContent =
+            n === 1 ? '1 artículo encontrado.' : `${n} artículos encontrados.`;
+        }
+      }
+
+      function resetResults() {
+        grid.innerHTML = initialHtml;
+        if (pagination) pagination.hidden = initialPaginationHidden;
+        if (countEl) countEl.textContent = initialCountText;
+      }
+
+      input.addEventListener('input', async () => {
+        const raw = input.value || '';
+        const q = normalize(raw);
+
+        if (q.length < 2) {
+          resetResults();
+          return;
+        }
+
+        const data = await loadIndex();
+        if (!Array.isArray(data)) return;
+
+        const filtered = data.filter((post) => matches(post, q));
+        renderResults(filtered);
+      });
+    })();
+  </script>
 </BaseLayout>
+

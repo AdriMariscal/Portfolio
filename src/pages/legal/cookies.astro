@@ -1,23 +1,27 @@
 ---
 // src/pages/legal/cookies.astro
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import { SITE_OWNER } from "../../config/siteOwner";
 
 // Ajusta la fecha cuando hagas cambios de contenido.
 const lastUpdate = "01/11/2025";
 ---
 
 <BaseLayout title="Cookies" description="Política de cookies del sitio.">
-  <section class="section">
+  <section class="section section--legal">
     <div class="wrap">
       <article class="card card--soft legal__card">
         <div class="legal__body prose">
-      <h1>Política de cookies</h1>
-      <p class="muted">Última actualización: {lastUpdate}</p>
+          <header class="legal__header">
+            <h1>Política de cookies</h1>
+            <p class="muted legal__meta">Última actualización: {lastUpdate}</p>
+          </header>
 
       <p>
         En esta página te explico qué son las cookies y tecnologías similares, qué
         uso hago de ellas en este sitio y cómo puedes gestionarlas. Esta política se
-        aplica al dominio principal y a sus subdominios.
+            aplica al dominio principal <strong>{SITE_OWNER.domain}</strong> y a sus
+            subdominios.
       </p>
 
       <h2>1. ¿Qué son las cookies?</h2>
@@ -140,9 +144,8 @@ const lastUpdate = "01/11/2025";
 
       <h2>9. Contacto</h2>
       <p>
-        Para dudas sobre esta política, puedes escribirme a
-        {" "}
-        <a href="mailto:amariscalcantudo@gmail.com">amariscalcantudo@gmail.com</a>.
+            Para dudas sobre esta política, puedes escribirme a{" "}
+            <a href={`mailto:${SITE_OWNER.email}`}>{SITE_OWNER.email}</a>.
       </p>
 
       <hr />

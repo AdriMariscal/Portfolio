@@ -1,6 +1,7 @@
 ---
 // src/pages/legal/terminos.astro
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import { SITE_OWNER } from "../../config/siteOwner";
 
 // Si quieres mostrar la fecha automática, cámbiala por:
 // const updatedAt = new Date().toLocaleDateString("es-ES");
@@ -8,20 +9,25 @@ const updatedAt = "01/11/2025";
 ---
 
 <BaseLayout title="Términos y condiciones" description="Condiciones de uso del sitio y, en su caso, contratación a distancia.">
-  <section class="section">
+  <section class="section section--legal">
     <div class="wrap">
       <article class="card card--soft legal__card">
         <div class="legal__body prose">
-  <h1>Términos y condiciones</h1>
-          <p class="muted">Última actualización: {updatedAt}</p>
+          <header class="legal__header">
+            <h1>Términos y condiciones</h1>
+            <p class="muted legal__meta">Última actualización: {updatedAt}</p>
+          </header>
 
       <p>
         Este documento regula las condiciones de acceso y uso del sitio web
         (el “Sitio”) y, en su caso, las condiciones generales aplicables a
         encargos de servicios realizados a distancia. La navegación por el Sitio
         o la solicitud de servicios implica la aceptación de estos términos.
-        Para cualquier duda, puedes escribir a la dirección indicada en el
-        <a href="/legal/aviso-legal">Aviso legal</a>.
+            Para cualquier duda, puedes escribir a{" "}
+            <a class="link" href={`mailto:${SITE_OWNER.email}`}>{SITE_OWNER.email}</a>{" "}
+            o a la dirección indicada en el
+            {" "}
+        <a class="link" href="/legal/aviso-legal">Aviso legal</a>.
       </p>
 
       <ol class="legal__list">
@@ -74,7 +80,7 @@ const updatedAt = "01/11/2025";
             <li><strong>Desistimiento.</strong> En servicios, el derecho legal de desistimiento de 14 días puede no aplicar una vez ejecutado completamente el servicio o cuando el cliente haya solicitado el inicio durante el plazo de desistimiento, lo que se reconocerá expresamente en el encargo.</li>
             <li><strong>Entregables y plazos.</strong> Se fijarán en las condiciones particulares. El cliente facilitará la información necesaria y aprobará hitos cuando corresponda.</li>
             <li><strong>Atención de reclamaciones y resolución de litigios en línea (ODR).</strong> El usuario consumidor puede acudir a la plataforma ODR de la Comisión Europea:
-              <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer">https://ec.europa.eu/consumers/odr</a>.
+              <a class="link" href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer">https://ec.europa.eu/consumers/odr</a>.
             </li>
           </ul>
         </li>
@@ -105,9 +111,9 @@ const updatedAt = "01/11/2025";
           <h2>7. Privacidad y cookies</h2>
           <p>
             El tratamiento de datos personales se rige por la
-            <a href="/legal/privacidad">Política de privacidad</a> (RGPD/LOPDGDD).
+            <a class="link" href="/legal/privacidad">Política de privacidad</a> (RGPD/LOPDGDD).
             La instalación y uso de cookies o tecnologías similares se detalla en la
-            <a href="/legal/cookies">Política de cookies</a>.
+            <a class="link" href="/legal/cookies">Política de cookies</a>.
           </p>
         </li>
 
@@ -155,16 +161,11 @@ const updatedAt = "01/11/2025";
           <p>
             Para consultas relativas a estos términos, puedes escribir a la
             dirección de contacto indicada en el
-            <a href="/legal/aviso-legal">Aviso legal</a>.
+            <a class="link" href="/legal/aviso-legal">Aviso legal</a>.
           </p>
         </li>
       </ol>
 
-      <nav class="legal__nav">
-        <a href="/legal/aviso-legal">Aviso legal</a> ·
-        <a href="/legal/privacidad">Privacidad</a> ·
-        <a href="/legal/cookies">Cookies</a>
-      </nav>
     </div>
       </article>
     </div>
