@@ -510,6 +510,60 @@ html[data-theme="dark"] .skip-link{
   margin:0 0 6px;
 }
 
+/* ========================================================================== */
+/*   Blog / buscador                                                          */
+/* ========================================================================== */
+
+.blog-search {
+  max-width: var(--container-max);
+  margin: 0 auto 0.75rem;
+  padding-inline: clamp(1rem, 4vw, var(--space-6));
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.blog-search__field {
+  max-width: 480px;
+}
+
+.blog-search__label {
+  display: inline-block;
+  font-weight: 600;
+  color: var(--am-ink);
+  margin-bottom: 4px;
+}
+
+.blog-search__input {
+  width: 100%;
+}
+
+.blog-search__hint {
+  font-size: 0.85rem;
+  color: var(--am-graphite);
+}
+
+.blog-search__count {
+  max-width: var(--container-max);
+  margin: 0 auto 1rem;
+  padding-inline: clamp(1rem, 4vw, var(--space-6));
+  font-size: 0.88rem;
+  color: var(--am-graphite);
+}
+
+.blog-search__empty {
+  grid-column: 1 / -1;
+  padding: 1rem 1.1rem;
+  border-radius: var(--am-radius);
+  border: 1px dashed var(--am-border);
+  background: var(--am-surface);
+  color: var(--am-graphite);
+}
+
+/* Ajuste en modo oscuro */
+html[data-theme="dark"] .blog-search__empty {
+  background: #020617;
+}
 
 /* Listado base (3–2–1) */
 .posts-grid{
