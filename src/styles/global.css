@@ -678,6 +678,72 @@ html[data-theme="dark"] .skip-link{
   border-radius:8px;
 }
 
+.post__toc{
+  margin:1rem 0 1.75rem;
+  padding:.85rem 1rem 1rem;
+  border-radius:12px;
+  border:1px solid var(--am-border);
+  background:var(--am-surface-alt);
+}
+
+.post__toc-title{
+  font-size:.8rem;
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  margin:0 0 .5rem;
+  color:var(--am-graphite);
+}
+
+.post__toc-list{
+  list-style:none;
+  margin:0;
+  padding-left:.1rem;
+  display:flex;
+  flex-direction:column;
+  gap:.25rem;
+}
+
+.post__toc-item{
+  line-height:1.4;
+}
+
+.post__toc-item a{
+  font-size:.95rem;
+  text-decoration:none;
+  color:var(--am-ink);
+}
+
+.post__toc-item a:hover{
+  text-decoration:underline;
+  text-underline-offset:0.12em;
+  color:var(--am-accent);
+}
+
+.post__toc-item--level-3{
+  padding-left:1rem;
+  font-size:.9rem;
+}
+
+/* Saltos de ancla: que las cabeceras no queden ocultas bajo el header fijo */
+.post__prose h2,
+.post__prose h3{
+  scroll-margin-top:90px;
+}
+
+/* Resalta la sección a la que se ha navegado desde el índice */
+.post__prose :is(h2,h3):target{
+  outline:2px solid var(--am-accent);
+  outline-offset:.16em;
+  border-radius:4px;
+  background:rgba(148,163,184,0.08);
+}
+
+html[data-theme="dark"] .post__toc{
+  background:#020617;
+  border-color:#1f2937;
+}
+
 /* Bloques de código multi-línea */
 .post__prose pre{
   margin:1.25rem 0;
