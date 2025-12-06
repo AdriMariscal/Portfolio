@@ -1,7 +1,7 @@
 ---
 title: "Guía práctica de accesibilidad web: cómo hacer tu sitio más inclusivo"
 description: "Introducción práctica a la accesibilidad web: contraste de colores, navegación por teclado, texto alternativo, etiquetas ARIA y herramientas gratuitas como WAVE, Lighthouse y AXE para evaluar y mejorar cualquier sitio."
-tags: ["accesibilidad", "a11y", "ux", "lighthouse", "web"]
+tags: ["a11y", "ux", "lighthouse", "web"]
 published: true
 date: 2025-11-11
 ---

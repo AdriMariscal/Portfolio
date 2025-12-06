@@ -1,7 +1,7 @@
 ---
 title: "Automatiza tus presupuestos de rendimiento y flujos de usuario con Lighthouse CI y GitHub Actions"
 description: "Cómo definir performance budgets para LCP, INP y CLS, integrarlos con Lighthouse CI y GitHub Actions en proyectos Astro + Netlify, y combinar datos de laboratorio con el informe de UX de Chrome (CrUX)."
-tags: ["lighthouse", "core-web-vitals", "performance", "ci-cd", "github-actions", "astro", "netfly"]
+tags: ["lighthouse", "core‑web‑vitals", "performance", "ci‑cd", "github‑actions", "astro", "netlify"]
 published: true
 date: 2025-12-04
 ---
