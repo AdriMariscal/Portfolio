@@ -1,7 +1,7 @@
 ---
 title: "CI/CD para Astro y Netlify con GitHub Actions: pipeline completo paso a paso"
 description: "Cómo diseñar un pipeline de integración continua para un proyecto Astro desplegado en Netlify: tests, linters, Lighthouse (SEO y accesibilidad), matrices de Node y artefactos con GitHub Actions."
-tags: ["astro", "netfly", "ci-cd", "github-actions", "lighthouse", "seo"]
+tags: ["astro", "netlify", "ci‑cd", "github‑actions", "lighthouse", "seo"]
 published: true
 date: 2025-11-04
 ---
