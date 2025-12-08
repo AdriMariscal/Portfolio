@@ -1,4 +1,4 @@
-// lighthouserc.js
+// lighthouserc.cjs
 /** Configuración de Lighthouse CI para el portfolio de Adrián.
  *
  * - collect.staticDistDir: usa la build estática generada por `npm run build` (carpeta `dist`).
