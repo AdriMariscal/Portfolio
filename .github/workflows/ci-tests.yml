@@ -1,0 +1,68 @@
+# .github/workflows/ci-lighthouse.yml
+name: CI – E2E + Lighthouse
+
+on:
+  pull_request:
+    branches:
+      - dev
+      - staging
+      - main
+
+jobs:
+  e2e:
+    name: Playwright E2E + visual
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Instalar dependencias
+        run: npm install
+
+      - name: Instalar navegadores Playwright
+        run: npx playwright install --with-deps
+
+      - name: Ejecutar tests E2E
+        run: npm run test:e2e
+
+      - name: Subir artefactos de Playwright (resultados y capturas)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-test-results
+          path: |
+            test-results/
+            playwright-report/
+          if-no-files-found: ignore
+
+  lighthouse-ci:
+    name: Lighthouse CI (accesibilidad + SEO)
+    runs-on: ubuntu-latest
+    needs: e2e
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Instalar dependencias
+        run: npm install
+
+      - name: Build de Astro
+        run: npm run build
+
+      - name: Instalar Lighthouse CI (CLI)
+        run: npm install -g @lhci/cli@0.15.x
+
+      - name: Ejecutar Lighthouse CI
+        run: lhci autorun

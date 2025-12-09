@@ -1,7 +1,7 @@
 {
   "name": "portfolio",
   "type": "module",
-  "version": "2.14.0",
+  "version": "2.15.0",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
@@ -9,7 +9,8 @@
     "astro": "astro",
     "bump:patch": "npm version patch --no-git-tag-version",
     "bump:minor": "npm version minor --no-git-tag-version",
-    "bump:major": "npm version major --no-git-tag-version"
+    "bump:major": "npm version major --no-git-tag-version",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.8",
@@ -23,6 +24,7 @@
     "@astrojs/rss": "^4.0.13",
     "@tailwindcss/vite": "^4.1.16",
     "rehype-autolink-headings": "^7.1.0",
-    "remark-images": "^4.1.0"
+    "remark-images": "^4.1.0",
+    "@playwright/test": "^1.49.0"
   }
 }
