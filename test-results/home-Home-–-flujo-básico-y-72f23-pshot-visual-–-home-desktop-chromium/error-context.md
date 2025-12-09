@@ -1,0 +1,181 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - link "Saltar al contenido principal" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - link "Adrián Mariscal" [ref=e5] [cursor=pointer]:
+        - /url: /
+      - navigation "Navegación principal" [ref=e6]:
+        - link "Inicio" [ref=e7] [cursor=pointer]:
+          - /url: /
+        - link "Proyectos" [ref=e8] [cursor=pointer]:
+          - /url: /projects
+        - link "Blog" [ref=e9] [cursor=pointer]:
+          - /url: /blog
+        - link "Contacto" [ref=e10] [cursor=pointer]:
+          - /url: /contact
+        - button "Cambiar a tema oscuro" [ref=e11] [cursor=pointer]:
+          - generic [ref=e13]: Oscuro
+  - main "Contenido principal" [ref=e14]:
+    - region "Arquitecto Salesforce & soluciones web a medida" [ref=e15]:
+      - generic [ref=e16]:
+        - heading "Arquitecto Salesforce & soluciones web a medida" [level=1] [ref=e17]
+        - paragraph [ref=e18]: Diseño y construyo sistemas claros, mantenibles y con impacto.
+        - generic [ref=e19]:
+          - link "Cuéntame tu proyecto" [ref=e20] [cursor=pointer]:
+            - /url: /contact
+          - link "Leer el blog" [ref=e21] [cursor=pointer]:
+            - /url: /blog
+        - generic [ref=e22]:
+          - link "Entradas del blog con etiqueta Salesforce" [ref=e23] [cursor=pointer]:
+            - /url: /blog/tags/salesforce
+            - generic [ref=e24]:
+              - heading "10+" [level=3] [ref=e25]
+              - text: Años con Salesforce
+          - link "Ver proyectos" [ref=e26] [cursor=pointer]:
+            - /url: /projects
+            - generic [ref=e27]:
+              - heading "1" [level=3] [ref=e28]
+              - text: Proyectos propios
+          - link "Qué es Google Lighthouse" [ref=e29] [cursor=pointer]:
+            - /url: /blog/lighthouse
+            - generic [ref=e30]:
+              - heading "98/100" [level=3] [ref=e31]
+              - text: Lighthouse medio
+    - generic [ref=e33]:
+      - heading "Proyectos destacados" [level=2] [ref=e34]
+      - article [ref=e36]:
+        - generic [ref=e37]:
+          - 'heading "Abrir ficha del proyecto: Portfolio Personal" [level=3] [ref=e38]':
+            - 'link "Abrir ficha del proyecto: Portfolio Personal" [ref=e39] [cursor=pointer]':
+              - /url: /projects/portfolio/
+              - text: Portfolio Personal
+          - paragraph [ref=e40]: Sitio personal hecho con Astro. Blog, proyectos y contacto.
+          - list "Etiquetas" [ref=e41]:
+            - listitem [ref=e42]:
+              - link "#astro" [ref=e43] [cursor=pointer]:
+                - /url: /blog/tags/astro/
+            - listitem [ref=e44]:
+              - link "#typescript" [ref=e45] [cursor=pointer]:
+                - /url: /blog/tags/typescript/
+            - listitem [ref=e46]:
+              - link "#netlify" [ref=e47] [cursor=pointer]:
+                - /url: /blog/tags/netlify/
+            - listitem [ref=e48]:
+              - link "#edge-functions" [ref=e49] [cursor=pointer]:
+                - /url: /blog/tags/edge-functions/
+            - listitem [ref=e50]:
+              - link "#forms" [ref=e51] [cursor=pointer]:
+                - /url: /blog/tags/forms/
+            - listitem [ref=e52]:
+              - link "#seo" [ref=e53] [cursor=pointer]:
+                - /url: /blog/tags/seo/
+    - generic [ref=e55]:
+      - heading "Últimos artículos" [level=2] [ref=e56]
+      - generic [ref=e57]:
+        - article [ref=e58]:
+          - generic [ref=e59]:
+            - heading "Automatiza tus presupuestos de rendimiento y flujos de usuario con Lighthouse CI y GitHub Actions" [level=3] [ref=e60]:
+              - link "Automatiza tus presupuestos de rendimiento y flujos de usuario con Lighthouse CI y GitHub Actions" [ref=e61] [cursor=pointer]:
+                - /url: /blog/lighthouse-ci-presupuestos-rendimiento-flujos-usuario/
+            - paragraph [ref=e62]:
+              - time [ref=e63]: 04 dic 2025
+            - paragraph [ref=e64]: Cómo definir performance budgets para LCP, INP y CLS, integrarlos con Lighthouse CI y GitHub Actions en proyectos Astro + Netlify, y combinar datos de laboratorio con el informe de UX de Chrome (CrUX).
+            - list "Etiquetas" [ref=e65]:
+              - listitem [ref=e66]:
+                - link "#lighthouse" [ref=e67] [cursor=pointer]:
+                  - /url: /blog/tags/lighthouse/
+              - listitem [ref=e68]:
+                - link "#core‑web‑vitals" [ref=e69] [cursor=pointer]:
+                  - /url: /blog/tags/core-web-vitals/
+              - listitem [ref=e70]:
+                - link "#performance" [ref=e71] [cursor=pointer]:
+                  - /url: /blog/tags/performance/
+              - listitem [ref=e72]:
+                - link "#ci‑cd" [ref=e73] [cursor=pointer]:
+                  - /url: /blog/tags/ci-cd/
+              - listitem [ref=e74]:
+                - link "#github‑actions" [ref=e75] [cursor=pointer]:
+                  - /url: /blog/tags/github-actions/
+              - listitem [ref=e76]:
+                - link "#astro" [ref=e77] [cursor=pointer]:
+                  - /url: /blog/tags/astro/
+        - article [ref=e78]:
+          - generic [ref=e79]:
+            - 'heading "FinOps para pymes: cómo controlar los costes de la nube y optimizar tu inversión" [level=3] [ref=e80]':
+              - 'link "FinOps para pymes: cómo controlar los costes de la nube y optimizar tu inversión" [ref=e81] [cursor=pointer]':
+                - /url: /blog/finops-para-pymes-control-costes-nube/
+            - paragraph [ref=e82]:
+              - time [ref=e83]: 02 dic 2025
+            - paragraph [ref=e84]: "Introducción práctica a FinOps para pymes: cómo ganar visibilidad sobre los costes de la nube, evitar sustos en la factura y optimizar tu inversión mes a mes."
+            - list "Etiquetas" [ref=e85]:
+              - listitem [ref=e86]:
+                - link "#finops" [ref=e87] [cursor=pointer]:
+                  - /url: /blog/tags/finops/
+              - listitem [ref=e88]:
+                - link "#cloud" [ref=e89] [cursor=pointer]:
+                  - /url: /blog/tags/cloud/
+              - listitem [ref=e90]:
+                - link "#costes" [ref=e91] [cursor=pointer]:
+                  - /url: /blog/tags/costes/
+              - listitem [ref=e92]:
+                - link "#pymes" [ref=e93] [cursor=pointer]:
+                  - /url: /blog/tags/pymes/
+              - listitem [ref=e94]:
+                - link "#negocio" [ref=e95] [cursor=pointer]:
+                  - /url: /blog/tags/negocio/
+        - article [ref=e96]:
+          - generic [ref=e97]:
+            - 'heading "Backend as a Service (BaaS) en 2025: cómo elegirlo y conectarlo con Astro o Next.js" [level=3] [ref=e98]':
+              - 'link "Backend as a Service (BaaS) en 2025: cómo elegirlo y conectarlo con Astro o Next.js" [ref=e99] [cursor=pointer]':
+                - /url: /blog/backend-as-a-service-2025-astro-nextjs/
+            - paragraph [ref=e100]:
+              - time [ref=e101]: 27 nov 2025
+            - paragraph [ref=e102]: "Introducción práctica al modelo Backend as a Service (BaaS) en 2025: qué es, cuándo tiene sentido, comparación de proveedores como Firebase, Supabase y AWS Amplify, y ejemplos de integración con Astro o Next.js."
+            - list "Etiquetas" [ref=e103]:
+              - listitem [ref=e104]:
+                - link "#backend" [ref=e105] [cursor=pointer]:
+                  - /url: /blog/tags/backend/
+              - listitem [ref=e106]:
+                - link "#serverless" [ref=e107] [cursor=pointer]:
+                  - /url: /blog/tags/serverless/
+              - listitem [ref=e108]:
+                - link "#baas" [ref=e109] [cursor=pointer]:
+                  - /url: /blog/tags/baas/
+              - listitem [ref=e110]:
+                - link "#astro" [ref=e111] [cursor=pointer]:
+                  - /url: /blog/tags/astro/
+              - listitem [ref=e112]:
+                - link "#nextjs" [ref=e113] [cursor=pointer]:
+                  - /url: /blog/tags/nextjs/
+  - contentinfo "Información del sitio" [ref=e114]:
+    - generic [ref=e115]:
+      - navigation "Información legal" [ref=e116]:
+        - link "Aviso legal" [ref=e117] [cursor=pointer]:
+          - /url: /legal/aviso-legal
+        - link "Privacidad" [ref=e118] [cursor=pointer]:
+          - /url: /legal/privacidad
+        - link "Cookies" [ref=e119] [cursor=pointer]:
+          - /url: /legal/cookies
+        - link "Términos" [ref=e120] [cursor=pointer]:
+          - /url: /legal/terminos
+      - generic [ref=e121]: © 2025 Adrián Mariscal · v2.15.0
+  - generic [ref=e124]:
+    - button "Menu" [ref=e125]:
+      - img [ref=e127]
+      - generic: Menu
+    - button "Inspect" [ref=e131]:
+      - img [ref=e133]
+      - generic: Inspect
+    - button "Audit" [ref=e135]:
+      - generic [ref=e136]:
+        - img [ref=e137]
+        - img [ref=e140]
+      - generic: Audit
+    - button "Settings" [ref=e143]:
+      - img [ref=e145]
+      - generic: Settings
+```
