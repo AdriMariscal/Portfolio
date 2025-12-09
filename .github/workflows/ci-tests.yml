@@ -1,5 +1,5 @@
 # .github/workflows/ci-lighthouse.yml
-name: CI – Lighthouse a11y/SEO
+name: CI – E2E + Lighthouse
 
 on:
   pull_request:
@@ -30,6 +30,16 @@ jobs:
 
       - name: Ejecutar tests E2E
         run: npm run test:e2e
+
+      - name: Subir artefactos de Playwright (resultados y capturas)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-test-results
+          path: |
+            test-results/
+            playwright-report/
+          if-no-files-found: ignore
 
   lighthouse-ci:
     name: Lighthouse CI (accesibilidad + SEO)
