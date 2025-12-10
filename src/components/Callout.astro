@@ -1,0 +1,18 @@
+---
+export type CalloutVariant = "info" | "success" | "warning" | "danger";
+
+export interface Props {
+  variant?: CalloutVariant;
+  title?: string;
+}
+
+const { variant = "info", title } = Astro.props;
+const variantClass = `callout--${variant}`;
+---
+
+<aside class={`callout ${variantClass}`} role="note">
+  {title && <p class="callout__title">{title}</p>}
+  <div class="callout__body">
+    <slot />
+  </div>
+</aside>

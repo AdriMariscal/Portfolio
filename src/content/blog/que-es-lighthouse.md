@@ -1,7 +1,7 @@
 ---
 title: "Qué es Google Lighthouse (explicado fácil) y por qué debería importarte"
 description: "Lighthouse explicado sin tecnicismos: qué mide, cómo interpretar sus notas y cómo usarlo para mejorar la velocidad, accesibilidad y SEO de tu web."
-tags: ["lighthouse", "seo", "performance", "accesibilidad", "web"]
+tags: ["lighthouse", "seo", "performance", "a11y", "web"]
 published: true
 date: 2025-10-30
 ---

@@ -1,10 +1,12 @@
 ---
 title: "¿Qué es Salesforce? Explicado fácil para cualquier persona"
 description: "Salesforce explicado sin tecnicismos: qué es, ejemplos del día a día y en qué casos merece la pena implantarlo en una empresa pequeña o mediana."
-tags: ["salesforce", "crm", "nube", "negocio", "desarrollo"]
+tags: ["salesforce", "crm", "cloud", "negocio", "desarrollo"]
 published: true
 date: 2025-10-30
 image: "/images/blog/Salesforce-logo.jpg"
+imageAlt: "Logotipo de Salesforce sobre fondo azul"
+imageCaption: "Salesforce, la plataforma CRM líder para gestionar clientes y procesos de negocio."
 robots: "max-snippet:-1, max-image-preview:large"
 ---
 

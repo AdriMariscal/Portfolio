@@ -1,0 +1,20 @@
+---
+export interface Props {
+  author?: string;
+  role?: string;
+}
+
+const { author, role } = Astro.props;
+---
+
+<figure class="quote-highlight">
+  <blockquote class="quote-highlight__text">
+    <slot />
+  </blockquote>
+  {(author || role) && (
+    <figcaption class="quote-highlight__meta">
+      {author && <span class="quote-highlight__author">{author}</span>}
+      {role && <span class="quote-highlight__role"> · {role}</span>}
+    </figcaption>
+  )}
+</figure>

@@ -1,7 +1,7 @@
 ---
 title: "Cómo elegir la plataforma de cloud computing adecuada para tu negocio: comparativa y claves prácticas"
 description: "Guía práctica para elegir entre las principales plataformas de cloud computing (AWS, Azure, Google Cloud y otras). Claves de negocio, criterios técnicos, costes, soporte y recomendaciones según el tipo de empresa."
-tags: ["nube", "cloud", "negocio", "infraestructura", "estrategia"]
+tags: ["cloud", "negocio", "infraestructura", "estrategia"]
 published: true
 date: 2025-11-13
 ---

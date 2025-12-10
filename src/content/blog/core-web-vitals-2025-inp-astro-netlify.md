@@ -1,7 +1,7 @@
 ---
 title: "Core Web Vitals 2025: qué es INP y cómo optimizar tu sitio con Astro y Netlify"
 description: "Guía actualizada de Core Web Vitals en 2025: qué es INP, cómo se diferencia de FID, cómo medir LCP, INP y CLS con Lighthouse y PageSpeed Insights, y estrategias prácticas para optimizar sitios hechos con Astro y desplegados en Netlify."
-tags: ["core-web-vitals", "performance", "lighthouse", "seo", "astro", "netfly"]
+tags: ["core‑web‑vitals", "performance", "lighthouse", "seo", "astro", "netlify"]
 published: true
 date: 2025-11-18
 ---

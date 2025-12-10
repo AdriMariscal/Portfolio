@@ -431,6 +431,152 @@ html[data-theme="dark"] .skip-link{
 .footer__link:hover{opacity:1;color:var(--am-ink);text-decoration:underline}
 .footer__copy{font-weight:600}
 
+/* Botón del footer que actúa como enlace de configuración de cookies */
+.footer__link-btn{
+  border:none;
+  background:none;
+  padding:0;
+  cursor:pointer;
+}
+
+.footer__link-btn:focus-visible{
+  outline:2px solid var(--am-ink);
+  outline-offset:2px;
+}
+
+html[data-theme="dark"] .footer__link-btn:focus-visible{
+  outline-color:var(--am-accent);
+}
+
+/* ==========================================================================
+   Cookie banner
+   ========================================================================== */
+.cookie-banner{
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:0;
+  z-index:40;
+  background:var(--am-surface);
+  border-top:1px solid var(--am-border);
+  box-shadow:0 -8px 24px rgba(15,23,42,0.12);
+}
+
+.cookie-banner__inner{
+  padding-block:12px;
+}
+
+.cookie-banner__content{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.75rem 1.25rem;
+  align-items:flex-start;
+  justify-content:space-between;
+  font-size:.9rem;
+}
+
+.cookie-banner__main{
+  flex:1 1 260px;
+  min-width:240px;
+}
+
+.cookie-banner__title{
+  font-size:.95rem;
+  font-weight:700;
+  margin:0 0 .25rem;
+  color:var(--am-ink);
+}
+
+.cookie-banner__text{
+  margin:0;
+  color:var(--am-graphite);
+}
+
+.cookie-banner__prefs{
+  display:grid;
+  gap:.35rem;
+  margin-top:.5rem;
+}
+
+.cookie-banner__pref-label{
+  display:flex;
+  align-items:flex-start;
+  gap:.5rem;
+}
+
+.cookie-banner__pref-label input[type="checkbox"]{
+  margin-top:.15rem;
+}
+
+.cookie-banner__pref-label strong{
+  font-size:.9rem;
+}
+
+.cookie-banner__pref-desc{
+  display:block;
+  font-size:.8rem;
+  color:var(--am-graphite);
+}
+
+.cookie-banner__note{
+  margin:.5rem 0 0;
+  font-size:.8rem;
+  color:var(--am-graphite);
+}
+
+.cookie-banner__note-link{
+  color:var(--am-accent-cool);
+  text-decoration:underline;
+  text-underline-offset:.12em;
+  font-weight:500;
+}
+
+.cookie-banner__note-link:hover{
+  color:var(--am-accent);
+  text-decoration-thickness:2px;
+}
+
+.cookie-banner__actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.4rem;
+  align-items:center;
+  justify-content:flex-end;
+}
+
+.cookie-banner__link{
+  border:none;
+  background:none;
+  padding:0;
+  font-size:.85rem;
+  color:var(--am-accent);
+  text-decoration:underline;
+  text-underline-offset:.12em;
+  cursor:pointer;
+}
+
+.cookie-banner__link:hover{
+  text-decoration-thickness:2px;
+}
+
+@media (max-width:640px){
+  .cookie-banner__content{
+    flex-direction:column;
+    align-items:stretch;
+  }
+
+  .cookie-banner__actions{
+    justify-content:flex-start;
+    margin-top:.35rem;
+  }
+}
+
+html[data-theme="dark"] .cookie-banner{
+  background:#020617;
+  border-top-color:var(--am-border);
+  box-shadow:0 -10px 30px rgba(0,0,0,0.7);
+}
+
 /* ==========================================================================
    Fichas (layout y tipografía ligera)
    ========================================================================== */
@@ -732,6 +878,25 @@ html[data-theme="dark"] .blog-search__empty {
   border-radius:8px;
 }
 
+/* Imagen hero del post (frontmatter: image) */
+.post__hero{
+  margin: 1rem 0 1.75rem;
+}
+
+.post__hero img{
+  display:block;
+  width:100%;
+  height:auto;
+  border-radius:12px;
+  box-shadow:0 12px 28px rgba(15,23,42,.10);
+}
+
+.post__hero-caption{
+  margin-top:.35rem;
+  font-size:.85rem;
+  color:var(--am-graphite);
+}
+
 .post__toc{
   margin:1rem 0 1.75rem;
   padding:.85rem 1rem 1rem;
@@ -791,6 +956,204 @@ html[data-theme="dark"] .blog-search__empty {
   outline-offset:.16em;
   border-radius:4px;
   background:rgba(148,163,184,0.08);
+}
+
+/* ==========================================================================
+   Componentes de contenido enriquecido dentro de .post__prose
+   ========================================================================== */
+
+/* Callouts */
+.post__prose .callout {
+  margin: 1.25rem 0;
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  border: 1px solid var(--am-border);
+  background: var(--am-surface-alt);
+  display: grid;
+  row-gap: 0.35rem;
+  font-size: 0.95rem;
+}
+
+.post__prose .callout__title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--am-graphite);
+}
+
+.post__prose .callout__body > :first-child {
+  margin-top: 0;
+}
+.post__prose .callout__body > :last-child {
+  margin-bottom: 0;
+}
+
+/* Variantes por tipo */
+.post__prose .callout--info {
+  border-color: rgba(14, 165, 233, 0.35);   /* azul */
+  background: rgba(14, 165, 233, 0.06);
+}
+
+.post__prose .callout--success {
+  border-color: rgba(34, 197, 94, 0.35);    /* verde */
+  background: rgba(34, 197, 94, 0.06);
+}
+
+.post__prose .callout--warning {
+  border-color: rgba(245, 158, 11, 0.40);   /* naranja */
+  background: rgba(245, 158, 11, 0.08);
+}
+
+.post__prose .callout--danger {
+  border-color: rgba(239, 68, 68, 0.40);    /* rojo */
+  background: rgba(239, 68, 68, 0.06);
+}
+
+/* Ajustes en modo oscuro */
+html[data-theme="dark"] .post__prose .callout {
+  background: #020617;
+  border-color: #1f2937;
+}
+
+/* Quote destacada */
+.post__prose .quote-highlight {
+  margin: 1.5rem 0;
+  padding: 1.1rem 1.4rem;
+  border-radius: 14px;
+  border: 1px solid var(--am-border);
+  background: var(--am-surface-alt);
+  position: relative;
+  overflow: hidden;
+}
+
+.post__prose .quote-highlight::before {
+  content: "“";
+  position: absolute;
+  font-size: 4.5rem;
+  line-height: 1;
+  top: -0.8rem;
+  left: 0.6rem;
+  opacity: 0.08;
+}
+
+.post__prose .quote-highlight__text {
+  margin: 0;
+  font-style: italic;
+}
+
+.post__prose .quote-highlight__meta {
+  margin-top: 0.6rem;
+  font-size: 0.85rem;
+  color: var(--am-graphite);
+}
+
+.post__prose .quote-highlight__author {
+  font-weight: 600;
+}
+
+/* Modo oscuro para quote */
+html[data-theme="dark"] .post__prose .quote-highlight {
+  background: #020617;
+  border-color: #1f2937;
+}
+
+/* Árbol de carpetas */
+.post__prose .tree-diagram {
+  margin: 1.5rem 0;
+  padding: 1rem 1.2rem;
+  border-radius: 12px;
+  border: 1px solid var(--am-border);
+  background: var(--am-surface-alt);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+  font-size: 0.9rem;
+}
+
+.post__prose .tree-diagram__title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 0 0 0.25rem;
+}
+
+.post__prose .tree-diagram__note {
+  margin: 0 0 0.6rem;
+  color: var(--am-graphite);
+  font-size: 0.8rem;
+}
+
+.post__prose .tree-diagram__body {
+  margin-top: 0.25rem;
+}
+
+/* Estructura del árbol con UL/LI */
+.post__prose .tree-diagram ul {
+  list-style: none;
+  margin: 0.1rem 0;
+  padding-left: 0.8rem;
+}
+
+.post__prose .tree-diagram li {
+  position: relative;
+  padding-left: 1.1rem;
+  margin: 0.15rem 0;
+}
+
+.post__prose .tree-diagram li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.8em;
+  width: 0.75rem;
+  height: 1px;
+  background: rgba(148, 163, 184, 0.85);
+}
+
+.post__prose .tree-diagram li::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: -0.4em;
+  bottom: -0.4em;
+  width: 1px;
+  background: rgba(148, 163, 184, 0.5);
+}
+
+.post__prose .tree-diagram li:last-child::after {
+  bottom: 0.7em;
+}
+
+/* Interacción con <details>/<summary> */
+.post__prose .tree-diagram details {
+  padding-left: 0.1rem;
+}
+
+.post__prose .tree-diagram summary {
+  cursor: pointer;
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.post__prose .tree-diagram summary::-webkit-details-marker {
+  display: none;
+}
+
+.post__prose .tree-diagram summary::before {
+  content: "▸";
+  font-size: 0.8rem;
+  transform: translateY(1px);
+}
+
+.post__prose .tree-diagram details[open] > summary::before {
+  content: "▾";
+}
+
+/* Modo oscuro */
+html[data-theme="dark"] .post__prose .tree-diagram {
+  background: #020617;
+  border-color: #1f2937;
 }
 
 html[data-theme="dark"] .post__toc{

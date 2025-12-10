@@ -20,6 +20,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         action="/thanks"
         data-netlify="true"
         netlify-honeypot="bot-field"
+        data-netlify-recaptcha="true"
         aria-describedby="contact-privacy-note"
       >
         <!-- Netlify -->
@@ -29,28 +30,29 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         </p>
 
         <div class="card__body stack" style="--stack-gap: 18px;">
-          <label class="field">
-            <span>Nombre</span>
-            <input class="input" type="text" name="name" autocomplete="name" required />
+        <label class="field">
+          <span>Nombre</span>
+          <input class="input" type="text" name="name" autocomplete="name" required />
         </label>
 
-          <label class="field">
-            <span>Email</span>
-            <input class="input" type="email" name="email" autocomplete="email" required />
+        <label class="field">
+          <span>Email</span>
+          <input class="input" type="email" name="email" autocomplete="email" required />
         </label>
 
-          <label class="field">
-            <span>Mensaje</span>
-            <textarea class="input" name="message" rows="6" required></textarea>
+        <label class="field">
+          <span>Mensaje</span>
+          <textarea class="input" name="message" rows="6" required></textarea>
         </label>
 
-          <div class="contact__actions">
-            <button class="btn btn--primary btn--block" type="submit">Enviar</button>
-            <p id="contact-privacy-note" class="contact__legal muted">
-              Al enviar aceptas la
-              <a class="link" href="/legal/privacidad">Política de privacidad</a>.
-            </p>
-          </div>
+        <div data-netlify-recaptcha="true"></div>
+
+        <div class="contact__actions">
+          <button class="btn btn--primary btn--block" type="submit">Enviar</button>
+          <p id="contact-privacy-note" class="contact__legal muted">
+            Al enviar aceptas la
+            <a class="link" href="/legal/privacidad">Política de privacidad</a>.
+          </p>
         </div>
       </form>
     </div>
