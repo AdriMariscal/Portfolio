@@ -1,15 +1,26 @@
 ---
 title: "Portfolio Personal"
 description: "Sitio personal hecho con Astro. Blog, proyectos y contacto."
-tags: ["astro", "typescript", "netlify", "edge-functions", "forms", "seo", "lighthouse", "legal", "portfolio"]
-repoUrl: 
+tags: ["astro", "netlify", "edge-functions", "seo", "lighthouse", "portfolio", "ci‑cd", "github‑actions", "ux", "a11y"]
+repoUrl:
 demoUrl:
-projectUrl: "https://adrianmariscal.netlify.app"
+projectUrl: "https://adrianmariscal.es"
 featured: true
 published: true
 date: 2025-10-24
 status: "active"
 changelog:
+  - version: "v2.16.0"
+    date: "2025-12-10"
+    changes:
+      - { type: "added", text: "Componente de consentimiento de cookies con gestión granular y enlace a políticas." }
+      - { type: "changed", text: "Dominio principal migrado a adrianmariscal.es y redirecciones configuradas." }
+      - { type: "added", text: "Integración de Playwright y Lighthouse en GitHub Actions para pruebas e2e y presupuestos de rendimiento." }
+      - { type: "added", text: "Nuevos componentes Callout y FolderTree y mejoras de accesibilidad (QuoteHighlight, botón de cookies en el footer)." }
+      - { type: "changed", text: "Markdown mejorado: enlaces automáticos en encabezados y optimización de imágenes." }
+      - { type: "fixed", text: "Refactor de Netlify Edge Functions y autenticación de staging con variables de entorno seguras." }
+      - { type: "added", text: "Analítica RUM de Core Web Vitals y reCAPTCHA en formularios." }
+      - { type: "docs", text: "Actualización de contenidos y notas de lanzamiento v2.16.0." }
   - version: "v1.0.10"
     date: "2025-11-06"
     changes:
@@ -42,14 +53,15 @@ changelog:
 Portfolio en **Astro** con enfoque en rendimiento, SEO y accesibilidad. Incluye blog técnico, catálogo de proyectos y se apoya en content collections tipadas. Evoluciona por iteraciones, manteniendo un diseño consistente, una base legal al día y una arquitectura preparada para escalar.
 
 ## Contexto
-El sitio es mi carta de presentación como **arquitecto Salesforce y desarrollador web**. A nivel operativo, mantengo un flujo **DEV → STAGING (protegido) → PROD** con versionado SemVer y notas de versión públicas.
+El sitio es mi carta de presentación como **arquitecto Salesforce y desarrollador web**. A nivel operativo, mantengo un flujo **DEV → STAGING (protegido) → PROD** con CI/CD en GitHub Actions, tests automatizados y versionado SemVer con notas de versión públicas.
 
 ## Stack
-- **Astro** (content collections, rutas estáticas tipadas)
+- **Astro** (content collections, rutas estáticas tipadas, remark y rehype para Markdown)
 - **TypeScript**
-- **Netlify** (build/deploy, Forms)
-- **Edge Functions** (básica para proteger STAGING)
-- **GitHub** (ramas `dev`/`staging`/`main`, PRs y tags)
+- **Netlify** (build/deploy, Forms y gestión de cookies)
+- **Edge Functions** (protección de STAGING y autenticación)
+- **Playwright & Lighthouse** (tests e2e y presupuestos de rendimiento)
+- **GitHub Actions** (CI/CD con Playwright y Lighthouse)
 
 ## Resultados (v0.4.1)
 - **Diseño** coherente con la guía de marca: tipografías, espaciados y color.
@@ -69,8 +81,15 @@ El sitio es mi carta de presentación como **arquitecto Salesforce y desarrollad
 - **SEO avanzado:** meta canonical, OG/Twitter tags y JSON‑LD para posts; estructura de enlaces amigable y botón “Volver” para mejorar la navegación.
 - **Accesibilidad y UX:** colores y contraste revisados, jerarquías de encabezados lógicas y navegación con teclado optimizada.
 
+## Resultados (v2.16.0)
+
+- **Cumplimiento y privacidad:** implementación de un banner de cookies con gestión granular (analítica y marketing), integración de reCAPTCHA en formularios y actualización de políticas legales.
+- **Performance y pruebas:** se añaden tests end‑to‑end con Playwright y presupuestos de rendimiento con Lighthouse CI en GitHub Actions, además de un script RUM para monitorizar Core Web Vitals en producción.
+- **UX y accesibilidad:** nuevos componentes Callout, FolderTree y QuoteHighlight enriquecen el blog; mejor distribución del contenido y botón para configurar cookies desde el footer; mejoras de contraste y navegación.
+- **SEO y contenido:** migración al dominio canónico **adrianmariscal.es**, actualización de metadatos y canonical; optimización de imágenes y autogeneración de enlaces en encabezados gracias a remark/rehype; reorganización de artículos y etiquetas.
+- **Arquitectura y DevOps:** refactor de Edge Functions para login protegido en staging, variables de entorno seguras y adopción de GitHub Actions como pipeline principal.
+
 ## Roadmap corto
-- **Internacionalización** (i18n) y modo oscuro para ampliar audiencia y accesibilidad.
 - **Buscador interno** en el blog.
-- **Analítica conforme AEPD** cuando se active: revisión de cookies y consentimiento.
-- **Mejoras DevEx:** pruebas visuales, chequeos Lighthouse en CI y entornos de preview por PR.
+- **Mejorar la cobertura de pruebas**: ampliar tests end‑to‑end y presupuestos de rendimiento para mayor robustez.
+- **Gestión de contenido**: desarrollar herramientas o integrar un CMS que facilite la edición de posts y proyectos.
