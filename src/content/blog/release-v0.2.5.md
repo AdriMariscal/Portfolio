@@ -16,7 +16,7 @@ Con la **v0.2.5** publico la primera versión en producción de **Cartas Rápid
 - **Plantillas en Markdown y guías**: modelos para baja de gimnasio, desistimiento 14 días, reclamación a operadora, devolución de cargo SEPA y reclamación ASNEF, acompañados de introducción, puntos clave y FAQs.
 - **Firma manuscrita opcional**: canvas integrado que inserta la firma cuando la plantilla define el placeholder `{firma}`.
 - **Configuración de Astro 5**: site canónico (`https://cartasrapidas.es`), prefetch activado y dependencia actualizada a Astro 5.16 con mejoras de rendimiento y SEO.
-- **Publicidad y service worker**: se eliminan los scripts de service worker remotos, se sustituye el antiguo Adsense por un banner de Monetag cargado con `requestIdleCallback` y se publica una versión “no‑op” del service worker para invalidar instalaciones previas【355617442606897†L8-L33】.
+- **Publicidad y service worker**: se eliminan los scripts de service worker remotos, se sustituye el antiguo Adsense por un banner de Monetag cargado con `requestIdleCallback` y se publica una versión “no‑op” del service worker para invalidar instalaciones previas.
 - **DevOps**: automatización de versionado (tags `vX.Y.Z` en `main` y `vX.Y.Z-rc` en `staging`), despliegue estático a Netlify con Node 20 y rama `staging` protegida.
 
 ## Por qué este cambio
@@ -27,7 +27,7 @@ Las versiones previas eran experimentales: un generador sencillo escrito en Prea
 
 ### Generador de cartas en el navegador
 
-Se sustituye el antiguo componente Preact por un nuevo **generador de cartas** en Astro que carga plantillas desde una colección de contenido y genera formularios dinámicos.  Cada plantilla define sus placeholders (`{nombre_completo}`, `{dni}`, `{direccion}`, etc.), y el generador crea los campos de entrada adecuados.  Al rellenarlos, la carta se previsualiza en tiempo real y se puede **copiar** o **descargar en PDF** gracias a jsPDF.  La interfaz incluye botones para generar, limpiar el formulario y consejos de envío.  Todo el procesamiento se realiza en el cliente, mejorando la privacidad y eliminando la necesidad de un backend 【732089632976959†screenshot】.
+Se sustituye el antiguo componente Preact por un nuevo **generador de cartas** en Astro que carga plantillas desde una colección de contenido y genera formularios dinámicos.  Cada plantilla define sus placeholders (`{nombre_completo}`, `{dni}`, `{direccion}`, etc.), y el generador crea los campos de entrada adecuados.  Al rellenarlos, la carta se previsualiza en tiempo real y se puede **copiar** o **descargar en PDF** gracias a jsPDF.  La interfaz incluye botones para generar, limpiar el formulario y consejos de envío.  Todo el procesamiento se realiza en el cliente, mejorando la privacidad y eliminando la necesidad de un backend.
 
 ### Catálogo de plantillas y guías
 
@@ -51,7 +51,7 @@ El proyecto se actualiza a **Astro 5.16** y se configura correctamente el campo
 
 ### Publicidad y service worker
 
-La web dejaba de utilizar un **service worker remoto** para cargar anuncios y notificaciones push.  En su lugar se publica un service worker vacío que únicamente define eventos `install` y `activate` para invalidar cualquier versión previa【355617442606897†L8-L33】.  La integración publicitaria se renueva: se eliminan los componentes de Adsense (`HeaderDisplayAd` y `FooterMultiplexAd`) y se implementa un **script de Monetag** que se inyecta con `requestIdleCallback` al final de `BaseLayout.astro`, cargando un banner en páginas idle y manteniendo la eficiencia 【355617442606897†L8-L33】.
+La web dejaba de utilizar un **service worker remoto** para cargar anuncios y notificaciones push.  En su lugar se publica un service worker vacío que únicamente define eventos `install` y `activate` para invalidar cualquier versión previa.  La integración publicitaria se renueva: se eliminan los componentes de Adsense (`HeaderDisplayAd` y `FooterMultiplexAd`) y se implementa un **script de Monetag** que se inyecta con `requestIdleCallback` al final de `BaseLayout.astro`, cargando un banner en páginas idle y manteniendo la eficiencia .
 
 ### DevOps, versionado y despliegue
 
