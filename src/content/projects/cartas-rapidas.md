@@ -1,7 +1,7 @@
 ---
 title: "Cartas Rápidas"
 description: "Generador de cartas legales frecuentes para España, con plantillas guiadas y exportación a PDF, ejecutado 100% en el navegador."
-tags: ["astro", "netlify", "seo", "performance", "core‑web‑vitals", "ux", "a11y", "ci‑cd", "github-actions", "web"]
+tags: ["astro", "netlify", "seo", "performance", "core‑web‑vitals", "ux", "a11y", "ci‑cd", "cartas-rapidas", "web"]
 repoUrl:
 demoUrl: ""
 projectUrl: "https://cartasrapidas.es"
