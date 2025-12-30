@@ -1,0 +1,485 @@
+---
+title: "Playwright en GitHub Actions: E2E y regresión visual en Deploy Previews"
+description: "Configura Playwright en GitHub Actions para testear cada PR contra el Deploy Preview de Netlify, con snapshots, reportes y artefactos fiables para Astro."
+tags: ["astro", "netlify", "ci‑cd", "github-actions", "playwright"]
+published: true
+date: 2025-12-25
+image: "/images/blog/latop-plant-mug.jpg"
+imageAlt: "Portátil con un Pull Request de GitHub y un reporte de Playwright en pantalla, representando un flujo de CI con tests E2E"
+imageCaption: "La meta: que cada PR tenga un semáforo fiable antes del merge."
+robots: "max-snippet:-1, max-image-preview:large"
+---
+
+import Callout from '@/components/Callout.astro';
+import QuoteHighlight from '@/components/QuoteHighlight.astro';
+import FolderTree from '@/components/FolderTree.astro';
+
+# Playwright en GitHub Actions: E2E y regresión visual en Deploy Previews
+
+Seguro que te ha pasado: abres un pull request, Netlify te genera un Deploy Preview, todo parece “verde”… y al hacer merge alguien descubre que **se ha roto un flujo crítico** (login, checkout, formulario, navegación, etc.).
+
+La buena noticia es que, si ya usas **Astro + Netlify**, tienes el escenario perfecto para automatizar:
+- Tests **E2E reales** (sobre el entorno de preview, no sobre mocks).
+- **Regresión visual** con snapshots (capturas comparadas en cada PR).
+- Reportes, trazas y capturas como **artefactos descargables** en GitHub Actions.
+- Y un “semáforo” que **bloquea el merge** si algo se rompe.
+
+<Callout variant="info" title="Qué vas a conseguir con esta guía">
+  Al terminar, tendrás un workflow que se dispara en cada pull request, espera a que el Deploy Preview esté listo, ejecuta Playwright contra esa URL y sube reportes/trace/screenshots como artefactos.
+</Callout>
+
+![Checks de GitHub Actions pasando en un pull request con un enlace visible al Deploy Preview de Netlify](/images/blog/github-screenshot.jpg)
+
+---
+
+## 1. El patrón: “PR → Deploy Preview → Playwright → merge seguro”
+
+En proyectos modernos, el Deploy Preview no es solo “para que lo vea producto”: es tu entorno de QA automático.
+
+**La idea clave** es esta:
+
+1. Abres PR → Netlify construye un Deploy Preview.
+2. GitHub Actions **espera** a que el preview esté “ready”.
+3. Playwright ejecuta:
+   - E2E (flujos críticos).
+   - Visual regression (capturas clave).
+4. Si falla algo, se suben pruebas:
+   - HTML report.
+   - Trace Viewer (muy útil para depurar).
+   - Capturas/vídeos (si los activas).
+5. El check queda rojo → **no hay merge** (si lo marcas como “required” en branch protection).
+
+<QuoteHighlight>
+  “Si un PR no puede demostrar que funciona en un Deploy Preview, no debería llegar a producción por accidente.”
+</QuoteHighlight>
+
+---
+
+## 2. Preparar Playwright para probar un Deploy Preview (sin servidor local)
+
+Cuando pruebas sobre un Deploy Preview, no necesitas levantar `astro dev` en CI. Solo necesitas que Playwright use como `baseURL` la URL del preview.
+
+### 2.1 Dependencias y scripts mínimos
+
+Instala Playwright:
+
+```bash
+npm i -D @playwright/test
+npx playwright install
+```
+
+Añade scripts útiles en `package.json`:
+
+```json
+{
+  "scripts": {
+    "test:e2e": "playwright test",
+    "test:e2e:update": "playwright test --update-snapshots"
+  }
+}
+```
+
+### 2.2 Config recomendada: baseURL por variable + trazas en CI
+
+Ejemplo de `playwright.config.ts` (ajústalo a tu repo):
+
+```ts
+import { defineConfig, devices } from '@playwright/test';
+
+const isCI = !!process.env.CI;
+
+export default defineConfig({
+  testDir: './tests/e2e',
+  // Importante: en CI solemos permitir 1-2 reintentos controlados para reducir flakiness.
+  retries: isCI ? 2 : 0,
+  // Manténlo razonable para no “tapar” errores reales.
+  timeout: 60_000,
+  expect: { timeout: 10_000 },
+
+  // Reporte HTML (en CI lo subiremos como artefacto)
+  reporter: [
+    ['list'],
+    ['html', { open: 'never', outputFolder: 'playwright-report' }],
+  ],
+
+  use: {
+    // La URL vendrá del workflow: BASE_URL = Deploy Preview
+    baseURL: process.env.BASE_URL,
+
+    // “Pruebas” para depurar: trazas/capturas solo si falla
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
+    trace: isCI ? 'on-first-retry' : 'retain-on-failure',
+
+    // Recomendable para estabilidad visual
+    viewport: { width: 1280, height: 720 },
+    // Si tu app usa mucha animación, considera desactivarla en tests (ver sección 5).
+  },
+
+  projects: [
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
+    { name: 'webkit', use: { ...devices['Desktop Safari'] } },
+  ],
+});
+```
+
+<Callout variant="warning" title="Base URL: controla el origen de verdad">
+  Si tus tests dependen de `baseURL`, evita hardcodear dominios. En local, usa `BASE_URL=http://localhost:4321`. En CI, usa el Deploy Preview. Así tus tests son portables.
+</Callout>
+
+---
+
+## 3. Obtener la URL del Deploy Preview (sin “pegamento” frágil)
+
+Aquí está el punto que más suele fallar: **cómo saber qué URL probar**.
+
+Tienes dos enfoques principales:
+
+### Opción A (recomendada): leer la URL desde el “commit status” de Netlify
+
+Cuando Netlify genera el Deploy Preview, normalmente publica un status en el commit del PR con un `target_url` apuntando al preview. Eso significa que puedes resolver la URL **solo con `GITHUB_TOKEN`**.
+
+Ventajas:
+- No necesitas token de Netlify.
+- La URL siempre coincide con lo que Netlify ha publicado para ese commit.
+- Menos moving parts.
+
+### Opción B: usar la API de Netlify (si necesitas más control)
+
+Si quieres filtrar por contexto, rama, etc., puedes llamar a la API de Netlify con `NETLIFY_AUTH_TOKEN` + `NETLIFY_SITE_ID` y buscar el deploy más reciente del PR.
+
+Ventajas:
+- Control total si tienes flujos complejos (varios sites, deploy contexts, alias, etc.).
+- Útil si el status de GitHub no está disponible por tu configuración.
+
+En el workflow de ejemplo iremos con **Opción A** y dejaremos la B como plan de contingencia.
+
+---
+
+## 4. Workflow completo: matriz de navegadores, cachés y artefactos
+
+Este workflow hace lo siguiente:
+- Se dispara en `pull_request`.
+- Espera a que el Deploy Preview esté listo (polling del status).
+- Ejecuta Playwright por navegador (matriz).
+- Sube reportes y evidencias como artefactos.
+
+### 4.1 Estructura mínima en el repo
+
+<FolderTree title="Estructura sugerida para E2E + snapshots" note="No es obligatoria; busca consistencia y revisión sencilla en PRs.">
+  <details open>
+    <summary>/</summary>
+    <ul>
+      <li>.github/workflows/e2e-deploy-preview.yml</li>
+      <li>playwright.config.ts</li>
+
+      <li>
+        tests/
+        <ul>
+          <li>
+            e2e/
+            <ul>
+              <li>smoke.spec.ts</li>
+              <li>checkout.visual.spec.ts</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </details>
+</FolderTree>
+
+### 4.2 Workflow `e2e-deploy-preview.yml`
+
+```yml
+name: E2E (Playwright) on Netlify Deploy Preview
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: e2e-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: read
+  statuses: read
+
+jobs:
+  e2e:
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [chromium, firefox, webkit]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Cache de navegadores de Playwright (acelera muchísimo)
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-ms-playwright-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-ms-playwright-
+
+      - name: Install Playwright browsers (with deps)
+        run: npx playwright install --with-deps
+
+      - name: Resolve Netlify Deploy Preview URL
+        id: preview
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const delay = (ms) => new Promise((r) => setTimeout(r, ms));
+
+            const { owner, repo } = context.repo;
+            const sha = context.payload.pull_request.head.sha;
+
+            // Ajusta si tu status tiene otro patrón; esta heurística suele ser suficiente.
+            const isPreviewUrl = (u) =>
+              typeof u === 'string' && (u.includes('deploy-preview') || u.includes('.netlify.app'));
+
+            for (let attempt = 1; attempt <= 30; attempt++) {
+              const { data: statuses } = await github.rest.repos.listCommitStatusesForRef({
+                owner,
+                repo,
+                ref: sha,
+                per_page: 100,
+              });
+
+              // Preferimos el status que apunte a deploy-preview y esté "success"
+              const candidate = statuses.find((s) => {
+                const ctx = (s.context || '').toLowerCase();
+                return ctx.includes('netlify') && isPreviewUrl(s.target_url);
+              });
+
+              if (candidate?.state === 'success' && isPreviewUrl(candidate.target_url)) {
+                core.setOutput('url', candidate.target_url);
+                core.info(`Deploy Preview listo: ${candidate.target_url}`);
+                return;
+              }
+
+              core.info(
+                `Intento ${attempt}/30: aún no está listo (status: ${candidate?.state || 'no encontrado'}).`
+              );
+              await delay(20_000);
+            }
+
+            core.setFailed(
+              'No se encontró un Deploy Preview listo. Revisa que Netlify publique el status en el PR o aumenta el tiempo de espera.'
+            );
+
+      - name: Export BASE_URL
+        run: echo "BASE_URL=${{ steps.preview.outputs.url }}" >> $GITHUB_ENV
+
+      - name: Run Playwright tests
+        env:
+          PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report
+          PLAYWRIGHT_HTML_OPEN: never
+        run: npx playwright test --project=${{ matrix.project }}
+
+      - name: Upload Playwright report (HTML)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ matrix.project }}
+          path: playwright-report
+          retention-days: 7
+
+      - name: Upload test results (traces, screenshots, videos)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-test-results-${{ matrix.project }}
+          path: test-results
+          retention-days: 7
+```
+
+### 4.3 Hacer que “bloquee el merge”
+
+El workflow por sí solo no bloquea nada. Lo bloquea tu repositorio cuando lo marcas como **Required status check** en la rama principal (Branch protection).
+
+En la práctica:
+- Si el job falla → el check queda rojo.
+- Si el check es requerido → no puedes hacer merge.
+
+---
+
+## 5. Regresión visual con snapshots: cómo hacerlo bien (y sin falsas alarmas)
+
+La regresión visual es potente, pero solo funciona si **la imagen es estable**.
+
+### 5.1 Qué es un snapshot en Playwright
+
+Cuando haces algo como:
+
+```ts
+import { test, expect } from '@playwright/test';
+
+test('checkout: no se rompe el resumen', async ({ page }) => {
+  await page.goto('/checkout');
+  await expect(page.locator('[data-testid="order-summary"]')).toHaveScreenshot();
+});
+```
+
+Playwright crea (o compara) una imagen en tu repo. En CI:
+- Si la UI cambió, verás diffs.
+- Si está igual, pasa.
+
+### 5.2 Cuándo actualizar snapshots
+
+Actualiza snapshots cuando:
+- Has cambiado UI a propósito (rediseño, copy, spacing).
+- Has corregido un bug visual y quieres “congelar” el nuevo comportamiento.
+
+**No actualices snapshots** para “hacer que el CI se calle”. Si el snapshot falla, primero pregunta: ¿es un cambio esperado o un bug?
+
+### 5.3 Revisión segura de diffs (la parte humana)
+
+En un PR, lo sano es:
+- El autor actualiza snapshots localmente (`npm run test:e2e:update`) y commitea.
+- El revisor compara:
+  - Captura “antes vs después” (si subes artefactos o usas el diff de Playwright).
+  - Contexto del cambio en el PR.
+
+<Callout variant="warning" title="No actualices snapshots automáticamente en CI">
+  Automatizar la actualización en CI suele acabar ocultando regresiones reales. Mejor: actualiza en local, versiona, revisa en PR y deja que CI sea el verificador.
+</Callout>
+
+### 5.4 Técnicas anti-falsos-positivos
+
+Checklist rápido para estabilizar visual regression:
+
+- **Desactiva animaciones** en tests (CSS global inyectado).
+- Fija `viewport` y evita layouts responsive si no es el objetivo.
+- Evita datos dinámicos (fechas, IDs, “hoy”, contadores).
+- Si hay zonas dinámicas inevitables, usa `mask` o captura un componente concreto (no toda la página).
+- Usa `toHaveScreenshot()` sobre un **locator estable** (no `page` entero, salvo en smoke visual).
+
+Ejemplo de “apagado de animaciones”:
+
+```ts
+test.beforeEach(async ({ page }) => {
+  await page.addStyleTag({
+    content: `
+      *, *::before, *::after {
+        transition: none !important;
+        animation: none !important;
+        caret-color: transparent !important;
+      }
+    `,
+  });
+});
+```
+
+---
+
+## 6. Reportes, trazas y capturas: que depurar sea barato
+
+Cuando un test falla en CI, lo caro no es el fallo: es **entenderlo**.
+
+Por eso, en el workflow subimos:
+- `playwright-report/` → HTML report (resultados navegables).
+- `test-results/` → traces, screenshots y vídeos (si los activas).
+
+Consejos prácticos:
+- `trace: 'on-first-retry'` suele ser el mejor equilibrio: no genera trazas en verde, pero sí cuando hay flakiness o fallos reales.
+- `video: 'retain-on-failure'` ayuda mucho en flows complejos (pero pesa).
+- Ajusta `retention-days` según tu uso (7–30 días suele estar bien).
+
+![Reporte HTML de Playwright con un test fallido y enlace a Trace Viewer](TODO: captura genérica del reporte HTML de Playwright mostrando un test fallido y un botón/enlace a abrir la traza)
+
+---
+
+## 7. Técnicas anti-flakiness que sí merecen la pena
+
+Un CI “rojo por flakiness” se ignora. Y lo que se ignora, deja de proteger.
+
+En Playwright, lo que suele funcionar (sin magia) es:
+
+- **Retries controlados**: 1–2 en CI, 0 en local.
+- Timeouts explícitos (pero no absurdos): `actionTimeout`, `navigationTimeout` si tu app lo necesita.
+- Evitar `waitForTimeout()` salvo emergencias: prefiere *esperas inteligentes* (por ejemplo, esperar a un locator visible).
+- Aislamiento:
+  - Tests independientes.
+  - Datos de prueba predecibles.
+- “Smoke” primero:
+  - Un set pequeño de tests críticos puede ejecutarse en todos los navegadores.
+  - El resto (más pesado) quizá solo en Chromium o en un pipeline nocturno.
+
+---
+
+## 8. ¿Y si quiero algo “no-code” o más fácil?
+
+Tiene sentido quererlo fácil. Especialmente si estás validando un MVP o si todavía no tienes cultura de QA automatizado.
+
+Opciones típicas (sin casarte con un stack):
+
+- **QA manual con Deploy Previews**: rápido, barato… pero no escala y depende de personas.
+- **Herramientas SaaS de regresión visual**: suelen integrarse con GitHub y te dan diffs “bonitos” sin que montes infraestructura.
+- **E2E no-code**: útiles para smoke tests simples, pero se quedan cortas en flujos complejos o cuando necesitas control fino (datos, auth, mocks parciales, etc.).
+
+Dónde suele estar el equilibrio realista en pymes y equipos pequeños:
+- Empieza con un **smoke suite** (3–10 tests) que bloquee lo crítico.
+- Añade regresión visual solo en pantallas “clave” (home, pricing, checkout, panel, etc.).
+- Evoluciona a medida que el producto madura.
+
+**Y aquí viene la parte importante:** montar esto bien no es “meter un YAML”. Es diseñar un sistema que:
+- sea estable,
+- cueste poco mantener,
+- y de verdad proteja releases.
+
+Si lo quieres “hecho y olvidarte”, suele salir mejor que lo monte un profesional: reduces semanas de prueba/error y evitas que el pipeline termine desactivado “porque molesta”.
+
+---
+
+## 9. Checklist final: tu semáforo de regresión visual
+
+Antes de darlo por terminado, revisa:
+
+1. El check de E2E está marcado como **required** en la rama principal.
+2. El workflow espera correctamente a que el Deploy Preview esté “success”.
+3. `BASE_URL` viene del preview (no de producción, no de localhost).
+4. Tienes un smoke suite pequeño y rápido (lo crítico).
+5. Los tests no dependen de datos volátiles (fechas, IDs, contenido aleatorio).
+6. La regresión visual captura locators estables (no toda la página por defecto).
+7. Animaciones/transiciones desactivadas en tests visuales.
+8. Trazas/reportes se suben como artefactos siempre (`if: always()`).
+9. Retries controlados (1–2) y timeouts razonables.
+10. Si falla, puedes depurar sin “adivinar” (trace + screenshot + HTML report).
+
+---
+
+## Lecturas recomendadas dentro del blog
+
+Si quieres completar el sistema “de calidad” alrededor del CI:
+
+- [CI/CD para Astro y Netlify con GitHub Actions: pipeline completo paso a paso](/blog/ci-cd-astro-netlify-github-actions/)
+- [Automatiza tus presupuestos de rendimiento y flujos de usuario con Lighthouse CI y GitHub Actions](/blog/lighthouse-ci-presupuestos-rendimiento-flujos-usuario/)
+- [Netlify Functions y Edge Functions con Astro: servicios dinámicos sin backend propio](/blog/netlify-functions-edge-astro-servicios-dinamicos/)
+
+---
+
+## Cierre
+
+Si quieres, puedo ayudarte a **diseñar y dejar funcionando** este flujo en tu proyecto (Astro + Netlify), con una suite inicial de tests, regresión visual estable y reporting útil para el equipo.
+
+Si te encaja, **[escríbeme](/contact)** y lo aterrizamos con tu caso real (qué flujos son críticos, qué navegadores importan y qué nivel de cobertura tiene sentido).
