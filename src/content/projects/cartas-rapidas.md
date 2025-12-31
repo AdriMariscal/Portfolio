@@ -1,15 +1,26 @@
 ---
 title: "Cartas Rápidas"
-description: "Generador de cartas legales frecuentes para España, con plantillas guiadas y exportación a PDF, ejecutado 100% en el navegador."
+description: "Generador de cartas legales frecuentes para España, con plantillas guiadas, exportación a PDF y ahora funcionalidades multilingües y de accesibilidad."
 tags: ["astro", "netlify", "seo", "performance", "core‑web‑vitals", "ux", "a11y", "ci‑cd", "cartas-rapidas", "web"]
 repoUrl:
 demoUrl: ""
 projectUrl: "https://cartasrapidas.es"
 featured: true
 published: true
-date: 2025-12-15
+date: 2025-12-31
 status: "active"
 changelog:
+  - version: "v1.4.0"
+    date: "2025-12-31"
+    changes:
+    - { type: "added", text: "Módulo de cuenta local cifrada: permite guardar, cargar y exportar/importar cartas, firmas y recordatorios en el navegador usando localStorage y WebCrypto sin recurrir a servidores." }
+    - { type: "added", text: "Soporte multilingüe (español, catalán y euskera) con rutas localizadas, traducciones centralizadas y sitemap por idioma." }
+    - { type: "added", text: "Componente de llamada a la acción para feedback y mejora del formulario de contacto con preselección de guía, motivo y mensaje." }
+    - { type: "added", text: "Modo oscuro y modo de alto contraste con tokens de diseño y conmutadores accesibles en la barra de navegación." }
+    - { type: "changed", text: "Normalización de slugs y mejoras SEO: slugs uniformes con guiones, verificación de unicidad, nuevas opciones de Open Graph (campo og_image) y sitemap con prioridades y changefreq dinámico." }
+    - { type: "changed", text: "Actualización de datos legales y de contacto: unificación del correo de contacto a info@cartasrapidas.es y añadido enlace al portfolio profesional." }
+    - { type: "devops", text: "Integración de workflows de GitHub Actions para CI, auditoría de paquetes, tests de Lighthouse y despliegues automáticos en Netlify, más configuración de Dependabot." }
+    - { type: "docs", text: "Documentación ampliada: nuevos README, CONTRIBUTING.md y guías de agentes, además de plantillas de issues y PR para estandarizar contribuciones." }
   - version: "v0.2.5"
     date: "2025-12-15"
     changes:
@@ -23,22 +34,29 @@ changelog:
 ---
 
 ## Resumen
-Cartas Rápidas es una herramienta web para generar cartas legales claras y listas para enviar, orientada a casos frecuentes en España (baja de gimnasio, desistimiento, reclamaciones, devoluciones SEPA y solicitudes relacionadas con ASNEF).
-
-El flujo es guiado: eliges plantilla, rellenas tus datos y obtienes el texto final para copiar o descargar en PDF, sin enviar información a servidores.
+Cartas Rápidas es una herramienta web para generar cartas legales claras y listas para enviar, orientada a casos frecuentes en España (baja de gimnasio, desistimiento, reclamaciones, devoluciones SEPA y solicitudes relacionadas con ASNEF). Con la nueva versión incorpora un módulo de cuenta local cifrada, modos de visualización accesibles y multilingüe (es, ca, eu), así como mecanismos para recabar feedback y mejorar continuamente.
 
 ## Contexto
-Proyecto pensado como utilitario de autoservicio: contenido legal “plantillable” + guías prácticas alrededor de cada modelo.
-
-El despliegue es estático (Astro) y la generación ocurre en cliente. El repositorio incluye flujo de versionado basado en `package.json` y automatización de tags en GitHub por rama (staging/main).
+Proyecto de utilidad pública y portfolio profesional: combina contenido legal “plantillable” con guías prácticas y ahora con soporte multilingüe. El despliegue sigue un flujo dev → staging → main, con versiones etiquetadas automáticamente y despliegues estáticos en Netlify. Desde la versión 1.4.0 se integran workflows de CI/CD, dependabot y plantillas de contribución para facilitar colaboraciones externas.
 
 ## Stack
-- Astro 5 (sitio estático, content collections y SEO básico con `site` definido).
-- Tailwind CSS 4 (estilos del generador y componentes).
-- Preact (integración Astro para componentes/UX).
-- jsPDF (exportación a PDF en cliente).
-- Netlify (build `npm run build`, salida `dist`, Node 20).
-- GitHub Actions (auto-tag en `main` y tags “rc” en `staging`).
+- Astro 5 para sitio estático y content collections con traducciones (i18n) y SEO configurado.
+- Tailwind CSS 4 y tokens de tema para modo claro/oscuro y alto contraste.
+- Preact para componentes interactivos (generador, feedback CTA, conmutadores de tema).
+- jsPDF para exportación de cartas a PDF en cliente.
+- WebCrypto API y localStorage para el módulo de cuenta local cifrada (exportación/importación de datos).
+- Netlify con Node 20 para builds y deploys; workflows de GitHub Actions para CI, Lighthouse y auditoría.
+- GitHub Actions y Dependabot para auto‑tag, actualización de dependencias y despliegues continuos.
+
+## Resultados (v1.4.0)
+- **Experiencia multilingüe:** la web está disponible en español, catalán y euskera con rutas localizadas y metadatos SEO por idioma, lo que amplía el alcance y mejora el posicionamiento.
+- **Cuenta local cifrada:** los usuarios pueden guardar borradores de cartas, firmas y recordatorios en su dispositivo, exportarlos/importarlos con cifrado AES‑GCM y recuperarlos sin backend, mejorando la retención y la privacidad.
+- **Feedback contextual:** cada guía incluye una llamada a la acción que abre el formulario de contacto pre‑rellenado, facilitando la recogida de sugerencias e incidencias específicas.
+- **Accesibilidad y personalización:** se introducen modos oscuro y de alto contraste con persistencia en localStorage y conmutadores accesibles, mejorando la usabilidad en diferentes entornos.
+- **SEO avanzado:** normalización de slugs, control de duplicados, campos opcionales og_image y un sitemap enriquecido con changefreq/priority elevan la indexación y la presentación en redes sociales.
+- **Transparencia y profesionalidad:** actualización de todas las referencias al correo de contacto a info@cartasrapidas.es
+ y añadido enlace al portfolio del autor en la sección “Quién está detrás”.
+- **DevOps y documentación:** nuevos workflows de CI/CD automatizan tests, auditorías y despliegues; documentación completa y plantillas de PR/issues facilitan contribuciones y mantienen la calidad del código.
 
 ## Resultados (v0.2.5)
 - Generación de cartas completamente en el navegador: mejora de privacidad al no depender de backend para datos personales.
@@ -48,7 +66,8 @@ El despliegue es estático (Astro) y la generación ocurre en cliente. El reposi
 - Señales técnicas para SEO/performance: `site` configurado en Astro y prefetch activado para navegación más fluida.
 
 ## Roadmap corto
-- Ampliar el catálogo de plantillas y homogeneizar slugs/títulos para URLs más consistentes.
-- Añadir páginas por plantilla con metadatos específicos (title/description/canonical) y schema.org orientado a “HowTo/FAQ” cuando aplique.
-- Incorporar validaciones de formulario (tipos de campo, formatos) y mejoras de accesibilidad en inputs (ayudas, errores y foco).
-- Integrar analítica mínima (opt-in) para medir uso por plantilla y priorizar mejoras.
+- Extender la localización a otros idiomas (inglés u otros) y revisar las traducciones actuales con revisores nativos.
+- Sincronizar el módulo de cuenta local con almacenamiento en la nube opcional para que los usuarios puedan compartir y recuperar cartas en múltiples dispositivos.
+- Añadir validaciones de formularios y mensajes de error accesibles para mejorar la usabilidad del generador en dispositivos móviles.
+- Integrar pruebas automatizadas (vitest), linter completo y auditorías de rendimiento para mantener la calidad y detectar regresiones.
+- Incorporar analítica opt‑in anonimizada para priorizar nuevas plantillas y mejoras según el uso real.
