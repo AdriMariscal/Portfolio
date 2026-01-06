@@ -16,8 +16,16 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props as { post: CollectionEntry<'blog'> };
 
-// Render del Markdown del post
-const { Content } = await post.render();
+// Render del Markdown del post + cabeceras para el índice
+const { Content, headings } = await post.render();
+
+// Tabla de contenidos: usamos h2 y h3 (secciones principales)
+const tocHeadings = Array.isArray(headings)
+  ? headings.filter((h) => h.depth === 2 || h.depth === 3)
+  : [];
+
+// Consideramos “artículo largo” cuando hay al menos 3 secciones
+const showToc = tocHeadings.length >= 3;
 
 // Metadatos de la página
 const title = post.data.title ?? SITE.title;
@@ -26,7 +34,29 @@ const canonical = Astro.url?.href ?? new URL(`/blog/${post.slug}/`, SITE.url).hr
 
 // Imagen principal (absoluta): prioriza la del post si existe
 const rawImage = (post.data.image ?? post.data.heroImage ?? SITE.ogImage ?? '/og-default.png') as string;
-const imageAbs = rawImage?.startsWith('http') ? rawImage : new URL(rawImage, SITE.url).href;
+const imageAbs = rawImage?.startsWith('http')
+  ? rawImage
+  : new URL(rawImage, SITE.url).href;
+
+// Hero dentro del artículo: solo si el frontmatter define `image`
+const heroImage =
+  typeof (post.data as any).image === "string" &&
+  (post.data as any).image.trim().length > 0
+    ? (post.data as any).image.trim()
+    : null;
+
+// Alt y figcaption opcionales desde el frontmatter
+const heroAlt =
+  typeof (post.data as any).imageAlt === "string" &&
+  (post.data as any).imageAlt.trim().length > 0
+    ? (post.data as any).imageAlt.trim()
+    : title;
+
+const heroCaption =
+  typeof (post.data as any).imageCaption === "string" &&
+  (post.data as any).imageCaption.trim().length > 0
+    ? (post.data as any).imageCaption.trim()
+    : "";
 
 // Fechas del frontmatter (acepta Date o string)
 const toISO = (d: unknown) => {
@@ -40,6 +70,12 @@ const dateModifiedISO = toISO(post.data.updated ?? post.data.date ?? null);
 
 // Etiquetas (solo se mostrarán al final)
 const tags = Array.isArray(post.data.tags) ? post.data.tags : [];
+
+// Directivas opcionales de robots por post (frontmatter: robots: "max-snippet:..., max-image-preview:...")
+const robots =
+  typeof (post.data as any).robots === "string"
+    ? (post.data as any).robots
+    : undefined;
 
 // JSON-LD Article
 const jsonLd = {
@@ -55,10 +91,21 @@ const jsonLd = {
   ...(dateModifiedISO ? { "dateModified": dateModifiedISO } : {}),
   "author": { "@type": "Person", "name": SITE.author },
   ...(tags.length ? { "keywords": tags.join(", ") } : {}),
+  ...(tags.length ? { "articleSection": tags[0] } : {}),  
 };
 ---
 
-<BaseLayout title={title} description={description} ogImage={imageAbs} ogType="article">
+<BaseLayout
+  title={title}
+  description={description}
+  ogImage={imageAbs}
+  ogType="article"
+  articleAuthor={SITE.author}
+  articleTags={tags}
+  articleSection={tags[0] ?? "Blog"}
+  robots={robots}
+  twitterCreator={SITE.twitterCreator}
+>
   <article class="section post">
     <div class="wrap post__card card card--soft">
       <div class="post__body">
@@ -78,6 +125,37 @@ const jsonLd = {
           <a class="btn btn--secondary btn--sm post__back" href="/blog" data-back>← Volver</a>
         </div>
 
+      {/* Imagen principal del artículo (hero), si el frontmatter define `image` */}
+      {heroImage && (
+        <figure class="post__hero">
+          <img
+            src={heroImage}
+            alt={heroAlt}
+            loading="eager"
+            decoding="async"
+          />
+          {heroCaption && (
+            <figcaption class="post__hero-caption">
+              {heroCaption}
+            </figcaption>
+          )}
+        </figure>
+      )}        
+
+        {showToc && (
+          <nav class="post__toc" aria-label="Índice de contenidos">
+            <p class="post__toc-title">En este artículo:</p>
+            <ol class="post__toc-list">
+              {tocHeadings.map((h) => (
+                <li class={`post__toc-item post__toc-item--level-${h.depth}`}>
+                  <a href={`#${h.slug}`}>
+                    {h.text}
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )}
         <div class="post__prose prose">
       <Content />
         </div>
@@ -99,13 +177,65 @@ const jsonLd = {
   </article>
 
   <!-- JSON-LD Article -->
-  <script type="application/ld+json">
-    {JSON.stringify(jsonLd)}
-  </script>
+  <script
+    type="application/ld+json"
+    set:html={JSON.stringify(jsonLd, null, 2)}
+  />
 
-  <!-- Fallback en cliente: si hay referer real, usamos ese para el botón -->
+  <!-- Lógica cliente: botón Volver + botones de copiado en los bloques de código -->
   <script>
-    const a = document.querySelector('[data-back]');
-    if (a && document.referrer) a.setAttribute('href', document.referrer);
+    // Botón "Volver": usa el referer si existe
+    const backLink = document.querySelector('[data-back]');
+    if (backLink && document.referrer) {
+      backLink.setAttribute('href', document.referrer);
+    }
+
+    // Botón de copiado en bloques de código
+    (function () {
+      if (!('clipboard' in navigator)) return;
+
+      const codeBlocks = document.querySelectorAll('.post__prose pre code');
+
+      codeBlocks.forEach((codeEl) => {
+        const pre = codeEl.parentElement;
+        if (!pre || pre.querySelector('.codeblock__copy')) return;
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'codeblock__copy';
+        btn.setAttribute('aria-label', 'Copiar código');
+        btn.textContent = 'Copiar';
+
+        btn.addEventListener('click', async () => {
+          try {
+            await navigator.clipboard.writeText(codeEl.innerText);
+            btn.textContent = 'Copiado';
+            btn.classList.add('codeblock__copy--success');
+            setTimeout(() => {
+              btn.textContent = 'Copiar';
+              btn.classList.remove('codeblock__copy--success');
+            }, 1500);
+          } catch {
+            btn.textContent = 'Error';
+            setTimeout(() => {
+              btn.textContent = 'Copiar';
+            }, 1500);
+          }
+        });
+
+        pre.appendChild(btn);
+      });
+    })();
+
+    // Lazy loading para todas las imágenes dentro del contenido del post
+    const contentImages = document.querySelectorAll('.post__prose img');
+    contentImages.forEach((img) => {
+      if (!img.hasAttribute('loading')) {
+        img.setAttribute('loading', 'lazy');
+        img.setAttribute('decoding', 'async');
+      }
+    });    
   </script>
+</BaseLayout>
+
 </BaseLayout>

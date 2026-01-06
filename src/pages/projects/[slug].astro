@@ -53,24 +53,27 @@ const latestDate = latest?.date ? fmtDate(latest.date) : undefined;
 ---
 
 <BaseLayout title={title} description={undefined}>
-  <article class="section post">
+  <article class="section post project-detail">
     <!-- margen inferior ajustado a 24px -->
-    <div class="wrap post__card card card--soft" style="margin:8px auto 24px">
+    <div class="wrap post__card card card--soft">
       <div class="post__body">
           <h1 class="post__title">{title}</h1>
 
-            <p class="post__date">
-          <strong>Estado:</strong> {isActive ? "Activo" : "Inactivo"}
+        <p class="post__date project-detail__meta">
+          <strong class="project-detail__meta-label">Estado:</strong>{" "}
+          <span class={`badge ${isActive ? "badge--active" : "badge--inactive"}`}>
+            {isActive ? "Activo" : "Inactivo"}
+          </span>
           {latest?.version && (
-              <>
+            <>
               {" · "}<strong>Última versión:</strong> {latest.version}
-                {latestDate && ` (${latestDate})`}
-              </>
-            )}
-            </p>
+              {latestDate && ` (${latestDate})`}
+            </>
+          )}
+        </p>
 
           {(projectUrl || repoUrl || demoUrl) && (
-          <div class="post__actions" style="display:flex; gap:.5rem; flex-wrap:wrap; margin:.5rem 0 0">
+          <div class="post__actions">
           {projectUrl && (
               <a class="btn btn--secondary btn--sm" href={projectUrl} target="_blank" rel="noopener noreferrer">
                 Ver proyecto →
@@ -110,7 +113,7 @@ const latestDate = latest?.date ? fmtDate(latest.date) : undefined;
 
   {/* Changelog con sección compacta y respiración inferior */}
   {changelog.length ? (
-    <article class="section section--tight post" style="padding-bottom:24px">
+    <article class="section section--tight post project-detail__changelog">
       <div class="wrap" aria-labelledby="changelog-title">
             <h2 id="changelog-title" class="h3" style="margin:0 0 .75rem">Changelog</h2>
 

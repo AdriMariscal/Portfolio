@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://adrianmariscal.netlify.app/sitemap-index.xml
+Sitemap: https://adrianmariscal.es/sitemap-index.xml

@@ -1,7 +1,7 @@
 ---
 title: "Netlify Functions y Edge Functions con Astro: servicios dinámicos sin backend propio"
 description: "Tutorial paso a paso para usar Netlify Functions y Edge Functions con Astro: envío de correos con APIs externas, generación de contenido dinámico y protección de entornos de staging sin montar un servidor propio."
-tags: ["astro", "netfly", "serverless", "edge-functions", "backend"]
+tags: ["astro", "netlify", "serverless", "edge‑functions", "backend"]
 published: true
 date: 2025-11-20
 ---

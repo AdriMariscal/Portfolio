@@ -1,0 +1,404 @@
+---
+title: "Dashboard FinOps DIY: unifica costes de AWS, Azure y Google Cloud en una hoja de cálculo"
+description: "Guía práctica para unificar costes multi‑cloud en Google Sheets: extrae datos de AWS, Azure y GCP, crea un dashboard por proyecto y añade alertas simples."
+tags: ["finops", "cloud", "costes", "pymes", "negocio", "infraestructura"]
+published: true
+date: 2025-12-11
+image: "/images/blog/dashboard-finops.png"
+imageAlt: "Hoja de cálculo con un dashboard de costes multi‑cloud por proyecto"
+imageCaption: "Un panel simple (y barato) puede darte más control que esperar a la factura."
+robots: "max-snippet:-1, max-image-preview:large"
+---
+
+import Callout from '@/components/Callout.astro';
+import FolderTree from '@/components/FolderTree.astro';
+
+# Dashboard FinOps DIY: unifica costes de AWS, Azure y Google Cloud en una hoja de cálculo
+
+Seguro que te suena esta escena: tienes la web en un sitio, una base de datos en otro, algún servicio “barato” en una tercera nube… y **solo ves el gasto real cuando llega la factura**.
+
+El problema no es que la nube sea “cara” por defecto. El problema es que, sin visibilidad, es muy fácil:
+
+- No saber **qué proyecto** (o qué entorno) está generando el coste.
+- Detectar demasiado tarde un pico de consumo.
+- Discutir sobre números sin tener un “panel único” que negocio y tecnología entiendan.
+
+En esta guía vas a montar un **dashboard FinOps multi‑cloud** con una hoja de cálculo (por ejemplo, Google Sheets), usando datos de facturación y un ETL pequeño.
+
+Vas a conseguir:
+
+- **Coste unificado** por proveedor y por proyecto (día/mes).
+- Un tablero “para humanos” con métricas y alertas simples.
+- Un patrón de automatización que puedes integrar en tu stack (GitHub Actions, cron, etc.).
+
+<Callout variant="info" title="Importante antes de empezar">
+  Este enfoque está pensado para <strong>pymes y side‑projects</strong>: visibilidad rápida, coste bajo y mantenimiento sencillo.
+  No sustituye a un sistema FinOps enterprise ni busca el “céntimo perfecto”. Busca una cosa: <strong>tomar decisiones antes de que llegue la factura</strong>.
+</Callout>
+
+---
+
+## 1. Qué vas a construir (y qué NO)
+
+### Lo que sí
+
+Un panel que centraliza, en una hoja:
+
+- Gasto **diario** y **mensual** por proveedor (AWS/Azure/GCP).
+- Gasto por **proyecto** y **entorno** (prod/staging/dev).
+- Top servicios que más cuestan.
+- Alertas básicas (“te estás comiendo el presupuesto”).
+
+### Lo que no
+
+- Un cálculo contable con impuestos, prorrateos y conciliación exacta de facturas.
+- Un sistema de “chargeback” perfecto para 10 equipos y 200 cuentas.
+
+Si necesitas lo segundo, perfecto: pero normalmente una pyme primero necesita lo primero.
+
+---
+
+## 2. La base de todo: etiquetas (tags) y un “diccionario” de proyectos
+
+Si no puedes agrupar el gasto por proyecto, el dashboard será solo “otro gráfico bonito”.
+
+La práctica más rentable en FinOps para pymes es establecer **una convención mínima**:
+
+- `project`: nombre del producto/proyecto (ej. `portfolio`, `crm-interno`, `landing-x`)
+- `env`: `prod` | `staging` | `dev`
+- `owner`: responsable (persona o equipo)
+
+Cómo se llama cada cosa según proveedor:
+
+- **AWS**: *Tags* en recursos (y, si te interesa, habilitar *cost allocation tags*).
+- **Azure**: *Tags* en recursos / resource groups (y una estructura clara de *Resource Groups* por proyecto/entorno).
+- **GCP**: *Labels* (o el propio `project_id` si ya separas por proyectos).
+
+<Callout variant="warning" title="Una decisión que te ahorrará horas">
+  Decide ya un formato de valores y respétalo. Por ejemplo: <code>project=cartas-rapidas</code> y <code>env=prod</code>.
+  Lo importante no es la perfección, es que <strong>sea consistente</strong> en las tres nubes.
+</Callout>
+
+---
+
+## 3. Define un modelo de datos mínimo (tu “contrato” entre nubes)
+
+Antes de tocar APIs, define las columnas que vas a volcar a la hoja.
+
+Un modelo mínimo, muy práctico para pymes:
+
+| Columna | Ejemplo | Para qué sirve |
+|---|---|---|
+| `date` | `2025-12-14` | Series temporales y picos |
+| `provider` | `aws` / `azure` / `gcp` | Reparto por nube |
+| `scope` | `account` / `subscription` / `billing_account` | Contexto de facturación |
+| `project` | `portfolio` | Agrupar por proyecto |
+| `env` | `prod` | Separar entornos |
+| `service` | `lambda` / `storage` / `sql` | Top “cost drivers” |
+| `cost` | `12.34` | Métrica base |
+| `currency` | `EUR` | Mezclas multi‑moneda |
+| `source` | `estimated` / `invoiced` | Expectativas realistas |
+
+No necesitas más para empezar. Si luego quieres añadir `region`, `team`, `sku`, etc., lo harás sobre una base sólida.
+
+---
+
+## 4. Extraer costes por proveedor (sin morir en el intento)
+
+Aquí hay un patrón común: **cada proveedor “piensa” distinto**.
+
+- AWS y Azure te permiten consultar costes por API de forma relativamente directa.
+- En GCP, lo más cómodo (y habitual) es exportar billing a **BigQuery** y consultar desde ahí.
+
+### 4.1 AWS: Cost Explorer (agrupando por tags)
+
+En AWS, la pieza clave es **Cost Explorer**, y el objetivo es agrupar por:
+
+- Tag `project`
+- Tag `env`
+- (opcional) `SERVICE`
+
+Ejemplo orientativo con AWS SDK (TypeScript):
+
+```ts
+import { CostExplorerClient, GetCostAndUsageCommand } from "@aws-sdk/client-cost-explorer";
+
+const client = new CostExplorerClient({ region: "us-east-1" });
+
+export async function fetchAwsDailyCosts(start: string, end: string) {
+  const cmd = new GetCostAndUsageCommand({
+    TimePeriod: { Start: start, End: end },
+    Granularity: "DAILY",
+    Metrics: ["UnblendedCost"],
+    GroupBy: [
+      { Type: "TAG", Key: "project" },
+      { Type: "TAG", Key: "env" },
+      { Type: "DIMENSION", Key: "SERVICE" },
+    ],
+  });
+
+  const res = await client.send(cmd);
+  return res.ResultsByTime ?? [];
+}
+```
+
+**Notas prácticas**:
+
+- Los datos pueden llegar como **estimados** durante el mes y “cerrarse” después.
+- Si no ves tags en los resultados, revisa:
+  - Que estás etiquetando recursos.
+  - Que tu estrategia de tags esté alineada con facturación.
+
+### 4.2 Azure: Cost Management Query (por tags o por resource group)
+
+En Azure, la vía típica es **Cost Management + Billing** con una consulta agregada sobre el *scope* (suscripción, management group, etc.).
+
+Patrón de consulta: “dame coste diario y agrúpame por `project`, `env` y servicio”.
+
+Ejemplo conceptual (HTTP) para que se vea la idea (el `api-version` puede cambiar según evolucione el servicio):
+
+```ts
+async function fetchAzureDailyCosts({ scope, token, from, to }: {
+  scope: string; // ej: /subscriptions/{subscriptionId}
+  token: string;
+  from: string;
+  to: string;
+}) {
+  const url = `https://management.azure.com${scope}/providers/Microsoft.CostManagement/query?api-version=2023-03-01`;
+
+  const body = {
+    type: "ActualCost",
+    timeframe: "Custom",
+    timePeriod: { from, to },
+    dataset: {
+      granularity: "Daily",
+      aggregation: { totalCost: { name: "Cost", function: "Sum" } },
+      grouping: [
+        { type: "TagKey", name: "project" },
+        { type: "TagKey", name: "env" },
+        { type: "Dimension", name: "ServiceName" },
+      ],
+    },
+  };
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+```
+
+**Notas prácticas**:
+
+- Si tu tagging en Azure es irregular, una alternativa común es agrupar por **Resource Group** (si lo usas como contenedor por proyecto/entorno).
+- Para autenticación, lo más limpio es **Managed Identity** (si ejecutas en Azure) o un **service principal** con permisos mínimos.
+
+### 4.3 Google Cloud: exporta billing a BigQuery y consulta por proyecto/servicio
+
+En Google Cloud, el camino más estable para BI “casero” es:
+
+1. Activar **Cloud Billing export** a BigQuery.
+2. Consultar la tabla exportada para obtener coste diario.
+3. Enriquecer si necesitas `env`/`owner` (por ejemplo, con un diccionario en la propia hoja).
+
+Ejemplo de consulta SQL (simplificada):
+
+```sql
+SELECT
+  DATE(usage_start_time) AS date,
+  'gcp' AS provider,
+  project.id AS project_id,
+  service.description AS service,
+  SUM(cost) AS cost,
+  currency
+FROM `TU_DATASET.TU_TABLA_DE_EXPORT`
+WHERE DATE(usage_start_time) BETWEEN @from AND @to
+GROUP BY date, project_id, service, currency
+ORDER BY date DESC;
+```
+
+**Notas prácticas**:
+
+- BigQuery tiene coste: pero para un dashboard básico con queries diarias, suele ser asumible si filtras por fechas y usas particiones.
+- Si tu organización ya separa por `project_id`, puede que ese campo te baste como “project”.
+
+---
+
+## 5. Cargar los datos en la hoja: dos enfoques (elige el que te dé menos fricción)
+
+Aquí tienes dos rutas típicas. Ambas funcionan.
+
+### Opción A: Google Apps Script (rápido, pero ojo con credenciales)
+
+Ventaja: todo vive dentro de Google Sheets.  
+Inconveniente: autenticar AWS/Azure desde Apps Script puede complicarse si quieres hacerlo “bien” (firmas, tokens, rotación, etc.).
+
+### Opción B: script en Node.js + ejecución programada (recomendado)
+
+Ventaja: control total de SDKs y credenciales, y lo puedes meter en tu repo con CI/CD.
+
+Un esqueleto mínimo podría ser así:
+
+<FolderTree title="Estructura mínima del proyecto (ETL + dashboard)" note="Puedes tener esto en un repo aparte o dentro de tu monorepo.">
+  <details open>
+    <summary>/finops-dashboard</summary>
+    <ul>
+      <li>scripts/</li>
+      <ul>
+        <li>fetch-aws.ts</li>
+        <li>fetch-azure.ts</li>
+        <li>fetch-gcp.ts</li>
+        <li>sync-to-sheets.ts</li>
+      </ul>
+      <li>queries/</li>
+      <ul>
+        <li>gcp-billing.sql</li>
+      </ul>
+      <li>.github/workflows/</li>
+      <ul>
+        <li>sync-costs.yml</li>
+      </ul>
+      <li>README.md</li>
+    </ul>
+  </details>
+</FolderTree>
+
+Ejemplo de escritura a Google Sheets con `googleapis` (simplificado):
+
+```ts
+import { google } from "googleapis";
+
+export async function appendRowsToSheet({
+  spreadsheetId,
+  range,
+  rows,
+  clientEmail,
+  privateKey,
+}: {
+  spreadsheetId: string;
+  range: string;
+  rows: (string | number)[][];
+  clientEmail: string;
+  privateKey: string;
+}) {
+  const auth = new google.auth.JWT({
+    email: clientEmail,
+    key: privateKey,
+    scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+  });
+
+  const sheets = google.sheets({ version: "v4", auth });
+
+  await sheets.spreadsheets.values.append({
+    spreadsheetId,
+    range,
+    valueInputOption: "USER_ENTERED",
+    requestBody: { values: rows },
+  });
+}
+```
+
+Para programarlo, una opción muy práctica es un workflow con *schedule* en GitHub Actions. Si quieres un ejemplo de pipeline (y cómo encaja con Netlify), puedes apoyarte en esta guía:
+
+- **[CI/CD para Astro y Netlify con GitHub Actions](/blog/ci-cd-astro-netlify-github-actions/)**
+
+---
+
+## 6. Diseña la hoja para que “se entienda de un vistazo”
+
+Si tu objetivo es visibilidad para negocio y tecnología, el dashboard tiene que ser escaneable.
+
+Una estructura práctica (muy compatible con lo que luego quieras ampliar) es:
+
+- **Base**: datos reales (lo que viene de las APIs/exports)
+- **Optimista**: proyección con crecimiento moderado
+- **Viral**: proyección con picos (tu “peor caso”)
+
+Puedes apoyar el artículo con una imagen genérica de la hoja:
+
+![Pestañas Base, Optimista y Viral en una hoja de cálculo con un dashboard de costes](/images/blog/dashboard-costes-proveedor.png)
+
+### Métricas mínimas que suelen bastar en pymes
+
+En tu dashboard, intenta que siempre existan estos bloques:
+
+1. **Gasto del mes (MTD)** total y por proveedor.
+2. **Top proyectos** por coste (y su tendencia).
+3. **Top servicios** por coste (los “drivers”).
+4. **Forecast** fin de mes (proyección simple).
+5. **Alertas**: “esto se sale del rango normal”.
+
+En Google Sheets, con `QUERY`, `SUMIFS` y tablas dinámicas puedes llegar muy lejos sin complicarte.
+
+---
+
+## 7. Alertas simples que funcionan (sin herramientas caras)
+
+La idea no es inundarte de notificaciones. Es enterarte cuando pasa algo relevante.
+
+Tres alertas muy útiles:
+
+- **Pico diario**: si el coste de hoy supera el promedio de los últimos 7 días en un X%.
+- **Presupuesto mensual**: si el forecast de fin de mes supera tu límite.
+- **Anomalía por proyecto**: si un proyecto sube de golpe (aunque el total no se dispare).
+
+Cómo implementarlo de forma sencilla:
+
+- Fórmulas + formato condicional (para “alertas visuales”).
+- Un pequeño script (Apps Script o tu job de CI) que:
+  - lee las celdas “rojas”,
+  - y envía un email/Slack si hay alerta.
+
+---
+
+## 8. Lo que suele romper el dashboard (y cómo evitarlo)
+
+**1) Mezclar monedas sin control**  
+Si tienes EUR y USD, decide un criterio: convertir (con un tipo medio) o separar por moneda.
+
+**2) Confiar en datos “finales” en tiempo real**  
+En muchos casos el dato “hoy” es estimado. Úsalo para alertas, pero no para contabilidad.
+
+**3) Tagging inconsistente**  
+Si hoy `project=Portfolio` y mañana `project=portfolio`, tu dashboard se fragmenta. Normaliza.
+
+**4) Querer demasiado detalle demasiado pronto**  
+Empieza por proyecto+entorno+servicio. Cuando eso funcione, añade `region`, `sku` o lo que haga falta.
+
+Si quieres más contexto de por qué esto importa en proyectos pequeños, esta guía sobre **costes ocultos en BaaS** te va a resonar:
+
+- **[BaaS y costes ocultos: cómo estimar y controlar la factura en tus side projects](/blog/baas-costes-ocultos-controlar-factura-side-projects/)**
+
+---
+
+## 9. Checklist final (para pasar de “idea” a “uso real”)
+
+- [ ] Tengo una convención mínima de tags/labels: `project`, `env`, `owner`.
+- [ ] Puedo obtener coste diario de:
+  - [ ] AWS (Cost Explorer agrupado)
+  - [ ] Azure (Cost Management Query)
+  - [ ] GCP (BigQuery billing export)
+- [ ] Convierto todo a un modelo común (`date`, `provider`, `project`, `env`, `service`, `cost`, `currency`…).
+- [ ] Sincronizo la hoja 1 vez al día (cron / GitHub Actions).
+- [ ] El dashboard tiene: MTD, top proyectos, top servicios, forecast y alertas.
+- [ ] Las alertas son pocas, útiles y accionables.
+
+---
+
+## Cierre: un panel simple te da control (y evita sorpresas)
+
+Si ya te interesa FinOps, este dashboard es un paso muy natural después de ganar contexto con una introducción general:
+
+- **[FinOps para pymes: cómo controlar los costes de la nube y optimizar tu inversión](/blog/finops-para-pymes-control-costes-nube/)**
+
+Si quieres, puedo ayudarte a aterrizarlo en tu caso real:
+
+- Definir el modelo de datos y las etiquetas.
+- Montar el ETL (con permisos mínimos y buenas prácticas).
+- Dejar el dashboard listo para que lo entienda tanto negocio como tecnología.
+
+**[Escríbeme](/contact)** y lo planteamos paso a paso.

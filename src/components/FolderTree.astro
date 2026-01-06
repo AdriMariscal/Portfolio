@@ -1,0 +1,17 @@
+---
+export interface Props {
+  title?: string;
+  note?: string;
+}
+
+const { title, note } = Astro.props;
+---
+
+<section class="tree-diagram">
+  {title && <p class="tree-diagram__title">{title}</p>}
+  {note && <p class="tree-diagram__note">{note}</p>}
+
+  <div class="tree-diagram__body">
+    <slot />
+  </div>
+</section>

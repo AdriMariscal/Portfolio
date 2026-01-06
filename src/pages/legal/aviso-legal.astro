@@ -1,15 +1,7 @@
 ---
 // src/pages/legal/aviso-legal.astro
 import BaseLayout from "../../layouts/BaseLayout.astro";
-
-const OWNER = {
-  name: "Adrián Mariscal Cantudo", 
-  nif: "25605288-D",
-  address: "C/Belgrado 2, 1B, 29590 Málaga",
-  email: "amariscalcantudo@gmail.com",
-  phone: "",
-  domain: "adrianmariscal.netlify.app",
-};
+import { SITE_OWNER } from "../../config/siteOwner";
 
 // Fecha de última revisión visible
 const updatedAt = new Date().toLocaleDateString("es-ES", {
@@ -20,15 +12,15 @@ const updatedAt = new Date().toLocaleDateString("es-ES", {
 ---
 
 <BaseLayout title="Aviso legal">
-  <main class="section">
+  <main class="section section--legal">
     <div class="wrap">
       <!-- Ojo: estas clases vienen de global.css -->
       <article class="card card--soft legal__card">
         <div class="legal__body">
-          <header style="margin:0 0 .5rem 0">
-            <h1 style="margin:0">Aviso legal</h1>
-            <p class="muted" style="margin:.25rem 0 0 0">Última actualización: {updatedAt}</p>
-        </header>
+          <header class="legal__header">
+            <h1>Aviso legal</h1>
+            <p class="muted legal__meta">Última actualización: {updatedAt}</p>
+          </header>
 
         <!-- 1. Identificación del titular (art. 10 LSSI) -->
           <section>
@@ -38,15 +30,21 @@ const updatedAt = new Date().toLocaleDateString("es-ES", {
               de la información y de comercio electrónico (LSSI), se informa:
           </p>
           <ul>
-            <li><strong>Titular:</strong> {OWNER.name}</li>
-              <li><strong>NIF:</strong> {OWNER.nif}</li>
-              <li><strong>Domicilio:</strong> {OWNER.address}</li>
-            <li><strong>Email:</strong> <a href={`mailto:${OWNER.email}`}>{OWNER.email}</a></li>
-            {OWNER.phone && <li><strong>Teléfono:</strong> {OWNER.phone}</li>}
-            <li><strong>Nombre de dominio:</strong> {OWNER.domain}</li>
+            <li><strong>Titular:</strong> {SITE_OWNER.name}</li>
+              <li><strong>NIF:</strong> {SITE_OWNER.nif}</li>
+              <li><strong>Domicilio:</strong> {SITE_OWNER.address}</li>
+            <li><strong>Email:</strong> <a class="link" href={`mailto:${SITE_OWNER.email}`}>{SITE_OWNER.email}</a></li>
+            {SITE_OWNER.phone && <li><strong>Teléfono:</strong> {SITE_OWNER.phone}</li>}
+            <li><strong>Nombre de dominio:</strong> {SITE_OWNER.domain}</li>
           </ul>
             <p class="muted" style="font-size:.92rem">
-            Base jurídica: <a href="https://noticias.juridicas.com/base_datos/Admin/l34-2002.t1.html#a10" target="_blank" rel="noopener">LSSI, art. 10</a>.
+              Base jurídica:
+              <a class="link"
+                href="https://noticias.juridicas.com/base_datos/Admin/l34-2002.t1.html#a10"
+                target="_blank"
+                rel="noopener"
+                >LSSI, art. 10</a
+              >.
           </p>
         </section>
 
@@ -54,7 +52,7 @@ const updatedAt = new Date().toLocaleDateString("es-ES", {
         <section>
           <h2>2. Objeto del sitio</h2>
           <p>
-              Este sitio web tiene por objeto presentar el portafolio profesional, proyectos y contenidos divulgativos de {OWNER.name},
+              Este sitio web tiene por objeto presentar el portafolio profesional, proyectos y contenidos divulgativos de {SITE_OWNER.name},
               así como facilitar el contacto a través del formulario disponible.
           </p>
         </section>
@@ -73,7 +71,7 @@ const updatedAt = new Date().toLocaleDateString("es-ES", {
         <section>
           <h2>4. Propiedad intelectual e industrial</h2>
           <p>
-              Salvo indicación expresa, los contenidos (textos, imágenes, diseño y código) son titularidad de {` ${OWNER.name}`} o se
+              Salvo indicación expresa, los contenidos (textos, imágenes, diseño y código) son titularidad de {` ${SITE_OWNER.name}`} o se
               usan con licencias que lo permiten. Queda prohibida su reproducción o distribución más allá de los límites legales
               (por ejemplo, cita o enlace) sin autorización previa.
           </p>
@@ -83,7 +81,7 @@ const updatedAt = new Date().toLocaleDateString("es-ES", {
         <section>
           <h2>5. Enlaces</h2>
           <p>
-              Este sitio puede incluir enlaces externos de terceros. {OWNER.name} no se hace responsable del contenido, exactitud
+              Este sitio puede incluir enlaces externos de terceros. {SITE_OWNER.name} no se hace responsable del contenido, exactitud
               o actualización de dichos sitios externos, ni de los daños que su acceso pudiera ocasionar.
           </p>
         </section>
@@ -92,7 +90,7 @@ const updatedAt = new Date().toLocaleDateString("es-ES", {
         <section>
           <h2>6. Responsabilidad</h2>
           <p>
-              {OWNER.name} adopta medidas razonables para que la información sea correcta y esté actualizada, pero no garantiza la
+              {SITE_OWNER.name} adopta medidas razonables para que la información sea correcta y esté actualizada, pero no garantiza la
               inexistencia de errores u omisiones. El uso del sitio se realiza bajo la responsabilidad de la persona usuaria.
           </p>
         </section>
@@ -102,8 +100,10 @@ const updatedAt = new Date().toLocaleDateString("es-ES", {
           <h2>7. Protección de datos</h2>
           <p>
               El tratamiento de datos personales (finalidades, base jurídica, plazos y derechos) se describe en la
-              {" "}<a href="/legal/privacidad">Política de privacidad</a>. El uso de cookies y tecnologías similares se detalla en la
-              {" "}<a href="/legal/cookies">Política de cookies</a>.
+              {" "}
+              <a class="link" href="/legal/privacidad">Política de privacidad</a>. El uso de cookies y tecnologías similares se detalla en la
+              {" "}
+              <a class="link" href="/legal/cookies">Política de cookies</a>.
           </p>
         </section>
 
@@ -112,11 +112,18 @@ const updatedAt = new Date().toLocaleDateString("es-ES", {
           <h2>8. Consumidores y resolución de conflictos</h2>
           <p>
               Si actúas como persona consumidora, puedes acudir a tu
-              {" "}<abbr title="Oficina Municipal de Información al Consumidor">OMIC</abbr> o a la Junta Arbitral de Consumo de tu
+              {" "}
+              <abbr title="Oficina Municipal de Información al Consumidor">OMIC</abbr> o a la Junta Arbitral de Consumo de tu
               territorio para resolver controversias por la vía extrajudicial. La anterior plataforma europea de resolución de
               litigios en línea (ODR) fue clausurada y el Reglamento (UE) 524/2013 quedó derogado en 2025; por ello, deben
               utilizarse las vías nacionales de consumo.
-              {" "}<a href="https://www.juntadeandalucia.es/temas/consumo/consultas/odr.html" target="_blank" rel="noopener">Más información oficial</a>.
+              {" "}
+              <a class="link"
+                href="https://www.juntadeandalucia.es/temas/consumo/consultas/odr.html"
+                target="_blank"
+                rel="noopener"
+                >Más información oficial</a
+              >.
           </p>
         </section>
 
@@ -125,7 +132,8 @@ const updatedAt = new Date().toLocaleDateString("es-ES", {
           <h2>9. Cookies</h2>
           <p>
             Este sitio utiliza cookies propias y/o de terceros con las finalidades indicadas en la
-              {" "}<a href="/legal/cookies">Política de cookies</a>, donde puedes consultar la configuración, cambio o retirada del consentimiento.
+              {" "}
+              <a class="link" href="/legal/cookies">Política de cookies</a>, donde puedes consultar la configuración, cambio o retirada del consentimiento.
           </p>
         </section>
 
@@ -142,17 +150,12 @@ const updatedAt = new Date().toLocaleDateString("es-ES", {
         <section>
           <h2>11. Contacto</h2>
           <p>
-            Para cualquier consulta relacionada con este aviso legal, escribe a
-              {" "}<a href={`mailto:${OWNER.email}`}>{OWNER.email}</a>.
+            Para cualquier consulta relacionada con este aviso legal, puedes utilizar el{" "}
+            <a class="link" href="/contact">formulario de contacto</a>
+            {" "}o escribir a{" "}
+            <a class="link" href={`mailto:${SITE_OWNER.email}`}>{SITE_OWNER.email}</a>.
           </p>
         </section>
-
-        <hr class="sep" />
-        <nav class="legal-nav">
-          <a href="/legal/privacidad">Privacidad</a> ·
-          <a href="/legal/cookies">Cookies</a> ·
-          <a href="/legal/aviso-legal">Aviso legal</a>
-        </nav>
         </div>
       </article>
     </div>

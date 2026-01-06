@@ -62,9 +62,9 @@ const title = `#${tag}`;
 ---
 
 <BaseLayout title={`${title} — página ${current}`} description={`Artículos con ${title}, página ${current} de ${totalPages}.`}>
-  <section class="container section">
+  <section class="section section--blog">
     <header class="section__header">
-      <h1 class="h1">{title}</h1>
+      <h1 class="h1 section__title section__title--page">{title}</h1>
       <p class="lead">Página {current} de {totalPages}</p>
     </header>
 

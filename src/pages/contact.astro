@@ -4,11 +4,11 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 
 <BaseLayout title="Contacto · Adrián Mariscal" description="Cuéntame en qué te puedo ayudar.">
-  <main class="section">
+  <main class="section section--contact">
     <div class="wrap">
       <!-- Encabezado con respiración -->
       <header class="contact__intro stack" style="--stack-gap: 6px;">
-        <h1 class="h2">Contacto</h1>
+        <h1 class="h2 section__title section__title--page">Contacto</h1>
       <p class="muted">Cuéntame en qué te puedo ayudar.</p>
       </header>
 
@@ -20,6 +20,8 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         action="/thanks"
         data-netlify="true"
         netlify-honeypot="bot-field"
+        data-netlify-recaptcha="true"
+        aria-describedby="contact-privacy-note"
       >
         <!-- Netlify -->
         <input type="hidden" name="form-name" value="contact" />
@@ -28,22 +30,29 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         </p>
 
         <div class="card__body stack" style="--stack-gap: 18px;">
-          <label class="field">
-            <span>Nombre</span>
-            <input class="input" type="text" name="name" autocomplete="name" required />
+        <label class="field">
+          <span>Nombre</span>
+          <input class="input" type="text" name="name" autocomplete="name" required />
         </label>
 
-          <label class="field">
-            <span>Email</span>
-            <input class="input" type="email" name="email" autocomplete="email" required />
+        <label class="field">
+          <span>Email</span>
+          <input class="input" type="email" name="email" autocomplete="email" required />
         </label>
 
-          <label class="field">
-            <span>Mensaje</span>
-            <textarea class="input" name="message" rows="6" required></textarea>
+        <label class="field">
+          <span>Mensaje</span>
+          <textarea class="input" name="message" rows="6" required></textarea>
         </label>
 
+        <div data-netlify-recaptcha="true"></div>
+
+        <div class="contact__actions">
           <button class="btn btn--primary btn--block" type="submit">Enviar</button>
+          <p id="contact-privacy-note" class="contact__legal muted">
+            Al enviar aceptas la
+            <a class="link" href="/legal/privacidad">Política de privacidad</a>.
+          </p>
         </div>
       </form>
     </div>

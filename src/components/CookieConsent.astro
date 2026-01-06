@@ -1,0 +1,252 @@
+---
+// src/components/CookieConsent.astro
+
+// No necesitamos props; el componente se autogestiona
+const STORAGE_KEY = "am-cookie-consent-v1";
+---
+
+<div
+  class="cookie-banner"
+  data-cookie-banner
+  hidden
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="cookie-banner-title"
+  tabindex="-1"
+>
+  <div class="wrap cookie-banner__inner">
+    <div class="cookie-banner__content">
+      <div class="cookie-banner__main">
+        <h2 class="cookie-banner__title" id="cookie-banner-title">
+          Tu privacidad importa
+        </h2>
+        <p class="cookie-banner__text">
+          Utilizo cookies técnicas necesarias para que el sitio funcione y,
+          si lo aceptas, también podré usar cookies de analítica y marketing
+          para medir y mejorar este proyecto. Puedes cambiar tu selección
+          cuando quieras.
+        </p>
+
+        <div class="cookie-banner__prefs" aria-label="Preferencias de cookies">
+          <label class="cookie-banner__pref-label">
+            <input
+              type="checkbox"
+              data-cookie-input="analytics"
+            />
+            <span>
+              <strong>Analíticas</strong>
+              <span class="cookie-banner__pref-desc">
+                Ayudan a entender cómo se usa la web de forma agregada para
+                mejorar contenido y rendimiento.
+              </span>
+            </span>
+          </label>
+
+          <label class="cookie-banner__pref-label">
+            <input
+              type="checkbox"
+              data-cookie-input="marketing"
+            />
+            <span>
+              <strong>Marketing</strong>
+              <span class="cookie-banner__pref-desc">
+                Permiten mostrar contenido o campañas promocionales más
+                relevantes si algún día las utilizo.
+              </span>
+            </span>
+          </label>
+        </div>
+
+        <p class="cookie-banner__note">
+          Más información en la política de
+          <a class="cookie-banner__note-link" href="/legal/cookies">
+            cookies
+          </a>.
+        </p>
+      </div>
+
+      <div class="cookie-banner__actions">
+        <button
+          type="button"
+          class="btn btn--secondary btn--sm"
+          data-cookie-reject
+        >
+          Rechazar no esenciales
+        </button>
+        <button
+          type="button"
+          class="btn btn--primary btn--sm"
+          data-cookie-accept-selected
+        >
+          Guardar selección
+        </button>
+        <button
+          type="button"
+          class="cookie-banner__link"
+          data-cookie-accept-all
+        >
+          Aceptar todo
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const STORAGE_KEY = "am-cookie-consent-v1";
+
+  function loadPrefs() {
+    try {
+      const raw = window.localStorage.getItem(STORAGE_KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed !== "object") return null;
+
+      return {
+        necessary: true,
+        analytics: !!parsed.analytics,
+        marketing: !!parsed.marketing,
+        updatedAt: parsed.updatedAt || new Date().toISOString(),
+      };
+    } catch {
+      return null;
+    }
+  }
+
+  function savePrefs(partialPrefs) {
+    const stored = {
+      necessary: true,
+      analytics: !!partialPrefs.analytics,
+      marketing: !!partialPrefs.marketing,
+      updatedAt: new Date().toISOString(),
+    };
+
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
+    } catch {
+      // si localStorage falla, no rompemos la navegación
+    }
+
+    // API global para otros scripts (GA4, etc.)
+    window.amCookieConsent = {
+      getPrefs: () => loadPrefs(),
+      hasConsent: (category) => {
+        const prefs = loadPrefs();
+        if (!prefs) return false;
+
+        if (category === "necessary") return true;
+        if (category === "analytics") return !!prefs.analytics;
+        if (category === "marketing") return !!prefs.marketing;
+
+        return false;
+      },
+    };
+
+    // Evento para que otros scripts reaccionen al cambio
+    try {
+      document.dispatchEvent(
+        new CustomEvent("am:cookie-consent", {
+          detail: stored,
+        })
+      );
+    } catch {
+      // CustomEvent debería existir en navegadores modernos; si no, ignoramos
+    }
+
+    return stored;
+  }
+
+  function initCookieConsent() {
+    const banner = document.querySelector("[data-cookie-banner]");
+    if (!banner) return;
+
+    const analyticsInput = banner.querySelector(
+      '[data-cookie-input="analytics"]'
+    );
+    const marketingInput = banner.querySelector(
+      '[data-cookie-input="marketing"]'
+    );
+    const btnReject = banner.querySelector("[data-cookie-reject]");
+    const btnAcceptAll = banner.querySelector("[data-cookie-accept-all]");
+    const btnSaveSelection = banner.querySelector(
+      "[data-cookie-accept-selected]"
+    );
+
+    const footerTriggers = document.querySelectorAll(
+      "[data-cookie-open-footer]"
+    );
+
+    function syncUIFromPrefs(prefs) {
+      const prefsSafe = prefs || { analytics: false, marketing: false };
+      if (analyticsInput) analyticsInput.checked = !!prefsSafe.analytics;
+      if (marketingInput) marketingInput.checked = !!prefsSafe.marketing;
+    }
+
+    function openBanner({ focus } = {}) {
+      const prefs = loadPrefs();
+      banner.removeAttribute("hidden");
+      syncUIFromPrefs(prefs);
+
+      if (focus && typeof banner.focus === "function") {
+        banner.focus();
+      }
+    }
+
+    function closeBanner() {
+      banner.setAttribute("hidden", "true");
+    }
+
+    // Estado inicial
+    const existing = loadPrefs();
+    if (!existing) {
+      // Primera visita: mostramos banner con analíticas/marketing desactivadas
+      syncUIFromPrefs({ analytics: false, marketing: false });
+      banner.removeAttribute("hidden");
+    } else {
+      // Ya tenemos preferencias: no mostramos banner pero
+      // inicializamos la API global con esos datos
+      savePrefs(existing);
+      syncUIFromPrefs(existing);
+      closeBanner();
+    }
+
+    // Botones del banner
+    btnReject?.addEventListener("click", () => {
+      savePrefs({ analytics: false, marketing: false });
+      closeBanner();
+    });
+
+    btnAcceptAll?.addEventListener("click", () => {
+      savePrefs({ analytics: true, marketing: true });
+      closeBanner();
+    });
+
+    btnSaveSelection?.addEventListener("click", () => {
+      const prefs = {
+        analytics: !!analyticsInput?.checked,
+        marketing: !!marketingInput?.checked,
+      };
+      savePrefs(prefs);
+      closeBanner();
+    });
+
+    // Enlaces del footer para reabrir la configuración
+    footerTriggers.forEach((el) => {
+      el.addEventListener("click", (event) => {
+        event.preventDefault();
+        openBanner({ focus: true });
+      });
+    });
+  }
+
+  if (typeof window !== "undefined") {
+    if (
+      document.readyState === "complete" ||
+      document.readyState === "interactive"
+    ) {
+      initCookieConsent();
+    } else {
+      document.addEventListener("DOMContentLoaded", initCookieConsent);
+    }
+  }
+</script>

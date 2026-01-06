@@ -30,8 +30,8 @@ const pageDescription =
 
 <BaseLayout title={pageTitle} description={pageDescription}>
   <!-- Cabecera de página -->
-  <section class="section">
-    <div class="wrap">
+  <section class="section hero section--projects-hero">
+    <div class="wrap projects-header">
       <h1 class="hero__title">Proyectos</h1>
       <p class="hero__lead">
         Proyectos propios y micro-productos. La marca <strong>active</strong> indica los que están en marcha.
@@ -39,24 +39,26 @@ const pageDescription =
     </div>
   </section>
 
+
   {/* Activos */}
   {active.length > 0 && (
-    <section class="section">
+    <section class="section section--alt projects-section">
       <div class="wrap">
-        <h2 class="h2">Activos</h2>
-        <div class="stack" style="--stack-gap:18px">
+        <h2 class="h2 section__title">Activos</h2>
+        <div class="stack projects-list">
           {active.map((p) => <ProjectCard entry={p} />)}
         </div>
       </div>
     </section>
   )}
 
+
   {/* Inactivos */}
   {inactive.length > 0 && (
-    <section class="section">
+    <section class="section projects-section">
       <div class="wrap">
-        <h2 class="h2">Inactivos</h2>
-        <div class="stack" style="--stack-gap:18px">
+        <h2 class="h2 section__title">Inactivos</h2>
+        <div class="stack projects-list">
           {inactive.map((p) => <ProjectCard entry={p} />)}
         </div>
       </div>

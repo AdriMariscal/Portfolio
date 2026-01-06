@@ -46,10 +46,12 @@ const description = `Artículos con la etiqueta ${title}`;
 ---
 
 <BaseLayout title={title} description={description}>
-  <section class="container section">
+  <section class="section section--blog">
     <header class="section__header">
-      <h1 class="h1">{title}</h1>
-      <p class="lead">Artículos con la etiqueta <strong>{title}</strong>.</p>
+      <h1 class="h1 section__title section__title--page">{title}</h1>
+      <p class="lead">
+        Artículos con la etiqueta <strong>{title}</strong>.
+      </p>
     </header>
 
       <div class="posts-grid">

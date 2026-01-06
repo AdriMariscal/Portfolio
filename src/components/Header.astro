@@ -14,15 +14,109 @@ const isActive = (href: string) => {
 };
 ---
 
-<header class="header">
+<header class="header" role="banner">
   <div class="wrap header__inner">
     <a class="brand" href="/">Adrián Mariscal</a>
 
-    <nav class="nav">
+    {/* Botón hamburguesa (solo se ve en móviles vía CSS) */}
+    <button
+      class="nav-toggle"
+      type="button"
+      aria-expanded="false"
+      aria-label="Abrir menú de navegación"
+      data-nav-toggle
+    >
+      <span class="nav-toggle__icon" aria-hidden="true"></span>
+    </button>
+
+    <nav
+      class="nav"
+      data-nav
+      aria-label="Navegación principal"
+    >
       <a class="nav__link" href="/" aria-current={isActive("/")}>Inicio</a>
       <a class="nav__link" href="/projects" aria-current={isActive("/projects")}>Proyectos</a>
       <a class="nav__link" href="/blog" aria-current={isActive("/blog")}>Blog</a>
       <a class="nav__link" href="/contact" aria-current={isActive("/contact")}>Contacto</a>
+
+      <button
+        class="theme-toggle"
+        type="button"
+        data-theme-toggle
+      >
+        <span class="theme-toggle__icon" aria-hidden="true"></span>
+        <span class="theme-toggle__label">Oscuro</span>
+      </button>
     </nav>
+
   </div>
 </header>
+
+<script>
+  const toggle = document.querySelector('[data-nav-toggle]');
+  const nav = document.querySelector('[data-nav]');
+
+  if (toggle && nav) {
+    const handleToggle = () => {
+      const isOpen = nav.classList.toggle('nav--open');
+      toggle.classList.toggle('nav-toggle--open', isOpen);
+      toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    };
+
+    toggle.addEventListener('click', handleToggle);
+
+    // Seguridad: al pasar a escritorio cerramos el menú móvil
+    const mql = window.matchMedia('(min-width: 769px)');
+    const handleMqChange = (event) => {
+      if (event.matches) {
+        nav.classList.remove('nav--open');
+        toggle.classList.remove('nav-toggle--open');
+        toggle.setAttribute('aria-expanded', 'false');
+      }
+    };
+
+    mql.addEventListener('change', handleMqChange);
+  }
+
+  // ==========================================================
+  // Toggle de tema (claro / oscuro)
+  // ==========================================================
+  const themeToggle = document.querySelector('[data-theme-toggle]');
+  if (themeToggle) {
+    const storageKey = 'am-theme';
+    const root = document.documentElement;
+
+    const getCurrent = () =>
+      root.dataset.theme === 'dark' ? 'dark' : 'light';
+
+    const syncLabel = () => {
+      const mode = getCurrent();
+      const label = themeToggle.querySelector('.theme-toggle__label');
+      if (label) {
+        // Texto muestra la opción CONTRARIA a la actual
+        label.textContent = mode === 'dark' ? 'Claro' : 'Oscuro';
+      }
+      themeToggle.setAttribute(
+        'aria-label',
+        mode === 'dark' ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'
+      );
+    };
+
+    const setTheme = (next) => {
+      root.dataset.theme = next;
+      try {
+        window.localStorage.setItem(storageKey, next);
+      } catch (e) { /* ignoramos errores */ }
+      syncLabel();
+    };
+
+    themeToggle.addEventListener('click', () => {
+      const next = getCurrent() === 'dark' ? 'light' : 'dark';
+      setTheme(next);
+    });
+
+    // Ajusta el texto inicial según el tema aplicado desde BaseLayout
+    syncLabel();
+  }
+
+</script>
