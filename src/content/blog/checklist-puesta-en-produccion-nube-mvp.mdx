@@ -1,0 +1,315 @@
+---
+title: "Checklist de puesta en producción en la nube para un MVP: seguridad, backups, observabilidad y control de costes"
+description: "Guía práctica para llevar un MVP a producción en la nube sin sustos: seguridad mínima, backups probados, observabilidad y límites de gasto con checklist."
+tags: ["#nube", "#cloud", "#infraestructura", "#finops", "#pymes"]
+published: true
+date: 2026-01-08
+image: "/images/blog/padlock-laptop.jpg"
+imageAlt: "Portátil con panel de despliegue en la nube y símbolos de seguridad, backups, métricas y control de costes."
+imageCaption: "Producción no es solo “funciona”: es seguridad, continuidad, observabilidad y guardrails de coste."
+robots: "max-snippet:-1, max-image-preview:large"
+---
+
+# Checklist de puesta en producción en la nube para un MVP: seguridad, backups, observabilidad y control de costes
+
+Un MVP “que funciona” no significa que esté listo para clientes. La primera semana en producción suele romper dos cosas: la **confianza** (porque algo falla sin que te enteres) y la **previsibilidad** (porque el coste sube o aparece un agujero de seguridad que nadie vio venir).
+
+En este artículo te propongo un enfoque 80/20 para pasar de “ya corre” a **“lo puedo operar sin vigilancia constante”**: seguridad mínima realista, backups con restauración, observabilidad útil y control de costes con límites.
+
+Lo que te llevas al terminar:
+- Un checklist completo (seguridad, continuidad, observabilidad y coste) que puedes usar tal cual antes de abrir el MVP al público.
+- Un método sencillo para estimar “coste real” y poner guardrails (presupuestos, alertas y límites).
+- Un mini-caso tipo (reservas/encargos) para visualizar cómo se aterriza en una pyme o negocio local.
+
+**Resumen rápido**  
+Define primero el “contrato de producción” (entornos, datos y responsabilidades). Después aplica un baseline: HTTPS + DNS, permisos mínimos, secretos bien guardados, backups probados, métricas/alertas básicas y presupuestos con acciones de contención. El objetivo es que el sistema sea **explicable, auditable y recuperable**.
+
+* * *
+
+## 1. Define el “contrato de producción” (antes de tocar la consola)
+
+La mayoría de sustos vienen de no acordar esto explícitamente:
+
+1) **Qué es “producción”**: dominios, entornos, datos, cuentas y quién puede cambiar qué.  
+2) **Qué nivel de servicio prometes** (aunque sea informal): ¿aceptas 30 minutos de caída? ¿tienes horario?  
+3) **Qué pasa si algo falla**: quién recibe alertas, cómo se revierte, cómo se restaura.
+
+Checklist de contrato (mínimo):
+- [ ] Hay 3 entornos (dev / staging / prod) o, si no, una justificación clara de por qué no.
+- [ ] Producción usa **datos de producción** y staging usa **datos anonimizados o sintéticos** (nunca una copia “tal cual” si hay datos personales).
+- [ ] Existe un “runbook” de 1 página: qué mirar primero cuando algo falla (logs, estado, despliegue, proveedor).
+- [ ] Están definidos dos números operativos:
+  - [ ] **RPO** (cuánta pérdida de datos es tolerable).
+  - [ ] **RTO** (cuánto tardas en volver a estar operativo).
+
+* * *
+
+## 2. Elección de hosting/BaaS: decisión rápida con criterios (no por modas)
+
+No hay una “mejor nube”. Para un MVP lo importante es escoger un stack que te deje responder bien a estas preguntas:
+
+- ¿Puedo **exportar** datos y configuración si cambio de proveedor?
+- ¿Tengo **backups** (o al menos una estrategia clara) y puedo restaurar?
+- ¿Puedo ver **logs/métricas** sin pagar un dineral por defecto?
+- ¿Cómo escala el **coste**: por usuarios, por tráfico, por lecturas, por almacenamiento, por logs?
+
+Si estás comparando un BaaS o serverless, te puede encajar como lectura previa:
+- [Backend as a Service (BaaS) en 2025: cómo elegirlo y conectarlo con Astro o Next.js](/blog/backend-as-a-service-2025-astro-nextjs/)
+- [BaaS y costes ocultos: cómo estimar y controlar la factura en tus side projects](/blog/baas-costes-ocultos-controlar-factura-side-projects/)
+
+Tabla de decisión 80/20 (MVP):
+| Pregunta | Señal de OK | Señal de riesgo |
+|---|---|---|
+| Backups/restauración | Backups automáticos + guía de restore | “El proveedor ya se apaña” (sin pruebas) |
+| Observabilidad | Logs con niveles + retención | Todo se guarda “para siempre” o no hay visibilidad |
+| Coste predecible | Presupuestos/alertas + límites | “Plan gratis” como estrategia |
+| Seguridad | IAM/roles, secretos, MFA, auditoría | Claves largas en CI, usuarios admin permanentes |
+| Lock-in | Export razonable y modelo claro | Datos/negocio atados a features difíciles de migrar |
+
+* * *
+
+## 3. Entornos y configuración: dev/staging/prod sin caos
+
+Si tu MVP tiene un frontend (Astro/Next.js) y servicios (DB, auth, storage, funciones), la separación por entorno no es un lujo: es tu airbag.
+
+Puntos clave:
+- **Variables por entorno**: `prod` no puede leer variables de `dev` “por error”.
+- **Secrets fuera del repo**: nunca en `.env` versionado ni en YAML de CI.
+- **Staging lo más parecido a prod**… pero con límites: cuotas, datos sintéticos, retención corta.
+
+Checklist de configuración:
+- [ ] Existe un inventario de variables (nombre, propósito, dónde vive, quién la cambia).
+- [ ] Los secretos se guardan en un gestor de secretos o en el sistema del proveedor (y no en Git).
+- [ ] La CI/CD usa identidad de corta duración (OIDC cuando aplica) y permisos mínimos.
+- [ ] Las migraciones de base de datos están versionadas y se ejecutan de forma controlada.
+
+Si estás trabajando un baseline serio por entornos, aquí tienes una guía complementaria:
+- [Infraestructura como código sin drama: baseline dev/staging/prod con Terraform + GitHub Actions](/blog/infraestructura-como-codigo-sin-drama-baseline-terraform-github-actions/)
+
+* * *
+
+## 4. Dominio + HTTPS: la parte “aburrida” que evita incidentes tontos
+
+Cuatro cosas suelen marcar la diferencia entre un despliegue “rápido” y uno profesional:
+
+1) **DNS y subdominios por entorno** (`staging.tudominio.com`).  
+2) **Redirects a HTTPS** y certificado renovable automáticamente.  
+3) **CORS y cookies** revisadas (sobre todo si hay auth).  
+4) **Headers de seguridad** básicos (sin volverte loco con una CSP perfecta el día 1).
+
+Checklist de borde (edge):
+- [ ] HTTPS forzado (redirect 301 desde HTTP).
+- [ ] HSTS solo cuando estés seguro de que todo sirve por HTTPS.
+- [ ] Cookies sensibles con `HttpOnly`, `Secure`, `SameSite` adecuado.
+- [ ] Reglas de CORS explícitas (no `*` “por probar” si hay credenciales).
+- [ ] Cabeceras mínimas: `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, `frame-ancestors` (o equivalente).
+
+![Diagrama genérico de entornos y dominios (dev/staging/prod) con DNS + HTTPS](/images/blog/enviroments-diagram.png)
+
+* * *
+
+## 5. Seguridad mínima operable (sin convertirlo en un proyecto paralelo)
+
+El objetivo no es “seguridad perfecta”. Es **reducir superficie de ataque** y evitar errores típicos que son baratos de corregir ahora y caros después.
+
+### 5.1 Identidad, roles y permisos mínimos
+
+Reglas prácticas:
+- Separa usuarios “normales” de **usuarios admin** (y limita el número de admins).
+- Activa **MFA** en cuentas de proveedor y paneles críticos (hosting, DNS, BaaS).
+- Aplica **principio de mínimo privilegio**: cada servicio solo puede hacer lo que necesita.
+
+Checklist:
+- [ ] No existe un “admin” permanente para todo.
+- [ ] Los accesos a consola están auditados (al menos por logs del proveedor).
+- [ ] Hay roles claros: lectura, escritura, administración.
+- [ ] En entornos no productivos, los permisos son aún más restrictivos.
+
+### 5.2 Secretos y configuración sensible
+
+Checklist:
+- [ ] Los secretos rotan al menos cuando hay indicio de fuga (y existe un plan de rotación).
+- [ ] No se registran secretos en logs (redacción de tokens, emails, IDs sensibles).
+- [ ] La CI/CD no imprime variables sensibles en logs de build.
+- [ ] Dependencias actualizadas y escaneo básico (SCA) en pipeline o repositorio.
+
+### 5.3 “Hardening” básico: lo que más se olvida
+
+Checklist:
+- [ ] Rate limiting o límites por usuario/endpoint si hay APIs públicas.
+- [ ] Protección frente a abuso en formularios (captcha o heurísticas, según el caso).
+- [ ] Validación de inputs en servidor (no solo en cliente).
+- [ ] Políticas de subida de archivos: tamaño máximo, tipos permitidos, virus scanning si aplica.
+- [ ] Reglas para evitar exposición accidental de buckets/storage (no público por defecto).
+
+* * *
+
+## 6. Backups y restauración: continuidad (de verdad, no “tenemos backups”)
+
+El backup que nunca restauras es una ilusión. La puesta en producción exige dos cosas:
+1) **backups automáticos**, y  
+2) **restauración probada** (al menos en staging).
+
+### 6.1 Qué debes respaldar (mínimo)
+
+- Base de datos (con retención y, si existe, point-in-time recovery).
+- Configuración crítica (IaC, variables por entorno, reglas de seguridad).
+- Storage de archivos (si el producto sube imágenes/PDFs/adjuntos).
+- “Estado” fuera de la DB: colas, jobs, etc. (si aplica).
+
+### 6.2 Una prueba de restauración que cabe en 30 minutos
+
+Checklist:
+- [ ] Restaurar DB a staging desde un snapshot.
+- [ ] Verificar integridad (migrations aplican, app arranca).
+- [ ] Ejecutar un “smoke test” básico (login, lectura, escritura).
+- [ ] Documentar tiempos y pasos (RTO real, no teórico).
+
+Checklist de continuidad:
+- [ ] Backups programados con retención (p. ej., diarios + semanales).
+- [ ] Al menos una copia fuera del “mismo sitio” (según proveedor/stack).
+- [ ] Alertas si un backup falla.
+- [ ] Ensayo de restore recurrente (mensual o trimestral).
+
+* * *
+
+## 7. Observabilidad: enterarte tú antes que el cliente
+
+Observabilidad no es “tener logs”. Es poder responder rápido a:
+- ¿Qué está fallando?
+- ¿A quién afecta?
+- ¿Desde cuándo?
+- ¿Qué cambió?
+
+### 7.1 El mínimo viable de observabilidad
+
+Checklist:
+- [ ] Logs con niveles (`error`, `warn`, `info`) y **retención definida**.
+- [ ] Métricas esenciales: latencia, tasa de errores, uso de CPU/memoria (si aplica), colas, DB.
+- [ ] Alertas: 3–5 reglas que de verdad importan (no 50 notificaciones inútiles).
+- [ ] Uptime check externo (un ping desde fuera) y notificación a un canal real.
+
+### 7.2 Alertas que funcionan: de señal a acción
+
+Una regla simple: **cada alerta debe tener una acción asociada** (mirar X, revertir Y, escalar a Z).
+
+Ejemplos de alertas 80/20:
+- Errores 5xx por encima de umbral durante 5–10 min.
+- Latencia p95/p99 por encima de umbral durante 10–15 min.
+- Fallos de jobs/colas.
+- Crecimiento anómalo de logs (puede ser bug o ataque).
+- Uso de storage subiendo más rápido de lo esperado.
+
+![Diagrama genérico de observabilidad (logs, métricas y alertas) conectados a un canal de notificaciones](TODO: diagrama simple de pipeline de logs/métricas hacia dashboard y alertas)
+
+* * *
+
+## 8. Control de costes: “coste real” + guardrails (sin FinOps enterprise)
+
+En un MVP el coste suele dispararse por 4 drivers:
+1) base de datos (lecturas/escrituras/queries),  
+2) storage (GB-mes + operaciones),  
+3) egress (ancho de banda),  
+4) observabilidad (volumen de logs y retención).
+
+Si quieres profundizar en guardrails y automatización, aquí tienes dos piezas complementarias:
+- [FinOps para pymes: cómo controlar los costes de la nube y optimizar tu inversión](/blog/finops-para-pymes-control-costes-nube/)
+- [FinOps sin sustos: presupuestos, alertas y “kill switch” para tus proyectos en la nube](/blog/finops-sin-sustos-presupuestos-alertas-kill-switch/)
+
+### 8.1 Método simple para estimar (sin números mágicos)
+
+1) Lista 5–10 **eventos de producto** (registro, login, crear, buscar, subir archivo, etc.).  
+2) Por evento, estima unidades facturables (lecturas, escrituras, MB, invocaciones).  
+3) Crea 3 escenarios: Base / Optimista / Pico (viral o campaña).  
+4) Pon un presupuesto mensual con margen humano y define alertas 50/80/100%.
+
+Checklist de estimación:
+- [ ] Sé explicar en una frase qué mueve mi factura (p. ej., “egress por descargas”).
+- [ ] Tengo escenarios (base/optimista/pico), aunque sean aproximados.
+- [ ] He identificado recursos “multiplicadores” (logs, storage, entornos duplicados).
+
+### 8.2 Guardrails de coste que dan mejor retorno
+
+Checklist:
+- [ ] Presupuestos por proyecto y entorno (prod vs non-prod).
+- [ ] Alertas escalonadas 50/80/100% a un canal real.
+- [ ] Retención de logs definida + sampling/niveles.
+- [ ] Políticas de lifecycle para storage (borrado de temporales, versioning controlado).
+- [ ] Timeouts y límites en funciones/jobs (evitar bucles caros).
+- [ ] Cache/CDN si hay contenido pesado o repetitivo.
+- [ ] “Kill switch” gradual (contención suave antes de apagar cosas críticas).
+
+* * *
+
+## 9. Mini-caso: sistema de reservas/encargos para un negocio local
+
+Imagina un MVP para reservas (restaurante, clínica, taller) con:
+- Web pública (landing + calendario).
+- Panel interno (gestión de reservas).
+- Base de datos + auth.
+- Notificaciones (email/WhatsApp) vía proveedor externo.
+
+Cómo aplicaría el checklist:
+
+**Seguridad**
+- Roles: cliente (solo crear/ver su reserva) y staff (gestionar agenda).
+- MFA en cuentas admin del proveedor y del dominio.
+- Rate limiting en endpoints de creación (evitar spam).
+
+**Backups**
+- Backup diario de DB + restore probado en staging (smoke test: crear, listar, cancelar).
+- Export mensual “por si acaso” (redundancia humana).
+
+**Observabilidad**
+- Alertas por 5xx y por latencia en creación de reserva.
+- Uptime check en la landing y en el endpoint de disponibilidad.
+- Logs con retención corta en staging (para no pagar por debug eterno).
+
+**Coste**
+- Driver principal probable: notificaciones (si son SMS/WhatsApp) y egress si hay muchas imágenes.
+- Presupuesto por entorno: prod (más conservador) y staging (con límites agresivos).
+- Lifecycle en storage (si suben adjuntos) y límites de tamaño de archivo.
+
+Resultado: el negocio no solo ve “una web que funciona”, ve un sistema que **puede operar** sin sorpresas y con un plan claro cuando algo falla.
+
+* * *
+
+## 10. Checklist final de producción (copiar/pegar)
+
+### Infra y despliegue
+- [ ] Entornos separados (dev/staging/prod) con dominios claros.
+- [ ] Pipeline CI/CD con permisos mínimos (idealmente OIDC) y cambios revisables.
+- [ ] Variables por entorno inventariadas; secretos fuera del repo.
+- [ ] DNS + HTTPS + redirects revisados.
+
+### Seguridad
+- [ ] MFA en cuentas de proveedor, DNS y paneles críticos.
+- [ ] Roles definidos (usuarios vs staff/admin) y mínimo privilegio.
+- [ ] Validación de inputs en servidor; límites anti-abuso (rate limit).
+- [ ] Reglas de storage: privado por defecto, políticas de subida de archivos.
+
+### Backups y continuidad
+- [ ] Backups automáticos (DB + storage si aplica) con retención definida.
+- [ ] Restore probado en staging y documentado (RTO real).
+- [ ] Alertas si falla un backup.
+- [ ] Revisión periódica (mensual/trimestral) de restore y runbook.
+
+### Observabilidad
+- [ ] Logs con niveles y retención; no se registran secretos.
+- [ ] Métricas básicas + alertas accionables (pocas, buenas).
+- [ ] Uptime check externo + canal de notificación real.
+- [ ] Registro de despliegues/cambios para correlacionar incidentes.
+
+### Coste (guardrails)
+- [ ] Presupuestos por proyecto/entorno + alertas 50/80/100%.
+- [ ] Driver(s) de coste identificados y monitorizados.
+- [ ] Retención/logs/lifecycle en storage para evitar “crecimientos silenciosos”.
+- [ ] Plan de contención (kill switch gradual) para picos o errores.
+
+* * *
+
+## Cierre: producir es diseñar para operar
+
+Llevar un MVP a producción no va de añadir complejidad: va de **hacer explícito lo que ya estás asumiendo**. Si tienes seguridad mínima, backups con restore, observabilidad útil y guardrails de coste, tu producto puede crecer sin que cada mejora sea una apuesta.
+
+Si quieres, puedo revisar tu arquitectura y tu checklist actual (hosting/BaaS, backups, observabilidad y coste) y proponerte un plan 80/20 adaptado a tu caso. Puedes escribirme desde [/contact/](/contact/).
