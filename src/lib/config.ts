@@ -11,7 +11,7 @@ export const SITE = {
 };
 
 export const THEME = {
-  color: "#0B1F3B", // theme-color/meta; coincide con tu primario
+  color: "#0A0A0A", // theme-color/meta; coincide con el fondo del tema oscuro
 };
 
 export const NAV = [
