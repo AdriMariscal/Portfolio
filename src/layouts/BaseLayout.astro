@@ -22,7 +22,8 @@ type Props = {
 
 const {
   title = "Adrián Mariscal",
-  description = "Arquitecto Salesforce y desarrollo web ligero.",
+  description = SITE.description ??
+    "Rendimiento web, SEO técnico y UX con Astro y Node.",
   ogImage,
   ogType,
   articleAuthor,
@@ -49,6 +50,34 @@ const ogImageAbs = rawImage.startsWith("http")
 // Locale + site name
 const locale = "es_ES";
 const siteName = SITE.siteName ?? "Portfolio - Adrián Mariscal";
+const personId = `${SITE.url}#persona`;
+const schemaOrg = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "name": siteName,
+      "url": SITE.url,
+      "description": SITE.description,
+      "inLanguage": SITE.lang ?? "es",
+      "publisher": { "@id": personId },
+    },
+    {
+      "@type": "Person",
+      "@id": personId,
+      "name": SITE.author,
+      "url": SITE.url,
+      "jobTitle": "Consultor de rendimiento web",
+      "knowsAbout": [
+        "Rendimiento web",
+        "SEO técnico",
+        "UX",
+        "Astro",
+        "Node.js",
+      ],
+    },
+  ],
+};
 ---
 
 <!doctype html>
@@ -118,7 +147,13 @@ const siteName = SITE.siteName ?? "Portfolio - Adrián Mariscal";
     <meta name="twitter:image" content={ogImageAbs} />
     {twitterCreator && (
       <meta name="twitter:creator" content={twitterCreator} />
-    )}    
+    )}
+
+    <!-- Schema.org (WebSite + Person) -->
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(schemaOrg, null, 2)}
+    />
   </head>
   <body>
     <a class="skip-link" href="#main-content">
