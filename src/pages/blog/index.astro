@@ -25,12 +25,15 @@ const totalPages = Math.max(1, Math.ceil(posts.length / VISIBLE));
 const initialVisible = Math.min(VISIBLE, posts.length);
 ---
 
-<BaseLayout title="Blog" description="Artículos sobre Salesforce, Astro, DevOps y más.">
+<BaseLayout
+  title="Blog"
+  description="Artículos sobre rendimiento web, Astro, SEO, Node y negocio digital."
+>
   <section class="section section--blog">
     <header class="section__header">
       <h1 class="h1 section__title section__title--page">Blog</h1>
       <p class="lead">
-        Artículos sobre Salesforce, Astro, DevOps y negocio digital.
+        Artículos sobre rendimiento web, Astro, SEO, Node y negocio digital.
       </p>
     </header>
 

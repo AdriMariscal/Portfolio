@@ -2,7 +2,8 @@
 export const SITE = {
   title: "Adrián Mariscal",
   siteName: "Portfolio - Adrián Mariscal",
-  description: "Arquitecto Salesforce & dev web ligero. Proyectos, blog y contacto.",
+  description:
+    "Rendimiento web, SEO técnico y UX con Astro y Node. Proyectos, blog y contacto.",
   url: "https://adrianmariscal.es",
   lang: "es",
   author: "Adrián Mariscal",
