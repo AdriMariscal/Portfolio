@@ -51,6 +51,8 @@ const ogImageAbs = rawImage.startsWith("http")
 const locale = "es_ES";
 const siteName = SITE.siteName ?? "Portfolio - Adrián Mariscal";
 const personId = `${SITE.url}#persona`;
+const fontStylesheet =
+  "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap";
 const schemaOrg = {
   "@context": "https://schema.org",
   "@graph": [
@@ -112,6 +114,20 @@ const schemaOrg = {
     <link rel="icon" href="/favicon.svg" />
     <link rel="canonical" href={canonical} />
     {robots && <meta name="robots" content={robots} />}    
+
+    <!-- Fuentes: preload del CSS crítico + swap -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preload" as="style" href={fontStylesheet} />
+    <link
+      rel="stylesheet"
+      href={fontStylesheet}
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript>
+      <link rel="stylesheet" href={fontStylesheet} />
+    </noscript>
 
     <!-- Open Graph -->
     <meta property="og:locale" content={locale} />
