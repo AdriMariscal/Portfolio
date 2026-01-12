@@ -52,7 +52,7 @@ const siteName = SITE.siteName ?? "Portfolio - Adrián Mariscal";
 ---
 
 <!doctype html>
-<html lang={SITE.lang ?? "es"}>
+<html lang={SITE.lang ?? "es"} data-theme="dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -69,13 +69,11 @@ const siteName = SITE.siteName ?? "Portfolio - Adrián Mariscal";
             return;
           }
         } catch (e) {
-          /* si localStorage falla, seguimos con prefers-color-scheme */
+          /* si localStorage falla, seguimos con el modo por defecto */
         }
 
-        const prefersDark = window.matchMedia &&
-          window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-        root.dataset.theme = prefersDark ? 'dark' : 'light';
+        // Modo oscuro por defecto; el claro queda como alternativa del toggle
+        root.dataset.theme = 'dark';
       })();
     </script>
 
