@@ -21,9 +21,15 @@ module.exports = {
 
     assert: {
       assertions: {
+        // Exige al menos 90/100 en rendimiento móvil
+        'categories:performance': ['error', { minScore: 0.9 }],
         // Exige al menos 90/100 en accesibilidad y SEO
         'categories:accessibility': ['error', { minScore: 0.9 }],
         'categories:seo': ['error', { minScore: 0.9 }],
+        // Presupuestos de métricas clave
+        'cumulative-layout-shift': ['error', { maxNumericValue: 0.1 }],
+        'interaction-to-next-paint': ['error', { maxNumericValue: 200 }],
+        'total-javascript': ['error', { maxNumericValue: 102400 }],
       },
     },
 

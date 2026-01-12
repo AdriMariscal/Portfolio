@@ -1,7 +1,7 @@
 {
   "name": "portfolio",
   "type": "module",
-  "version": "3.3.0",
+  "version": "3.4.0",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
@@ -21,7 +21,6 @@
   },
   "devDependencies": {
     "@astrojs/markdown-remark": "^6.3.9",
-    "@astrojs/rss": "^4.0.13",
     "@tailwindcss/vite": "^4.1.16",
     "rehype-autolink-headings": "^7.1.0",
     "remark-images": "^4.1.0",
