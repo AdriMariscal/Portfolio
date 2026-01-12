@@ -1,0 +1,570 @@
+---
+title: "Infinite scroll con URLs de verdad: atrás, estado y SEO en Astro"
+description: "Implementa un listado infinito en Astro sin romper SEO ni navegación: paginación indexable, carga progresiva, History API y restauración de scroll accesible."
+tags: ["astro", "seo", "ux", "a11y", "performance", "pagination"]
+published: true
+date: 2026-01-01
+image: "/images/blog/computer-screen-with-a-program.jpg"
+imageAlt: "Portátil sobre un escritorio con un listado largo tipo blog o catálogo y un botón de Cargar más, mientras se aprecia una URL paginada en el navegador"
+imageCaption: "Infinite scroll puede ser excelente… siempre que no sacrifiques enlaces, navegación y SEO."
+robots: "max-snippet:-1, max-image-preview:large"
+---
+
+import Callout from '@/components/Callout.astro';
+import QuoteHighlight from '@/components/QuoteHighlight.astro';
+import FolderTree from '@/components/FolderTree.astro';
+
+# Infinite scroll con URLs de verdad: atrás, estado y SEO en Astro
+
+Seguro que te ha pasado: entras a un blog o catálogo, empiezas a bajar… y la página “no se acaba nunca”.
+
+Hasta ahí, perfecto.
+
+El problema llega cuando haces cualquiera de estas cosas “normales”:
+
+- Quieres **compartir** lo que estás viendo (y el link siempre vuelve al inicio).
+- Abres una ficha y vuelves con el botón **Atrás**… y el listado **pierde el punto** donde estabas.
+- Google (o tu propia búsqueda interna) necesita **URLs indexables**… y el feed infinito solo existe “en cliente”.
+
+Este artículo va de cómo implementar un listado “infinito” en Astro **sin perder lo más importante**: enlaces compartibles, navegación atrás/adelante, estado consistente y una base SEO indexable.
+
+<Callout variant="info" title="Resumen rápido">
+  El patrón recomendado es híbrido: **paginación clásica como base** (URLs reales, indexable) + **carga progresiva** (Intersection Observer) como mejora. La pieza clave es sincronizar la URL con History API, añadir scroll restoration y cuidar accesibilidad para que no se rompa la UX.
+</Callout>
+
+![Persona haciendo scroll en un portátil con un listado largo tipo feed y un botón “Cargar más” visible en la parte inferior, en un entorno de trabajo real](/images/blog/person-browsing-photos.jpg)
+
+---
+
+## 1. Infinite scroll “de mentira” vs infinite scroll “de verdad”
+
+El infinite scroll “de mentira” funciona así:
+
+- La URL **no cambia**.
+- No hay páginas reales.
+- El contenido solo existe si el usuario llega hasta ahí y el JavaScript carga bien.
+
+Eso puede valer para redes sociales, pero en un blog o catálogo suele romper lo que más importa: **compartir, volver, encontrar**.
+
+El infinite scroll “de verdad” tiene tres propiedades:
+
+1. **Cada tramo** del listado tiene una **URL estable** (por ejemplo, `/blog/page/3/` o `?page=3`).
+2. Si desactivas JavaScript, sigues teniendo **paginación navegable** (y Google también).
+3. El botón Atrás/Adelante **funciona** sin “teletransporte” ni pérdida de estado.
+
+<QuoteHighlight>
+  “Si lo que estás viendo no se puede enlazar y volver a encontrar, no es un feed infinito: es un experimento con suerte.”
+</QuoteHighlight>
+
+---
+
+## 2. El patrón híbrido recomendado
+
+La idea es simple:
+
+- El **servidor** (o el build de Astro) genera páginas paginadas normales.
+- El **cliente** mejora la experiencia cargando la siguiente página cuando toca.
+
+En términos prácticos:
+
+- Base: `/blog/page/1/`, `/blog/page/2/`, `/blog/page/3/`…
+- Mejora: un “Cargar más” + un sentinel para auto-cargar cuando llega al viewport.
+
+Esto te da:
+
+- SEO indexable (cada página tiene su HTML).
+- URLs compartibles.
+- Progressive enhancement (si falla JS, no se cae el sitio).
+
+Y, además, te deja espacio para implementar lo que suele olvidarse: **History + scroll restoration + accesibilidad**.
+
+---
+
+## 3. URLs, SEO y estado: decide el contrato antes de escribir JavaScript
+
+Antes de codear, define estas tres cosas:
+
+### 3.1. ¿Ruta (`/page/2/`) o query (`?page=2`)?
+
+Ambas pueden funcionar. La ruta suele ser más limpia y “editorial” para un blog.
+
+Lo importante no es la forma, sino el **contrato**:
+
+- La URL identifica **qué “pantalla”** del listado estás viendo.
+- Esa pantalla se puede abrir directamente y debe renderizar contenido real.
+
+### 3.2. Paginación indexable (y navegación semántica)
+
+En cada página paginada, añade un `<nav>` con enlaces reales:
+
+- `rel="prev"` y `rel="next"` cuando existan.
+- Texto claro (“Anterior”, “Siguiente”), no solo iconos.
+- Un `aria-label` para lectores de pantalla.
+
+Esto es útil para usuarios, para crawlers y para tu propio mantenimiento.
+
+### 3.3. Estado en la URL: filtros, orden y búsqueda
+
+Si tu listado tiene filtros u orden (muy típico en catálogos), no los guardes “en memoria”:
+
+- Bien: `?q=zapatos&sort=precio&page=3`
+- Mal: “el usuario filtró algo y luego compartió un link que no lo conserva”
+
+Este artículo se centra en paginación, pero la regla es general:
+
+> **Todo lo que cambie lo que el usuario ve debería estar representado en la URL** (o al menos ser reconstruible desde ella).
+
+---
+
+## 4. Base en Astro: paginación clásica y HTML predecible
+
+La implementación concreta depende de tu contenido, pero el patrón se repite: calculas la página, haces `slice`, renderizas y construyes `prev/next`.
+
+Un ejemplo simplificado con Content Collections:
+
+```astro
+---
+// src/pages/blog/page/[page].astro
+export const prerender = true;
+
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import PostCard from "@/components/PostCard.astro";
+import { getCollection } from "astro:content";
+
+const PAGE_SIZE = 12;
+const page = Number(Astro.params.page ?? "1");
+
+const all = await getCollection("blog", ({ data }) => data.published !== false);
+all.sort((a, b) => new Date(b.data.date).valueOf() - new Date(a.data.date).valueOf());
+
+const totalPages = Math.max(1, Math.ceil(all.length / PAGE_SIZE));
+const safePage = Math.min(Math.max(page, 1), totalPages);
+
+const start = (safePage - 1) * PAGE_SIZE;
+const items = all.slice(start, start + PAGE_SIZE);
+
+const prevHref = safePage > 1 ? `/blog/page/${safePage - 1}/` : null;
+const nextHref = safePage < totalPages ? `/blog/page/${safePage + 1}/` : null;
+---
+
+<BaseLayout
+  title={`Blog — Página ${safePage}`}
+  description="Artículos y guías prácticas sobre desarrollo web, Astro, Netlify, SEO y producto."
+>
+  <main>
+    <h1>Blog</h1>
+
+    <div id="feed" data-feed data-page={safePage}>
+      <section id={`page-${safePage}`} data-page-section={safePage}>
+        <ol class="feed-list">
+          {items.map((post) => (
+            <li data-feed-item>
+              <PostCard post={post} />
+            </li>
+          ))}
+        </ol>
+      </section>
+    </div>
+
+    <nav aria-label="Paginación del blog" class="pagination">
+      {prevHref && <a rel="prev" href={prevHref}>← Anterior</a>}
+      {nextHref && <a rel="next" href={nextHref} id="next-link">Siguiente →</a>}
+    </nav>
+
+    <button type="button" id="load-more">Cargar más</button>
+    <div id="sentinel" aria-hidden="true"></div>
+    <p id="feed-status" class="sr-only" role="status" aria-live="polite"></p>
+
+    <script>
+      // La mejora progresiva va aquí (sección 5).
+    </script>
+  </main>
+</BaseLayout>
+```
+
+Dos decisiones intencionadas:
+
+- Marcamos items con `data-feed-item` para poder extraerlos desde HTML.
+- Envolvemos cada página en un `section` con `data-page-section` para poder “anclar” scroll y URL.
+
+<FolderTree title="Estructura mínima (paginación + mejora progresiva)" note="La clave es separar lo indexable (páginas) de lo progresivo (script).">
+  <details open>
+    <summary>/</summary>
+    <ul>
+      <li>src/</li>
+      <li>
+        pages/
+        <ul>
+          <li>blog/</li>
+          <li>
+            blog/page/
+            <ul>
+              <li>[page].astro</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>components/</li>
+      <li>layouts/</li>
+    </ul>
+  </details>
+</FolderTree>
+
+---
+
+## 5. Carga progresiva con Intersection Observer (sin perder el botón)
+
+Aquí va el truco práctico: **no dependas solo del auto-load**.
+
+Por accesibilidad, por control y por UX, la base es un botón:
+
+- Botón “Cargar más” (siempre accesible con teclado).
+- Auto-carga como mejora (si el usuario hace scroll y tú quieres).
+
+Ejemplo de script (puedes pegarlo tal cual dentro del `<script>` anterior y adaptarlo):
+
+```js
+const feed = document.querySelector("[data-feed]");
+const nextLink = document.querySelector("#next-link");
+const loadMoreBtn = document.querySelector("#load-more");
+const sentinel = document.querySelector("#sentinel");
+const status = document.querySelector("#feed-status");
+
+if (!feed || !nextLink || !loadMoreBtn || !sentinel || !status) {
+  // Si falta algo, no rompas la página. Simplemente no actives la mejora.
+  // La paginación clásica seguirá funcionando.
+} else {
+  let isLoading = false;
+  let autoEnabled = false; // activaremos auto-load tras la primera acción explícita
+  const maxPagesToAppend = 5;
+
+  const pageFromUrl = (url) => {
+    const m = url.match(/\/page\/(\d+)\/?$/);
+    return m ? Number(m[1]) : null;
+  };
+
+  const urlForPage = (n) => `/blog/page/${n}/`;
+
+  const setStatus = (msg) => {
+    status.textContent = msg;
+  };
+
+  const appendNextPage = async () => {
+    if (isLoading) return;
+    const nextUrl = nextLink.getAttribute("href");
+    if (!nextUrl) return;
+
+    // Límite anti “DOM infinito”
+    const appended = feed.querySelectorAll("[data-page-section]").length;
+    if (appended >= maxPagesToAppend) {
+      loadMoreBtn.disabled = true;
+      loadMoreBtn.textContent = "Has llegado al límite (carga manual desde la paginación)";
+      return;
+    }
+
+    isLoading = true;
+    loadMoreBtn.disabled = true;
+    setStatus("Cargando más resultados…");
+
+    try {
+      const res = await fetch(nextUrl, { headers: { "X-Requested-With": "fetch" } });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const html = await res.text();
+
+      const doc = new DOMParser().parseFromString(html, "text/html");
+      const incomingItems = doc.querySelectorAll("[data-feed-item]");
+      const incomingNext = doc.querySelector("a[rel='next']");
+
+      const nextPage = pageFromUrl(nextUrl);
+
+      // Creamos un “bloque de página” para poder sincronizar URL y scroll
+      const section = document.createElement("section");
+      section.dataset.pageSection = String(nextPage ?? "");
+      if (nextPage) section.id = `page-${nextPage}`;
+
+      const list = document.createElement("ol");
+      list.className = "feed-list";
+
+      incomingItems.forEach((node) => {
+        // Importante: clona nodos para insertarlos en el documento actual.
+        list.appendChild(node.cloneNode(true));
+      });
+
+      section.appendChild(list);
+      feed.appendChild(section);
+
+      // Actualiza el href del siguiente (si existe)
+      if (incomingNext && incomingNext.getAttribute("href")) {
+        nextLink.setAttribute("href", incomingNext.getAttribute("href"));
+        loadMoreBtn.disabled = false;
+      } else {
+        nextLink.removeAttribute("href");
+        loadMoreBtn.disabled = true;
+        loadMoreBtn.textContent = "No hay más resultados";
+      }
+
+      setStatus(`Se han cargado ${incomingItems.length} resultados más.`);
+    } catch (err) {
+      loadMoreBtn.disabled = false;
+      setStatus("No se han podido cargar más resultados. Inténtalo de nuevo.");
+    } finally {
+      isLoading = false;
+    }
+  };
+
+  loadMoreBtn.addEventListener("click", async () => {
+    autoEnabled = true;
+    await appendNextPage();
+  });
+
+  const io = new IntersectionObserver(
+    (entries) => {
+      const hit = entries.some((e) => e.isIntersecting);
+      if (hit && autoEnabled) appendNextPage();
+    },
+    { rootMargin: "1200px 0px" } // empieza a cargar antes de llegar al final
+  );
+
+  io.observe(sentinel);
+}
+```
+
+Este enfoque tiene dos ventajas importantes:
+
+- El usuario controla el ritmo (botón), pero si quiere “scroll natural” lo obtiene.
+- No dependes de una API nueva: **usas las páginas HTML como fuente** (HTML-as-API).
+
+Si tu listado viene de base de datos y necesitas robustez en datasets “vivos”, la paginación por cursor suele ser mejor a nivel de backend. En ese caso, te interesa esta guía: **[Paginación con cursor (keyset)](/blog/paginacion-con-cursor-keyset/)**.
+
+---
+
+## 6. Sincronizar la URL con History API (sin romper el botón Atrás)
+
+Hasta aquí, el usuario puede cargar más… pero la URL sigue “estática”. Para que sea “de verdad”, necesitas:
+
+- Detectar **qué página** está “activa” mientras haces scroll.
+- Actualizar la URL sin recargar.
+- Hacer que Atrás/Adelante te lleve al punto correcto.
+
+### 6.1. PushState vs ReplaceState: una regla simple
+
+- `history.pushState(...)` crea un punto en el historial (Atrás vuelve aquí).
+- `history.replaceState(...)` actualiza el punto actual sin crear uno nuevo.
+
+Para feeds, un patrón razonable es:
+
+- **pushState** solo cuando entras por primera vez a una nueva “pantalla” (página 2, 3, 4…).
+- **replaceState** para ajustes menores (por ejemplo, si estás dentro de la misma pantalla y solo quieres que la URL refleje el estado actual).
+
+### 6.2. Observa secciones de página y actualiza URL
+
+Como en el HTML cada bloque está en un `<section data-page-section="N">`, puedes observar esas secciones:
+
+```js
+const pushed = new Set([Number(feed.dataset.page ?? "1")]);
+
+const updateUrlForPage = (page) => {
+  const url = urlForPage(page);
+  const state = { page };
+
+  if (!pushed.has(page)) {
+    history.pushState(state, "", url);
+    pushed.add(page);
+  } else {
+    history.replaceState(state, "", url);
+  }
+};
+
+const pageObserver = new IntersectionObserver(
+  (entries) => {
+    // Elegimos la sección más “visible” como página activa.
+    const visible = entries
+      .filter((e) => e.isIntersecting)
+      .sort((a, b) => (b.intersectionRatio ?? 0) - (a.intersectionRatio ?? 0))[0];
+
+    if (!visible) return;
+
+    const page = Number(visible.target.getAttribute("data-page-section"));
+    if (!Number.isFinite(page)) return;
+
+    updateUrlForPage(page);
+  },
+  { threshold: [0.55, 0.7] }
+);
+
+feed.querySelectorAll("[data-page-section]").forEach((section) => pageObserver.observe(section));
+```
+
+Importante:
+
+- Cada vez que appendes una nueva página, recuerda hacer `pageObserver.observe(newSection)`.
+
+### 6.3. Popstate: cuando el usuario pulsa Atrás/Adelante
+
+Cuando usas History API, el navegador no “sabe” dónde quieres poner el scroll. Tú tienes que responder:
+
+```js
+window.addEventListener("popstate", (ev) => {
+  const page = ev.state?.page;
+  if (!page) return;
+
+  const section = document.querySelector(`#page-${page}`);
+  if (section) {
+    section.scrollIntoView({ block: "start" });
+    // Opcional: mueve el foco al inicio del listado para teclado/lectores de pantalla
+    // document.querySelector("h1")?.focus();
+  } else {
+    // Si esa página no está cargada en el DOM, navega “de verdad” (fallback).
+    window.location.assign(urlForPage(page));
+  }
+});
+```
+
+Este fallback es crítico: si el usuario hace Atrás a una página que no está en el DOM, no intentes “inventarte” la UI. Vuelve a la URL real.
+
+---
+
+## 7. Scroll restoration: que volver a una ficha no sea un castigo
+
+Ahora el caso real:
+
+1. Estás en el listado (con 2–3 páginas cargadas).
+2. Entras a una ficha (detalle).
+3. Pulsas Atrás.
+4. Quieres volver al **mismo punto** del scroll.
+
+A veces el navegador lo hace por ti (bfcache). A veces no. Y cuando History API entra en juego, suele ser más frágil.
+
+La estrategia práctica más fiable es:
+
+- Guardar estado en `sessionStorage` al salir:
+  - página activa
+  - `scrollY`
+- En la carga, si existe estado:
+  - cargar páginas hasta alcanzar esa página
+  - restaurar scroll
+
+Ejemplo (simplificado):
+
+```js
+const key = "feedState:/blog";
+
+const saveState = () => {
+  const active = history.state?.page ?? Number(feed.dataset.page ?? "1");
+  sessionStorage.setItem(key, JSON.stringify({ page: active, y: window.scrollY }));
+};
+
+window.addEventListener("pagehide", saveState);
+
+const restoreState = async () => {
+  const raw = sessionStorage.getItem(key);
+  if (!raw) return;
+
+  try {
+    const { page, y } = JSON.parse(raw);
+
+    // Asegura que el DOM tiene la página objetivo (carga progresiva)
+    while (document.querySelectorAll("[data-page-section]").length < page) {
+      await appendNextPage();
+    }
+
+    window.scrollTo({ top: y, left: 0, behavior: "instant" });
+  } catch {
+    // Si falla, no rompas nada: deja el listado en su estado normal.
+  }
+};
+
+restoreState();
+```
+
+Esto convierte un “feed bonito” en una experiencia **predecible**, que es lo que de verdad aprecia el usuario.
+
+---
+
+## 8. Accesibilidad y UX: lo que más se rompe (y cómo evitarlo)
+
+Infinite scroll puede ser un problema si no lo controlas.
+
+### 8.1. No escondas el footer “para siempre”
+
+Si el listado carga eternamente, el footer puede ser inalcanzable con teclado o lector de pantalla.
+
+Solución:
+
+- Pon un límite de auto-carga (como `maxPagesToAppend`).
+- Deja siempre accesible la paginación clásica.
+
+### 8.2. Anuncia cambios a lectores de pantalla
+
+Cuando cargas items nuevos, el lector de pantalla necesita un aviso:
+
+- Un elemento `role="status"` con `aria-live="polite"` (ya lo añadimos como `#feed-status`).
+- Mensajes cortos (“Se han cargado 12 resultados más”).
+
+### 8.3. Evita el auto-load sin consentimiento
+
+Auto-cargar contenido puede ser confuso.
+
+Una regla práctica:
+
+- Auto-load solo tras una acción explícita (primer click en “Cargar más”).
+- O añade un toggle “Activar carga automática” si tu público lo necesita.
+
+### 8.4. Mantén el foco bajo control
+
+Si el usuario está con teclado, cargar contenido no debe “moverle el foco”.
+
+Evita:
+
+- Hacer `focus()` agresivo tras cada carga.
+- Re-renderizar toda la lista.
+
+En general: añade, no re-pintes.
+
+---
+
+## 9. Producción: límites, errores, caché y métricas
+
+Infinite scroll se suele romper en producción por tres motivos:
+
+1. **DOM infinito**: demasiados nodos → peor INP.
+2. **Errores de red**: sin retry y sin estados claros, la UX se vuelve “¿se ha quedado colgado?”.
+3. **Sin medición**: nadie ve la regresión hasta que el SEO o la conversión cae.
+
+Recomendaciones prácticas:
+
+- Limita páginas cargadas en el DOM y ofrece escape (“Ver más” con paginación).
+- Usa `AbortController` para cancelar una carga si el usuario cambia de ruta rápido.
+- Cacha respuestas (al menos in-memory) si tu feed es muy visitado.
+- Vigila interactividad y rendimiento:
+  - Para entender INP/LCP/CLS y cómo impacta este tipo de UI, esta guía te sirve de base: **[Core Web Vitals 2025 (INP)](/blog/core-web-vitals-2025-inp-astro-netlify/)**.
+  - Si quieres automatizar presupuestos de rendimiento para que el feed no se degrade con cada PR: **[Lighthouse CI y budgets](/blog/lighthouse-ci-presupuestos-rendimiento-flujos-usuario/)**.
+
+---
+
+## 10. Checklist final para un infinite scroll “de verdad”
+
+<Callout variant="success" title="Checklist de producción (cópiala tal cual)">
+  - **URLs reales**: cada “pantalla” tiene ruta o query estable.
+  - **Fallback**: la paginación funciona sin JavaScript.
+  - **Cargar más**: botón accesible + auto-load opcional.
+  - **History API**: pushState solo cuando cambia de “pantalla”; replaceState para ajustes.
+  - **Popstate**: Atrás/Adelante hace scroll al ancla o navega a la URL real si no está en DOM.
+  - **Scroll restoration**: guarda `{ page, y }` y restaura al volver desde una ficha.
+  - **Accesibilidad**: `aria-live` para anunciar cargas, sin secuestrar el foco, y con límites para no “ocultar” el footer.
+  - **Límites**: evita DOM infinito y define un máximo razonable de páginas.
+  - **Errores**: estado claro + retry; si falla, no rompas la navegación.
+  - **Métricas**: vigila INP y memoria en sesiones largas (especialmente en móvil).
+</Callout>
+
+---
+
+## Cierre: que sea “infinito”, pero no impredecible
+
+Infinite scroll no es malo. Lo malo es implementarlo como si el listado fuese un “muro” sin URLs, sin historial y sin vuelta atrás.
+
+Si partes de paginación clásica y luego mejoras con carga progresiva, puedes tener lo mejor de ambos mundos: **UX fluida** y **producto sólido** (SEO, enlaces, accesibilidad y mantenimiento).
+
+Si quieres, puedo ayudarte a aplicarlo a tu caso concreto (blog, portfolio o catálogo), revisando tus rutas, tu paginación y el comportamiento real en móvil.
+
+**[Escríbeme](/contact)** y lo vemos paso a paso.
