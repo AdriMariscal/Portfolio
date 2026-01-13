@@ -1,12 +1,14 @@
 ---
 // src/pages/404.astro
 import BaseLayout from "../layouts/BaseLayout.astro";
+import Button from "../components/ui/Button.astro";
+import Card from "../components/ui/Card.astro";
 ---
 
 <BaseLayout title="404 · Página no encontrada">
   <section class="section section--404">
     <div class="container">
-      <article class="card error-card">
+      <Card as="article" class="error-card">
         <div class="card__body error-card__body">
           <!-- Icono/emoji con fondo suave -->
           <div class="error-card__icon" aria-hidden="true">🧭</div>
@@ -18,7 +20,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
           </p>
 
           <div class="stack error-card__actions">
-            <a class="btn btn--primary" href="/">Volver al inicio</a>
+            <Button href="/" variant="primary">Volver al inicio</Button>
             <p class="error-card__links">
               <small>
                 ¿Buscabas <a class="link" href="/projects">Proyectos</a> o
@@ -27,7 +29,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
             </p>
           </div>
         </div>
-      </article>
+      </Card>
     </div>
   </section>
 </BaseLayout>

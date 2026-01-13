@@ -2,6 +2,7 @@
 // src/pages/legal/cookies.astro
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { SITE_OWNER } from "../../config/siteOwner";
+import Card from "../../components/ui/Card.astro";
 
 // Ajusta la fecha cuando hagas cambios de contenido.
 const lastUpdate = "01/11/2025";
@@ -10,7 +11,7 @@ const lastUpdate = "01/11/2025";
 <BaseLayout title="Cookies" description="Política de cookies del sitio.">
   <section class="section section--legal">
     <div class="wrap">
-      <article class="card card--soft legal__card">
+      <Card as="article" variant="soft" class="legal__card">
         <div class="legal__body prose">
           <header class="legal__header">
             <h1>Política de cookies</h1>
@@ -160,7 +161,7 @@ const lastUpdate = "01/11/2025";
         cualquier momento.
       </p>
     </div>
-      </article>
+      </Card>
     </div>
   </section>
 </BaseLayout>

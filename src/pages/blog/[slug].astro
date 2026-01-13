@@ -1,6 +1,7 @@
 ---
 // src/pages/blog/[slug].astro
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import Button from '@/components/ui/Button.astro';
 import type { CollectionEntry } from 'astro:content';
 import { getCollection } from 'astro:content';
 import { toSlug } from '@/lib/content';
@@ -122,7 +123,9 @@ const jsonLd = {
 
         {/* Botón Volver con el mismo estilo que los botones de proyecto */}
         <div class="post__actions" style="display:flex; gap:.5rem; flex-wrap:wrap; margin:.5rem 0 0">
-          <a class="btn btn--secondary btn--sm post__back" href="/blog" data-back>← Volver</a>
+          <Button href="/blog" variant="secondary" size="sm" class="post__back" data-back>
+            ← Volver
+          </Button>
         </div>
 
       {/* Imagen principal del artículo (hero), si el frontmatter define `image` */}

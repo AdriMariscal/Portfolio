@@ -2,6 +2,7 @@
 // src/pages/blog/index.astro
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import PostCard from '@/components/PostCard.astro';
+import Input from '@/components/ui/Input.astro';
 import { getCollection } from 'astro:content';
 
 // Coacción segura de fecha
@@ -48,9 +49,9 @@ const initialVisible = Math.min(VISIBLE, posts.length);
         <label class="blog-search__label" for="blog-search-input">
           Buscar artículos
         </label>
-        <input
+        <Input
           id="blog-search-input"
-          class="input blog-search__input"
+          class="blog-search__input"
           type="search"
           name="q"
           placeholder="Busca por título, descripción o etiqueta…"

@@ -2,6 +2,7 @@
 // src/pages/legal/terminos.astro
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { SITE_OWNER } from "../../config/siteOwner";
+import Card from "../../components/ui/Card.astro";
 
 // Si quieres mostrar la fecha automática, cámbiala por:
 // const updatedAt = new Date().toLocaleDateString("es-ES");
@@ -11,7 +12,7 @@ const updatedAt = "01/11/2025";
 <BaseLayout title="Términos y condiciones" description="Condiciones de uso del sitio y, en su caso, contratación a distancia.">
   <section class="section section--legal">
     <div class="wrap">
-      <article class="card card--soft legal__card">
+      <Card as="article" variant="soft" class="legal__card">
         <div class="legal__body prose">
           <header class="legal__header">
             <h1>Términos y condiciones</h1>
@@ -166,7 +167,7 @@ const updatedAt = "01/11/2025";
       </ol>
 
     </div>
-      </article>
+      </Card>
     </div>
   </section>
 </BaseLayout>
