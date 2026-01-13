@@ -1,6 +1,8 @@
 ---
 // src/components/ProjectCard.astro
 import type { CollectionEntry } from "astro:content";
+import Button from "./ui/Button.astro";
+import Card from "./ui/Card.astro";
 
 type Link = { href: string; label: string };
 
@@ -57,7 +59,7 @@ const slugifyTag = (t: string) =>
     .replace(/(^-|-$)/g, "");
 ---
 
-<article class="card project-card">
+<Card as="article" class="project-card">
   {href && (
     <a
       class="card__overlay-link"
@@ -74,14 +76,15 @@ const slugifyTag = (t: string) =>
       <ul class="links card__interactive" aria-label="Enlaces del proyecto">
         {links.map((l) => (
           <li>
-            <a
-              class="btn btn--sm btn--secondary"
+            <Button
               href={l.href}
+              variant="secondary"
+              size="sm"
               target={toExternal(l.href) ? "_blank" : undefined}
               rel={toExternal(l.href) ? "noopener noreferrer" : undefined}
             >
               {l.label}
-            </a>
+            </Button>
           </li>
         ))}
       </ul>
@@ -97,7 +100,7 @@ const slugifyTag = (t: string) =>
       </ul>
     )}
   </div>
-</article>
+</Card>
 
 <style>
   .links,

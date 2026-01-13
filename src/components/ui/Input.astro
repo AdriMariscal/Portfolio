@@ -1,0 +1,18 @@
+---
+const {
+  as = "input",
+  class: className = "",
+  ...rest
+} = Astro.props;
+
+const Tag = as;
+const classes = ["input", className].filter(Boolean).join(" ");
+---
+
+{Tag === "textarea" ? (
+  <textarea class={classes} {...rest}>
+    <slot />
+  </textarea>
+) : (
+  <input class={classes} {...rest} />
+)}

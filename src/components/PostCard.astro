@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from "astro:content";
+import Card from "./ui/Card.astro";
 
 const { entry, maxTags = 6 } = Astro.props as {
   entry: CollectionEntry<"blog">;
@@ -34,7 +35,7 @@ const formattedDate = date
   : null;
 ---
 
-<article class="card card--post">
+<Card as="article" variant="post">
   <a
     class="card__overlay-link"
     href={`/blog/${slug}/`}
@@ -65,4 +66,4 @@ const formattedDate = date
       </ul>
     )}
   </div>
-</article>
+</Card>

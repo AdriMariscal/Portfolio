@@ -1,0 +1,16 @@
+---
+const {
+  as = "div",
+  variant = "default",
+  class: className = "",
+  ...rest
+} = Astro.props;
+
+const Tag = as;
+const variantClass = variant !== "default" ? `card--${variant}` : "";
+const classes = ["card", variantClass, className].filter(Boolean).join(" ");
+---
+
+<Tag class={classes} {...rest}>
+  <slot />
+</Tag>

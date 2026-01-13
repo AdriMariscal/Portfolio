@@ -2,6 +2,9 @@
 // src/pages/projects/[slug].astro
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { getCollection, getEntry } from "astro:content";
+import Badge from "@/components/ui/Badge.astro";
+import Button from "@/components/ui/Button.astro";
+import Card from "@/components/ui/Card.astro";
 
 export async function getStaticPaths() {
   const entries = await getCollection("projects", ({ data }) => data.published !== false);
@@ -55,15 +58,15 @@ const latestDate = latest?.date ? fmtDate(latest.date) : undefined;
 <BaseLayout title={title} description={undefined}>
   <article class="section post project-detail">
     <!-- margen inferior ajustado a 24px -->
-    <div class="wrap post__card card card--soft">
+    <Card as="div" variant="soft" class="wrap post__card">
       <div class="post__body">
           <h1 class="post__title">{title}</h1>
 
         <p class="post__date project-detail__meta">
           <strong class="project-detail__meta-label">Estado:</strong>{" "}
-          <span class={`badge ${isActive ? "badge--active" : "badge--inactive"}`}>
+          <Badge variant={isActive ? "active" : "inactive"}>
             {isActive ? "Activo" : "Inactivo"}
-          </span>
+          </Badge>
           {latest?.version && (
             <>
               {" · "}<strong>Última versión:</strong> {latest.version}
@@ -75,19 +78,19 @@ const latestDate = latest?.date ? fmtDate(latest.date) : undefined;
           {(projectUrl || repoUrl || demoUrl) && (
           <div class="post__actions">
           {projectUrl && (
-              <a class="btn btn--secondary btn--sm" href={projectUrl} target="_blank" rel="noopener noreferrer">
+              <Button href={projectUrl} variant="secondary" size="sm" target="_blank" rel="noopener noreferrer">
                 Ver proyecto →
-            </a>
+              </Button>
             )}
             {repoUrl && (
-              <a class="btn btn--secondary btn--sm" href={repoUrl} target="_blank" rel="noopener noreferrer">
+              <Button href={repoUrl} variant="secondary" size="sm" target="_blank" rel="noopener noreferrer">
                 Ver código
-              </a>
+              </Button>
             )}
             {demoUrl && (
-              <a class="btn btn--secondary btn--sm" href={demoUrl} target="_blank" rel="noopener noreferrer">
+              <Button href={demoUrl} variant="secondary" size="sm" target="_blank" rel="noopener noreferrer">
                 Ver demo
-              </a>
+              </Button>
           )}
           </div>
           )}
@@ -108,7 +111,7 @@ const latestDate = latest?.date ? fmtDate(latest.date) : undefined;
           </footer>
         ) : null}
       </div>
-    </div>
+    </Card>
   </article>
 
   {/* Changelog con sección compacta y respiración inferior */}
@@ -120,7 +123,7 @@ const latestDate = latest?.date ? fmtDate(latest.date) : undefined;
             {changelog.map((rel, i) => {
             const d = fmtDate(rel?.date);
               return (
-              <article class="card card--soft" style={i > 0 ? "margin-top: 1rem" : undefined}>
+              <Card as="article" variant="soft" style={i > 0 ? "margin-top: 1rem" : undefined}>
                   <div class="card__body">
                     <h3 class="h4" style="margin:0 0 .5rem">
                     {rel?.version}{d && ` (${d})`}
@@ -136,7 +139,7 @@ const latestDate = latest?.date ? fmtDate(latest.date) : undefined;
               </ul>
                   ) : null}
                   </div>
-                </article>
+                </Card>
               );
             })}
           </div>

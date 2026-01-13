@@ -1,6 +1,9 @@
 ---
 // src/pages/contact.astro
 import BaseLayout from "../layouts/BaseLayout.astro";
+import Button from "../components/ui/Button.astro";
+import Card from "../components/ui/Card.astro";
+import Input from "../components/ui/Input.astro";
 ---
 
 <BaseLayout title="Contacto · Adrián Mariscal" description="Cuéntame en qué te puedo ayudar.">
@@ -13,8 +16,9 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       </header>
 
       <!-- Formulario -->
-      <form
-        class="card contact__form"
+      <Card
+        as="form"
+        class="contact__form"
         name="contact"
         method="POST"
         action="/thanks"
@@ -34,8 +38,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         <div class="card__body stack" style="--stack-gap: 18px;">
         <label class="field">
           <span>Nombre</span>
-          <input
-            class="input"
+          <Input
             type="text"
             name="name"
             autocomplete="name"
@@ -46,8 +49,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
         <label class="field">
           <span>Email</span>
-          <input
-            class="input"
+          <Input
             type="email"
             name="email"
             autocomplete="email"
@@ -58,21 +60,21 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
         <label class="field">
           <span>Mensaje</span>
-          <textarea
-            class="input"
+          <Input
+            as="textarea"
             name="message"
             rows="6"
             placeholder="Cuéntame objetivos, plazos y si ya tienes web."
             required
-          ></textarea>
+          />
         </label>
 
         <div data-netlify-recaptcha="true"></div>
 
         <div class="contact__actions">
-          <button class="btn btn--primary btn--block" type="submit">
+          <Button variant="primary" type="submit" block>
             Solicitar auditoría gratuita
-          </button>
+          </Button>
           <p
             id="contact-error-message"
             class="contact__error muted"
@@ -88,7 +90,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
             <a class="link" href="/legal/privacidad">Política de privacidad</a>.
           </p>
         </div>
-      </form>
+      </Card>
     </div>
   </main>
 </BaseLayout>
