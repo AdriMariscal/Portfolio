@@ -40,6 +40,7 @@ const withLinks = props.withLinks ?? true;
 // HREF de la ficha (solo si viene desde colección)
 const href =
   "entry" in props ? `/projects/${props.entry.slug}/` : undefined;
+const ariaLabel = href ? `Abrir ficha del proyecto: ${title}` : undefined;
 
 // Máximo de etiquetas visibles
 const MAX_TAGS = 6;
@@ -57,27 +58,22 @@ const slugifyTag = (t: string) =>
 ---
 
 <article class="card project-card">
+  {href && (
+    <a
+      class="card__overlay-link"
+      href={href}
+      aria-label={ariaLabel}
+    ></a>
+  )}
   <div class="card__body">
-    <h3 class="card__title">
-      {href ? (
-        <a
-          href={href}
-          class="card__title-link"
-          aria-label={`Abrir ficha del proyecto: ${title}`}
-        >
-          {title}
-        </a>
-      ) : (
-        title
-      )}
-    </h3>
+    <h3 class="card__title">{title}</h3>
 
     {description && <p class="card__excerpt">{description}</p>}
 
     {withLinks && links.length > 0 && (
-      <ul class="links" aria-label="Enlaces del proyecto">
+      <ul class="links card__interactive" aria-label="Enlaces del proyecto">
         {links.map((l) => (
-            <li>
+          <li>
             <a
               class="btn btn--sm btn--secondary"
               href={l.href}
@@ -86,19 +82,19 @@ const slugifyTag = (t: string) =>
             >
               {l.label}
             </a>
-            </li>
+          </li>
         ))}
-        </ul>
+      </ul>
     )}
 
     {displayTags.length > 0 && (
-          <ul class="taglist" aria-label="Etiquetas">
+      <ul class="taglist card__interactive" aria-label="Etiquetas">
         {displayTags.map((t) => (
-              <li>
+          <li>
             <a class="tag" href={`/blog/tags/${slugifyTag(t)}/`}>#{t}</a>
-              </li>
-            ))}
-          </ul>
+          </li>
+        ))}
+      </ul>
     )}
   </div>
 </article>
@@ -112,19 +108,5 @@ const slugifyTag = (t: string) =>
     margin: 12px 0 0;
     padding: 0;
     flex-wrap: wrap;
-  }
-
-  .card__title-link {
-    display: inline-block;
-    text-decoration: none;
-    border-bottom: 2px solid transparent;
-    transition: border-color .15s ease, color .15s ease;
-  }
-  .card__title-link:hover { border-color: currentColor; }
-  .card__title-link:focus-visible {
-    outline: 3px solid rgba(11,31,59,.25);
-    outline-offset: 2px;
-    border-color: transparent;
-    border-radius: 6px;
   }
 </style>
