@@ -1,0 +1,237 @@
+---
+title: "De Excel a aplicación: checklist de alcance y estimación para tu MVP (pymes)"
+description: "Checklist práctico para pasar de un Excel a un MVP: 15 preguntas de discovery, plantilla de backlog y método simple para estimar tiempo y coste."
+tags: ["desarrollo", "pymes", "negocio", "backend", "nube"]
+published: true
+date: 2026-01-13
+image: "/images/blog/workflow-diagram-and-product-brief.jpg"
+imageAlt: "Checklist de alcance y estimación para convertir un Excel en un MVP."
+imageCaption: "Primero alcance, luego estimación: el antídoto contra el “ya que estamos…”."
+robots: "max-snippet:-1, max-image-preview:large"
+---
+
+# De Excel a aplicación: checklist de alcance y estimación para tu MVP (pymes)
+
+Muchos MVPs “se van de presupuesto” antes de escribir una línea de código. No por falta de talento, sino por un clásico: **empezar a construir sin cerrar el alcance mínimo**.
+
+Si hoy tu proceso vive en Excel (pedidos, inventario, clientes, reservas…), esta guía te ayuda a convertirlo en una primera app **sin sobreingeniería**: preguntas de discovery, una plantilla de backlog y un método de estimación por módulos (datos, roles, integraciones, paneles e informes).
+
+Lo que te llevas al terminar:
+
+- 15 preguntas para descubrir *qué hace falta de verdad* (y qué no).
+- Una plantilla de backlog: **Imprescindible** vs **Nice to have**.
+- Un método simple para estimar **tiempo** y **coste** por módulos, sin números mágicos.
+- Una matriz para elegir: **no-code**, **low-code** o **desarrollo a medida**.
+
+> Si buscas la visión general “paso a paso” para crear tu MVP desde cero, te puede servir como lectura previa:  
+> [Del Excel a tu primer producto digital: guía para crear tu MVP paso a paso](/blog/tu-primer-producto-digital/).
+
+* * *
+
+## 1. Define el MVP operativo (antes de estimar)
+
+Antes de hablar de horas, define qué significa “funciona” para tu negocio.
+
+Una forma práctica (y muy rentable) es cerrar **un único flujo principal**:
+
+- **Entrada**: ¿qué datos se crean o capturan?
+- **Proceso**: ¿qué cambios de estado ocurren?
+- **Salida**: ¿qué decisión permite tomar o qué trabajo ahorra?
+
+Ejemplo típico (negocio local): *“Registrar un pedido y descontar stock, con un estado claro para saber qué falta por servir.”*
+
+Regla 80/20 para evitar el “ya que estamos”:
+
+- Si una funcionalidad **no es necesaria** para completar el flujo principal, no entra en el MVP.
+- Si **nadie la usa** en la primera semana de prueba, probablemente no era MVP.
+
+* * *
+
+## 2. 15 preguntas de discovery (las que de verdad mueven el alcance)
+
+Usa estas preguntas como checklist. La mayoría de “sorpresas” de alcance caen en uno de estos bloques.
+
+### Objetivo y contexto
+
+1. ¿Qué decisión o tarea quieres acelerar (en una frase)?
+2. ¿Quién usará el MVP (roles reales, no organigrama)?
+3. ¿Con qué frecuencia se usa el proceso (diario, semanal, picos estacionales)?
+4. ¿Cuál es el error más caro hoy (tiempo, dinero, reputación, cumplimiento)?
+
+### Datos (tu “modelo” de negocio)
+
+5. ¿Cuáles son las **entidades** mínimas? (p. ej., Producto, Pedido, Cliente, Movimiento de stock)
+6. ¿Qué campos son obligatorios y cuáles opcionales?
+7. ¿Hay datos que deban **validarse** sí o sí? (IVA, formatos, cantidades, stock negativo, etc.)
+8. ¿Hay datos sensibles o personales? (RGPD, accesos, retención)
+
+### Roles y permisos
+
+9. ¿Qué puede hacer cada rol? (ver, crear, editar, borrar, exportar)
+10. ¿Necesitas auditoría? (quién cambió qué y cuándo)
+
+### Flujos y excepciones
+
+11. ¿Qué estados tiene el proceso? (borrador → confirmado → servido / cancelado)
+12. ¿Qué pasa cuando algo falla? (sin stock, cliente no contesta, devolución)
+
+### Integraciones
+
+13. ¿Qué herramientas “rodean” hoy al Excel? (email, WhatsApp, TPV, ERP, e-commerce)
+14. ¿La integración es *deseable* o *imprescindible* para que el MVP funcione?
+
+### Paneles, informes y operación
+
+15. ¿Qué necesitas ver cada día/semana? (lista de pedidos, stock bajo, ventas por periodo)  
+    Y una extra que suele doler: ¿quién dará soporte si “se cae” o hay dudas?
+
+* * *
+
+## 3. Plantilla de backlog: imprescindible vs “nice to have”
+
+Una plantilla útil para pymes no necesita 50 tickets. Necesita **claridad**.
+
+### Estructura recomendada (copiar/pegar)
+
+| Ítem | Tipo | Imprescindible | Criterio de aceptación (1 línea) | Riesgo / duda |
+|---|---|---:|---|---|
+| … | UI / Datos / Integración / Informe | Sí / No | … | … |
+
+**Tipos** (para estimar después por módulos):  
+- **Datos**: modelo, reglas, migración desde Excel  
+- **UI**: pantallas, formularios, listados  
+- **Roles**: permisos, trazabilidad  
+- **Integración**: email, ERP, TPV, pasarela, etc.  
+- **Informe**: listados, exportaciones, paneles  
+
+### Ejemplo: pedidos + inventario (negocio local)
+
+Imprescindible (MVP):
+
+- Alta/edición de productos (SKU, nombre, stock, umbral mínimo)
+- Crear pedido (cliente, líneas, cantidades)
+- Cambiar estado de pedido (pendiente → preparado → entregado / cancelado)
+- Descontar stock al confirmar o al entregar (decisión explícita)
+- Listado de pedidos con filtros básicos (estado, fecha)
+- Alertas simples: “stock bajo” en el panel
+
+Nice to have (no MVP):
+
+- Exportar a Excel/PDF automáticamente
+- Notificaciones por WhatsApp/email al cliente
+- Multi-almacén
+- Roles avanzados (aprobaciones, doble validación)
+- Informes complejos (márgenes, cohortes, predicción)
+
+![Diagrama genérico de un MVP de pedidos + inventario (entidades y flujo principal)](/images/blog/mvp-diagram.png)
+
+* * *
+
+## 4. Método simple para estimar tiempo y coste (por módulos)
+
+La estimación más fiable en un MVP no sale de “cuántas pantallas”, sino de **qué módulos están implicados** y qué incertidumbre arrastras.
+
+### 4.1 Trocea el MVP en 6 módulos
+
+1. **Datos**: entidades, reglas, migración desde Excel
+2. **Roles y permisos**: quién ve/edita, auditoría mínima
+3. **Interfaz (paneles)**: formularios, listados, búsqueda, UX básica
+4. **Integraciones**: email/ERP/TPV/e-commerce, automatizaciones
+5. **Informes**: métricas, exports, paneles
+6. **Operación**: despliegue, backups, logs, monitorización mínima
+
+> Si tu MVP va a tener usuarios reales, esta parte suele decidir el éxito (o el susto):  
+> [Checklist de puesta en producción en la nube para un MVP](/blog/checklist-puesta-en-produccion-nube-mvp/).
+
+### 4.2 Puntúa complejidad (sin autoengañarte)
+
+Para cada módulo, puntúa 1–3 en estos factores:
+
+- **Cambios esperados** (requisitos “en movimiento”)
+- **Reglas de negocio** (validaciones, excepciones, estados)
+- **Datos y volumen** (migración, historiales, consistencia)
+- **Integraciones** (número, fiabilidad, credenciales, errores)
+- **Riesgo** (cumplimiento, seguridad, disponibilidad)
+
+Convierte esa puntuación en un tamaño simple:
+
+- **S** (bajo): pocas reglas, poca variación
+- **M** (medio): varias reglas o dependencias
+- **L** (alto): integraciones críticas, reglas complejas o alta incertidumbre
+
+### 4.3 Estima en rangos, no en números “exactos”
+
+Un buen hábito es estimar en **rangos** y añadir un margen explícito de incertidumbre:
+
+- **Rango del módulo** (p. ej., 2–4 días)
+- **Buffer** (p. ej., +20–40% en MVPs con cambios frecuentes)
+
+Ejemplo orientativo (para visualizar el método, no como presupuesto cerrado):
+
+| Módulo | Tamaño | Por qué suele crecer | Resultado (rango) |
+|---|---:|---|---|
+| Datos | M | migrar Excel y normalizar campos | 2–4 días |
+| Roles | S | permisos básicos y trazabilidad mínima | 1–2 días |
+| Paneles | M | formularios + listados + filtros | 3–6 días |
+| Integraciones | L | credenciales, errores, reintentos | 4–10 días |
+| Informes | S/M | export vs panel real | 1–4 días |
+| Operación | M | despliegue, backups, logs, alertas | 2–5 días |
+
+Cómo llevarlo a coste (sin humo):
+
+- Coste aproximado ≈ **(horas estimadas × tarifa)** + **coste mensual de infraestructura**
+- En MVPs, la infraestructura puede empezar baja… pero ojo con el crecimiento y el lock-in. Si usas BaaS, esta guía te ayuda a aterrizar números:  
+  [BaaS y costes ocultos: cómo estimar y controlar la factura](/blog/baas-costes-ocultos-controlar-factura-side-projects/).
+
+* * *
+
+## 5. ¿No-code, low-code o a medida? Matriz de decisión rápida
+
+No existe una respuesta universal. Existe una pregunta clave: **¿dónde está tu ventaja competitiva?**  
+Si está en el proceso y necesitas control, probablemente acabarás en una solución más a medida. Si solo quieres velocidad para validar, no-code/low-code puede ser perfecto.
+
+| Opción | Cuándo compensa | Señales de riesgo | Ejemplos típicos |
+|---|---|---|---|
+| No-code | Validación rápida, equipo pequeño, reglas simples | lock-in, límites en roles e integraciones, crecimiento de coste por usuario | Glide, Airtable, formularios + automatizaciones |
+| Low-code | Panel interno, muchas pantallas CRUD, integraciones moderadas | “pegamento” frágil, automatizaciones difíciles de testear | Retool/Appsmith, n8n/Make, backends gestionados |
+| A medida | Proceso core del negocio, reglas específicas, escalabilidad y control | más lead time inicial, necesitas disciplina técnica | Next.js/Astro + API + DB gestionada |
+
+Una regla práctica para pymes:
+
+- Si tu Excel tiene **10 pestañas y 30 fórmulas críticas**, tu “proceso real” ya es un sistema. Trátalo como tal.
+- Si tu Excel es solo una lista y un par de filtros, empieza simple (y valida rápido).
+
+* * *
+
+## 6. Checklist final de alcance + estimación (copiar/pegar)
+
+Antes de pedir presupuesto o empezar a construir, revisa:
+
+**Alcance**
+- [ ] Flujo principal definido (entrada → proceso → salida)
+- [ ] Lista de entidades y campos mínimos (y validaciones)
+- [ ] Estados del proceso y excepciones relevantes
+- [ ] Roles y permisos por acción (ver/crear/editar/borrar/exportar)
+- [ ] Integraciones: imprescindibles vs deseables
+- [ ] Informes: qué decisiones soportan (no “por si acaso”)
+
+**Estimación**
+- [ ] MVP troceado en módulos (Datos, Roles, Paneles, Integraciones, Informes, Operación)
+- [ ] Cada módulo tiene tamaño S/M/L con razones escritas
+- [ ] Estimación en rangos + buffer explícito
+- [ ] Riesgos identificados (y qué se hará si ocurren)
+- [ ] Criterio de “listo para probar” definido (qué se considera entregable)
+
+**Operación mínima**
+- [ ] Backups y restauración probada (aunque sea en staging)
+- [ ] Logs y alertas básicas (las que evitan sustos)
+- [ ] Presupuesto/alertas de coste si hay nube/BaaS
+
+* * *
+
+## Cierre
+
+Si aplicas esta checklist, el MVP deja de ser “una app que hay que adivinar” y pasa a ser un proyecto **explicable**: qué entra, qué sale, qué riesgos hay y cuánto cuesta aproximarlo.
+
+Si quieres, puedo ayudarte a aterrizar tu Excel en un backlog realista (imprescindible vs nice-to-have) y una estimación por módulos, con tradeoffs claros entre no-code, low-code y a medida.  
+Puedes escribirme desde aquí: [Contacto](/contact/).
