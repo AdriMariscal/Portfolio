@@ -21,7 +21,9 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         data-netlify="true"
         netlify-honeypot="bot-field"
         data-netlify-recaptcha="true"
-        aria-describedby="contact-privacy-note"
+        data-contact-form
+        aria-describedby="contact-privacy-note contact-error-message"
+        novalidate
       >
         <!-- Netlify -->
         <input type="hidden" name="form-name" value="contact" />
@@ -32,23 +34,55 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         <div class="card__body stack" style="--stack-gap: 18px;">
         <label class="field">
           <span>Nombre</span>
-          <input class="input" type="text" name="name" autocomplete="name" required />
+          <input
+            class="input"
+            type="text"
+            name="name"
+            autocomplete="name"
+            placeholder="Tu nombre completo"
+            required
+          />
         </label>
 
         <label class="field">
           <span>Email</span>
-          <input class="input" type="email" name="email" autocomplete="email" required />
+          <input
+            class="input"
+            type="email"
+            name="email"
+            autocomplete="email"
+            placeholder="tu@email.com"
+            required
+          />
         </label>
 
         <label class="field">
           <span>Mensaje</span>
-          <textarea class="input" name="message" rows="6" required></textarea>
+          <textarea
+            class="input"
+            name="message"
+            rows="6"
+            placeholder="Cuéntame objetivos, plazos y si ya tienes web."
+            required
+          ></textarea>
         </label>
 
         <div data-netlify-recaptcha="true"></div>
 
         <div class="contact__actions">
-          <button class="btn btn--primary btn--block" type="submit">Enviar</button>
+          <button class="btn btn--primary btn--block" type="submit">
+            Solicitar auditoría gratuita
+          </button>
+          <p
+            id="contact-error-message"
+            class="contact__error muted"
+            data-contact-error
+            role="status"
+            aria-live="polite"
+            hidden
+          >
+            Revisa los campos marcados. Hay información obligatoria pendiente.
+          </p>
           <p id="contact-privacy-note" class="contact__legal muted">
             Al enviar aceptas la
             <a class="link" href="/legal/privacidad">Política de privacidad</a>.
@@ -58,3 +92,74 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     </div>
   </main>
 </BaseLayout>
+
+<script>
+  const form = document.querySelector('[data-contact-form]');
+  const errorMessage = document.querySelector('[data-contact-error]');
+
+  if (form && errorMessage) {
+    const requiredMessage =
+      'Revisa los campos marcados. Hay información obligatoria pendiente.';
+    const emailMessage =
+      'Ese email no parece válido. Comprueba el formato e inténtalo de nuevo.';
+
+    const fields = Array.from(form.querySelectorAll('input, textarea'));
+
+    const updateValidity = (field) => {
+      if (!(field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement)) {
+        return;
+      }
+
+      if (field.validity.valueMissing) {
+        field.setCustomValidity(requiredMessage);
+        return;
+      }
+
+      if (field instanceof HTMLInputElement && field.type === 'email' && field.validity.typeMismatch) {
+        field.setCustomValidity(emailMessage);
+        return;
+      }
+
+      field.setCustomValidity('');
+    };
+
+    const syncErrorMessage = () => {
+      const firstInvalid = form.querySelector(':invalid');
+      if (!firstInvalid) {
+        errorMessage.hidden = true;
+        return;
+      }
+
+      if (firstInvalid instanceof HTMLInputElement && firstInvalid.type === 'email') {
+        errorMessage.textContent = emailMessage;
+      } else {
+        errorMessage.textContent = requiredMessage;
+      }
+
+      errorMessage.hidden = false;
+    };
+
+    form.addEventListener('submit', (event) => {
+      fields.forEach(updateValidity);
+      if (!form.checkValidity()) {
+        event.preventDefault();
+        syncErrorMessage();
+        const firstInvalid = form.querySelector(':invalid');
+        if (firstInvalid && typeof firstInvalid.focus === 'function') {
+          firstInvalid.focus();
+        }
+      }
+    });
+
+    form.addEventListener('input', (event) => {
+      const target = event.target;
+      if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement) {
+        updateValidity(target);
+      }
+
+      if (form.checkValidity()) {
+        errorMessage.hidden = true;
+      }
+    });
+  }
+</script>
