@@ -111,7 +111,7 @@ html[data-theme="light"]{
 
   --color-heading:var(--palette-charcoal-950);
   --color-text:var(--palette-charcoal-900);
-  --color-text-muted:var(--palette-charcoal-600);
+  --color-text-muted:var(--palette-charcoal-800);
   --color-border:var(--palette-neutral-300);
 
   --color-accent:var(--palette-teal-500);
