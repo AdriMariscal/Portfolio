@@ -1,7 +1,7 @@
 {
   "name": "portfolio",
   "type": "module",
-  "version": "3.8.0",
+  "version": "3.9.0",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
@@ -10,6 +10,8 @@
     "bump:patch": "npm version patch --no-git-tag-version",
     "bump:minor": "npm version minor --no-git-tag-version",
     "bump:major": "npm version major --no-git-tag-version",
+    "test:e2e:setup": "node scripts/playwright-ensure-browsers.mjs",
+    "pretest:e2e": "pnpm run test:e2e:setup",
     "test:e2e": "playwright test"
   },
   "dependencies": {
