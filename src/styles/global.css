@@ -141,6 +141,29 @@ h1,h2,h3,strong{color:var(--color-heading)}
 
 .card__body{padding:18px}
 .card__title{font-size:1.25rem;font-weight:700;color:var(--color-heading)}
+.project-card,
+.card--post{
+  position:relative;
+}
+
+.card__overlay-link{
+  position:absolute;
+  inset:0;
+  display:block;
+  z-index:1;
+  border-radius:inherit;
+  text-decoration:none;
+}
+
+.card__overlay-link:focus-visible{
+  outline:3px solid rgba(11,31,59,.25);
+  outline-offset:2px;
+}
+
+.card__interactive{
+  position:relative;
+  z-index:2;
+}
 
 /* Grid consistente 3–2–1 para listados genéricos */
 .grid--3-2-1{grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}

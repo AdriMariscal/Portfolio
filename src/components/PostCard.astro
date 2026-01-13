@@ -35,10 +35,13 @@ const formattedDate = date
 ---
 
 <article class="card card--post">
+  <a
+    class="card__overlay-link"
+    href={`/blog/${slug}/`}
+    aria-label={`Abrir artículo: ${data.title}`}
+  ></a>
   <div class="card__body">
-    <h3 class="card__title postcard__title">
-      <a href={`/blog/${slug}/`}>{data.title}</a>
-  </h3>
+    <h3 class="card__title postcard__title">{data.title}</h3>
 
     {formattedDate && date && (
       <p class="postcard__date">
@@ -51,15 +54,15 @@ const formattedDate = date
     )}
 
     {tagSlice.length > 0 && (
-      <ul class="taglist" aria-label="Etiquetas">
+      <ul class="taglist card__interactive" aria-label="Etiquetas">
         {tagSlice.map((t) => (
           <li>
             <a class="tag" href={`/blog/tags/${slugifyTag(t)}/`}>
               #{t}
             </a>
           </li>
-      ))}
-    </ul>
-  )}
-    </div>
+        ))}
+      </ul>
+    )}
+  </div>
 </article>
