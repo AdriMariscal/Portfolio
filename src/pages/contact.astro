@@ -4,9 +4,16 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import Button from "../components/ui/Button.astro";
 import Card from "../components/ui/Card.astro";
 import Input from "../components/ui/Input.astro";
+import { buildMetaDescription, buildMetaTitle, SEO_KEYWORD } from "../lib/seo";
+
+const metaTitle = buildMetaTitle(SEO_KEYWORD, "Contacto");
+const metaDescription = buildMetaDescription(
+  "Contacta para mejorar rendimiento web, SEO técnico y UX con un plan claro y medible.",
+  "Agenda tu auditoría gratuita hoy."
+);
 ---
 
-<BaseLayout title="Contacto · Adrián Mariscal" description="Cuéntame en qué te puedo ayudar.">
+<BaseLayout title="Contacto" metaTitle={metaTitle} description={metaDescription}>
   <main class="section section--contact">
     <div class="wrap">
       <!-- Encabezado con respiración -->

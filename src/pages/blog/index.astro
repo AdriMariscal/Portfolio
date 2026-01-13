@@ -4,6 +4,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import PostCard from '@/components/PostCard.astro';
 import Input from '@/components/ui/Input.astro';
 import { getCollection } from 'astro:content';
+import { buildMetaDescription, buildMetaTitle, SEO_KEYWORD } from '@/lib/seo';
 
 // Coacción segura de fecha
 const toTime = (d: unknown): number => {
@@ -24,11 +25,18 @@ const posts = (await getCollection('blog')).sort(
 const VISIBLE = 9;
 const totalPages = Math.max(1, Math.ceil(posts.length / VISIBLE));
 const initialVisible = Math.min(VISIBLE, posts.length);
+
+const metaTitle = buildMetaTitle(SEO_KEYWORD, "Blog de rendimiento y SEO");
+const metaDescription = buildMetaDescription(
+  "Artículos sobre rendimiento web, Astro, SEO técnico, Node y estrategia digital aplicada.",
+  "Explora las guías y mejora tu web hoy."
+);
 ---
 
 <BaseLayout
   title="Blog"
-  description="Artículos sobre rendimiento web, Astro, SEO, Node y negocio digital."
+  metaTitle={metaTitle}
+  description={metaDescription}
 >
   <section class="section section--blog">
     <header class="section__header">

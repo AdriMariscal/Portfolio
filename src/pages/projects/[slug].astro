@@ -1,19 +1,40 @@
 ---
 // src/pages/projects/[slug].astro
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import { getCollection, getEntry } from "astro:content";
+import { getCollection } from "astro:content";
 import Badge from "@/components/ui/Badge.astro";
 import Button from "@/components/ui/Button.astro";
 import Card from "@/components/ui/Card.astro";
+import { SITE } from "@/lib/config";
+import {
+  buildHeadingTitle,
+  buildMetaDescription,
+  buildMetaTitle,
+  SEO_KEYWORD
+} from "@/lib/seo";
 
 export async function getStaticPaths() {
   const entries = await getCollection("projects", ({ data }) => data.published !== false);
-  return entries.map(({ slug }) => ({ params: { slug } }));
+  return entries.map((entry) => ({
+    params: { slug: entry.slug },
+    props: {
+      project: entry,
+      metaTitle: buildMetaTitle(SEO_KEYWORD, entry.data.title ?? SITE.title),
+      metaDescription: buildMetaDescription(
+        entry.data.description ?? SITE.description,
+        "Descubre el proyecto y pide una auditoría."
+      ),
+      headingTitle: buildHeadingTitle(entry.data.title ?? SITE.title)
+    }
+  }));
 }
 
-const { slug } = Astro.params;
-const project = await getEntry("projects", slug);
-if (!project) throw new Error(`Proyecto no encontrado: ${slug}`);
+const { project, metaTitle, metaDescription, headingTitle } = Astro.props as {
+  project: Awaited<ReturnType<typeof getCollection>>[number];
+  metaTitle: string;
+  metaDescription: string;
+  headingTitle: string;
+};
 
 const { Content } = await project.render();
 const data: any = project.data;
@@ -55,12 +76,16 @@ const latest = changelog.length ? changelog[0] : undefined;
 const latestDate = latest?.date ? fmtDate(latest.date) : undefined;
 ---
 
-<BaseLayout title={title} description={undefined}>
+<BaseLayout
+  title={title}
+  metaTitle={metaTitle}
+  description={metaDescription}
+>
   <article class="section post project-detail">
     <!-- margen inferior ajustado a 24px -->
     <Card as="div" variant="soft" class="wrap post__card">
       <div class="post__body">
-          <h1 class="post__title">{title}</h1>
+          <h1 class="post__title">{headingTitle}</h1>
 
         <p class="post__date project-detail__meta">
           <strong class="project-detail__meta-label">Estado:</strong>{" "}

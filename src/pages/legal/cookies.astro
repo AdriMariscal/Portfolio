@@ -3,12 +3,19 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { SITE_OWNER } from "../../config/siteOwner";
 import Card from "../../components/ui/Card.astro";
+import { buildMetaDescription, buildMetaTitle, SEO_KEYWORD } from "../../lib/seo";
 
 // Ajusta la fecha cuando hagas cambios de contenido.
 const lastUpdate = "01/11/2025";
+
+const metaTitle = buildMetaTitle(SEO_KEYWORD, "Política de cookies");
+const metaDescription = buildMetaDescription(
+  "Información clara sobre cookies, privacidad y control de consentimiento en el sitio.",
+  "Revisa la política y configura tus preferencias."
+);
 ---
 
-<BaseLayout title="Cookies" description="Política de cookies del sitio.">
+<BaseLayout title="Cookies" metaTitle={metaTitle} description={metaDescription}>
   <section class="section section--legal">
     <div class="wrap">
       <Card as="article" variant="soft" class="legal__card">

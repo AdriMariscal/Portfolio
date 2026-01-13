@@ -3,11 +3,18 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { SITE_OWNER } from "../../config/siteOwner";
 import Card from "../../components/ui/Card.astro";
+import { buildMetaDescription, buildMetaTitle, SEO_KEYWORD } from "../../lib/seo";
 
 const updated = "01/11/2025";
+
+const metaTitle = buildMetaTitle(SEO_KEYWORD, "Política de privacidad");
+const metaDescription = buildMetaDescription(
+  "Resumen transparente del tratamiento de datos personales y seguridad del sitio.",
+  "Revisa la política y contacta si necesitas ayuda."
+);
 ---
 
-<BaseLayout title="Privacidad" description="Política de privacidad y protección de datos personales (RGPD/LOPDGDD).">
+<BaseLayout title="Privacidad" metaTitle={metaTitle} description={metaDescription}>
   <section class="section section--legal">
     <div class="wrap">
       <Card as="article" variant="soft" class="legal__card">
