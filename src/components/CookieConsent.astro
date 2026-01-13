@@ -2,6 +2,7 @@
 // src/components/CookieConsent.astro
 
 // No necesitamos props; el componente se autogestiona
+import Button from "./ui/Button.astro";
 const STORAGE_KEY = "am-cookie-consent-v1";
 ---
 
@@ -69,27 +70,31 @@ const STORAGE_KEY = "am-cookie-consent-v1";
       </div>
 
       <div class="cookie-banner__actions">
-        <button
+        <Button
           type="button"
-          class="btn btn--secondary btn--sm"
+          variant="secondary"
+          size="sm"
           data-cookie-reject
         >
           Solo necesarias
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
-          class="btn btn--primary btn--sm"
+          variant="primary"
+          size="sm"
           data-cookie-accept-selected
         >
           Guardar preferencias
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
+          variant="tertiary"
+          size="sm"
           class="cookie-banner__link"
           data-cookie-accept-all
         >
           Aceptar todas
-        </button>
+        </Button>
       </div>
     </div>
   </div>

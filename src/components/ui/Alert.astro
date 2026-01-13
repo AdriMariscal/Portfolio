@@ -1,0 +1,19 @@
+---
+const {
+  variant = "info",
+  title,
+  class: className = "",
+  ...rest
+} = Astro.props;
+
+const classes = ["alert", `alert--${variant}`, className]
+  .filter(Boolean)
+  .join(" ");
+---
+
+<aside class={classes} role="status" {...rest}>
+  {title && <p class="alert__title">{title}</p>}
+  <div class="alert__body">
+    <slot />
+  </div>
+</aside>

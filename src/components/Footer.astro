@@ -1,6 +1,7 @@
 ---
 // src/components/Footer.astro
 import pkg from '../../package.json' assert { type: 'json' };
+import Button from './ui/Button.astro';
 
 const year = new Date().getFullYear();
 const version = pkg.version;
@@ -24,13 +25,15 @@ const legalLinks = [
       ))}
     </nav>
 
-    <button
+    <Button
       type="button"
+      variant="tertiary"
+      size="sm"
       class="footer__link footer__link-btn"
       data-cookie-open-footer
     >
       Gestionar cookies
-    </button>
+    </Button>
 
 
     <div class="footer__copy">

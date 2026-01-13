@@ -1,18 +1,20 @@
 ---
 // src/pages/thanks.astro
 import BaseLayout from "../layouts/BaseLayout.astro";
+import Button from "../components/ui/Button.astro";
+import Card from "../components/ui/Card.astro";
 ---
 
 <BaseLayout title="¡Gracias! · Adrián Mariscal" description="Mensaje enviado correctamente.">
   <section class="section section--thanks">
     <div class="wrap">
-      <div class="card thanks__card">
+      <Card class="thanks__card">
         <div class="card__body thanks__body">
           <h1 class="thanks__title">¡Gracias!</h1>
           <p class="muted thanks__desc">He recibido tu mensaje. Te responderé lo antes posible.</p>
-          <a class="btn btn--secondary" href="/">Volver al inicio</a>
+          <Button href="/" variant="secondary">Volver al inicio</Button>
         </div>
-      </div>
+      </Card>
     </div>
   </section>
 </BaseLayout>

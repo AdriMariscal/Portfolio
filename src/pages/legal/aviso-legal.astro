@@ -2,6 +2,7 @@
 // src/pages/legal/aviso-legal.astro
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { SITE_OWNER } from "../../config/siteOwner";
+import Card from "../../components/ui/Card.astro";
 
 // Fecha de última revisión visible
 const updatedAt = new Date().toLocaleDateString("es-ES", {
@@ -15,7 +16,7 @@ const updatedAt = new Date().toLocaleDateString("es-ES", {
   <main class="section section--legal">
     <div class="wrap">
       <!-- Ojo: estas clases vienen de global.css -->
-      <article class="card card--soft legal__card">
+      <Card as="article" variant="soft" class="legal__card">
         <div class="legal__body">
           <header class="legal__header">
             <h1>Aviso legal</h1>
@@ -157,7 +158,7 @@ const updatedAt = new Date().toLocaleDateString("es-ES", {
           </p>
         </section>
         </div>
-      </article>
+      </Card>
     </div>
   </main>
 

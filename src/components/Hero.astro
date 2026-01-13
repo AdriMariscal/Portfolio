@@ -1,6 +1,8 @@
 ---
 // src/components/Hero.astro
 import { getCollection } from "astro:content";
+import Button from "./ui/Button.astro";
+import Card from "./ui/Card.astro";
 
 const projects = await getCollection("projects");
 const projectsCount = projects.length;
@@ -22,31 +24,31 @@ const SALESFORCE_TAG_PATH = "/blog/tags/salesforce";
     </p>
 
     <div class="grid" style="grid-auto-flow: column; gap: 12px; width: max-content; margin-top: 16px">
-      <a class="btn btn--primary" href="/contact">Cuéntame tu proyecto</a>
-      <a class="btn btn--secondary" href="/blog">Ver metodología de performance</a>
+      <Button href="/contact" variant="primary">Cuéntame tu proyecto</Button>
+      <Button href="/blog" variant="secondary">Ver metodología de performance</Button>
     </div>
 
     <div class="grid grid--3 hero__stats" style="margin-top: 20px">
-      <a class="card card--link" href={SALESFORCE_TAG_PATH} aria-label="Entradas del blog con etiqueta Salesforce">
+      <Card as="a" variant="link" href={SALESFORCE_TAG_PATH} aria-label="Entradas del blog con etiqueta Salesforce">
         <div class="card__body">
           <h3 class="card__title">10+</h3>
           <small>Años con Salesforce</small>
         </div>
-      </a>
+      </Card>
 
-      <a class="card card--link" href="/projects" aria-label="Ver proyectos">
+      <Card as="a" variant="link" href="/projects" aria-label="Ver proyectos">
         <div class="card__body">
           <h3 class="card__title">{projectsCount}</h3>
           <small>Proyectos propios</small>
         </div>
-      </a>
+      </Card>
 
-      <a class="card card--link" href="/blog/lighthouse" aria-label="Qué es Google Lighthouse">
+      <Card as="a" variant="link" href="/blog/lighthouse" aria-label="Qué es Google Lighthouse">
         <div class="card__body">
           <h3 class="card__title">98/100</h3>
-        <small>Lighthouse medio</small>
+          <small>Lighthouse medio</small>
         </div>
-      </a>
+      </Card>
     </div>
   </div>
 </section>
