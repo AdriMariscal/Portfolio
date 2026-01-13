@@ -257,10 +257,21 @@ strong{color:var(--color-heading)}
 }
 
 .brand{
-  font-family:var(--font-display);
-  font-weight:800;
-  letter-spacing:.2px;
+  display:flex;
+  align-items:center;
+  gap:12px;
   color:var(--color-heading);
+  text-decoration:none;
+}
+
+.brand__logo{
+  display:block;
+  height:32px;
+  width:auto;
+}
+
+[data-theme="light"] .brand__logo{
+  filter:invert(1) hue-rotate(180deg);
 }
 
 /* Navegación escritorio (por defecto) */

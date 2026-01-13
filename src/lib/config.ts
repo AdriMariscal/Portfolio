@@ -7,7 +7,7 @@ export const SITE = {
   url: "https://adrianmariscal.es",
   lang: "es",
   author: "Adrián Mariscal",
-  ogImage: "/og-default.png",
+  ogImage: "/logo.png",
   twitterCreator: "",
 };
 

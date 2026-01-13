@@ -16,7 +16,16 @@ const isActive = (href: string) => {
 
 <header class="header" role="banner">
   <div class="wrap header__inner">
-    <a class="brand" href="/">Adrián Mariscal</a>
+    <a class="brand" href="/" aria-label="Adrián Mariscal">
+      <img
+        class="brand__logo"
+        src="/logo.png"
+        width="1366"
+        height="768"
+        alt=""
+        decoding="async"
+      />
+    </a>
 
     {/* Botón hamburguesa (solo se ve en móviles vía CSS) */}
     <button
