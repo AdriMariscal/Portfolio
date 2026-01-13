@@ -3,6 +3,7 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import ProjectCard from "../../components/ProjectCard.astro";
 import { getCollection } from "astro:content";
+import { buildMetaDescription, buildMetaTitle, SEO_KEYWORD } from "../../lib/seo";
 
 // Traemos todos los proyectos
 const all = await getCollection("projects");
@@ -23,12 +24,15 @@ active.sort(byOrderThenTitle);
 inactive.sort(byOrderThenTitle);
 
 // SEO
-const pageTitle = "Proyectos · Adrián Mariscal";
-const pageDescription =
-  "Proyectos propios y micro-productos. Marca “active” indica los que están en marcha ahora mismo.";
+const pageTitle = "Proyectos";
+const metaTitle = buildMetaTitle(SEO_KEYWORD, "Proyectos y casos reales");
+const pageDescription = buildMetaDescription(
+  "Proyectos propios enfocados en rendimiento web, SEO técnico y UX con resultados medibles.",
+  "Explora los casos y solicita una auditoría."
+);
 ---
 
-<BaseLayout title={pageTitle} description={pageDescription}>
+<BaseLayout title={pageTitle} metaTitle={metaTitle} description={pageDescription}>
   <!-- Cabecera de página -->
   <section class="section hero section--projects-hero">
     <div class="wrap projects-header">

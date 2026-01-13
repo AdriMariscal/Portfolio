@@ -5,9 +5,16 @@ import Badge from "../components/ui/Badge.astro";
 import Button from "../components/ui/Button.astro";
 import Card from "../components/ui/Card.astro";
 import Input from "../components/ui/Input.astro";
+import { buildMetaDescription, buildMetaTitle, SEO_KEYWORD } from "../lib/seo";
+
+const metaTitle = buildMetaTitle(SEO_KEYWORD, "UI Kit y sistema de diseño");
+const metaDescription = buildMetaDescription(
+  "Biblioteca de componentes del sistema UI para sitios rápidos, accesibles y consistentes.",
+  "Explora patrones y aplica la guía hoy."
+);
 ---
 
-<BaseLayout title="UI Kit" description="Componentes base y variantes del sistema UI.">
+<BaseLayout title="UI Kit" metaTitle={metaTitle} description={metaDescription}>
   <section class="section">
     <div class="wrap stack" style="--stack-gap: 28px;">
       <header class="stack" style="--stack-gap: 8px;">

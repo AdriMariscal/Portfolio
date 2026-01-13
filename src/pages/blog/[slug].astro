@@ -6,16 +6,35 @@ import type { CollectionEntry } from 'astro:content';
 import { getCollection } from 'astro:content';
 import { toSlug } from '@/lib/content';
 import { SITE } from '@/lib/config';
+import {
+  buildHeadingTitle,
+  buildMetaDescription,
+  buildMetaTitle,
+  SEO_KEYWORD
+} from '@/lib/seo';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog', ({ data }) => !data.draft);
   return posts.map((p) => ({
     params: { slug: p.slug },
-    props: { post: p }
+    props: {
+      post: p,
+      metaTitle: buildMetaTitle(SEO_KEYWORD, p.data.title ?? SITE.title),
+      metaDescription: buildMetaDescription(
+        p.data.description ?? SITE.description ?? "Rendimiento web con Astro y Node.",
+        "Aplica los pasos y mejora tu web hoy."
+      ),
+      headingTitle: buildHeadingTitle(p.data.title ?? SITE.title)
+    }
   }));
 }
 
-const { post } = Astro.props as { post: CollectionEntry<'blog'> };
+const { post, metaTitle, metaDescription, headingTitle } = Astro.props as {
+  post: CollectionEntry<'blog'>;
+  metaTitle: string;
+  metaDescription: string;
+  headingTitle: string;
+};
 
 // Render del Markdown del post + cabeceras para el índice
 const { Content, headings } = await post.render();
@@ -98,7 +117,8 @@ const jsonLd = {
 
 <BaseLayout
   title={title}
-  description={description}
+  metaTitle={metaTitle}
+  description={metaDescription}
   ogImage={imageAbs}
   ogType="article"
   articleAuthor={SITE.author}
@@ -110,7 +130,7 @@ const jsonLd = {
   <article class="section post">
     <div class="wrap post__card card card--soft">
       <div class="post__body">
-      <h1 class="post__title">{title}</h1>
+      <h1 class="post__title">{headingTitle}</h1>
 
       {datePublishedISO ? (
           <p class="post__date">

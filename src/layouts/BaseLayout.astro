@@ -10,6 +10,7 @@ import "../scripts/rum-core-web-vitals.ts";
 
 type Props = {
   title?: string;
+  metaTitle?: string;
   description?: string;
   ogImage?: string;
   ogType?: string;
@@ -22,6 +23,7 @@ type Props = {
 
 const {
   title = "Adrián Mariscal",
+  metaTitle,
   description = SITE.description ??
     "Rendimiento web, SEO técnico y UX con Astro y Node.",
   ogImage,
@@ -32,6 +34,8 @@ const {
   robots,
   twitterCreator,  
 } = Astro.props as Props;
+
+const resolvedTitle = metaTitle ?? title;
 
 // Canonical absoluto usando siempre el dominio canónico del config de Astro
 // (Astro.site se construye a partir de la opción `site` de astro.config.mjs)
@@ -108,7 +112,7 @@ const schemaOrg = {
       })();
     </script>
 
-    <title>{title} — Adrián Mariscal</title>
+    <title>{resolvedTitle}</title>
     <meta name="description" content={description} />
     <meta name="theme-color" content={THEME.color} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -136,11 +140,11 @@ const schemaOrg = {
     <meta property="og:locale" content={locale} />
     <meta property="og:site_name" content={siteName} />
     <meta property="og:type" content={type} />
-    <meta property="og:title" content={title} />
+    <meta property="og:title" content={resolvedTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogImageAbs} />
-    <meta property="og:image:alt" content={title} />
+    <meta property="og:image:alt" content={resolvedTitle} />
 
     {type === "article" && (
       <>
@@ -161,7 +165,7 @@ const schemaOrg = {
 
     <!-- Twitter (compatible con X/Twitter cards) -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={title} />
+    <meta name="twitter:title" content={resolvedTitle} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageAbs} />
     {twitterCreator && (
