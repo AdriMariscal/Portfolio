@@ -207,17 +207,21 @@ const visibleNow = pagePosts.length;
           const article = document.createElement('article');
           article.className = 'card card--post post-card';
 
+          const overlay = document.createElement('a');
+          overlay.className = 'card__overlay-link';
+          overlay.href = `/blog/${post.slug}/`;
+          overlay.setAttribute(
+            'aria-label',
+            `Abrir artículo: ${post.title || 'Artículo sin título'}`
+          );
+          article.appendChild(overlay);
+
           const body = document.createElement('div');
           body.className = 'card__body';
 
           const h3 = document.createElement('h3');
           h3.className = 'card__title postcard__title';
-
-          const link = document.createElement('a');
-          link.href = `/blog/${post.slug}/`;
-          link.textContent = post.title || 'Artículo sin título';
-
-          h3.appendChild(link);
+          h3.textContent = post.title || 'Artículo sin título';
           body.appendChild(h3);
 
           if (post.date) {
@@ -248,7 +252,7 @@ const visibleNow = pagePosts.length;
 
           if (Array.isArray(post.tags) && post.tags.length) {
             const ul = document.createElement('ul');
-            ul.className = 'taglist';
+            ul.className = 'taglist card__interactive';
             ul.setAttribute('aria-label', 'Etiquetas');
 
             post.tags.slice(0, 6).forEach((t) => {
@@ -302,4 +306,3 @@ const visibleNow = pagePosts.length;
     })();
   </script>
 </BaseLayout>
-
