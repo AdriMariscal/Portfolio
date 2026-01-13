@@ -4,6 +4,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import Hero from "../components/Hero.astro";
 import ProjectCard from "../components/ProjectCard.astro";
 import PostCard from "../components/PostCard.astro";
+import { buildMetaDescription, buildMetaTitle, SEO_KEYWORD } from "../lib/seo";
 
 // contenido
 import { getCollection } from "astro:content";
@@ -29,9 +30,18 @@ const latestPosts = (await getCollection("blog"))
 
 // Métrica de proyectos
 const totalProjects = await countProjects();
+
+const metaTitle = buildMetaTitle(
+  SEO_KEYWORD,
+  "Portfolio de Adrián Mariscal"
+);
+const metaDescription = buildMetaDescription(
+  "Portfolio de Adrián Mariscal especializado en rendimiento web, SEO técnico y UX con Astro y Node.",
+  "Solicita una auditoría gratuita hoy."
+);
 ---
 
-<BaseLayout title="Inicio">
+<BaseLayout title="Inicio" metaTitle={metaTitle} description={metaDescription}>
   <Hero totalProjects={totalProjects} />
 
   <section class="section section--home-projects">

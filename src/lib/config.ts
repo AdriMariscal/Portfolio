@@ -3,7 +3,7 @@ export const SITE = {
   title: "Adrián Mariscal",
   siteName: "Portfolio - Adrián Mariscal",
   description:
-    "Rendimiento web, SEO técnico y UX para sitios rápidos en Astro y Node. Proyectos, blog y contacto.",
+    "Rendimiento web, SEO técnico y UX para sitios rápidos con Astro y Node. Auditoría clara, métricas y mejoras accionables.",
   url: "https://adrianmariscal.es",
   lang: "es",
   author: "Adrián Mariscal",

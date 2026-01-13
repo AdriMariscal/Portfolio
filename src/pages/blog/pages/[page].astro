@@ -4,6 +4,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import PostCard from '@/components/PostCard.astro'; 
 import Input from '@/components/ui/Input.astro';
 import { getCollection } from 'astro:content';
+import { buildMetaDescription, buildMetaTitle, SEO_KEYWORD } from '@/lib/seo';
 
 const PER_PAGE = 9; // usado para el slice fuera de getStaticPaths
 
@@ -44,9 +45,19 @@ const current = Math.max(1, Math.min(Number(Astro.params.page ?? 1), totalPages)
 const start = (current - 1) * PER_PAGE;
 const pagePosts = posts.slice(start, start + PER_PAGE);
 const visibleNow = pagePosts.length;
+
+const metaTitle = buildMetaTitle(SEO_KEYWORD, `Blog página ${current}`);
+const metaDescription = buildMetaDescription(
+  `Página ${current} con artículos sobre rendimiento web, SEO técnico y Astro.`,
+  "Explora los artículos y aplica mejoras hoy."
+);
 ---
 
-<BaseLayout title={`Blog — página ${current}`} description="Artículos del blog paginados.">
+<BaseLayout
+  title="Blog"
+  metaTitle={metaTitle}
+  description={metaDescription}
+>
   <section class="section section--blog">
     <header class="section__header">
       <h1 class="h1 section__title section__title--page">Blog</h1>

@@ -3,9 +3,16 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Button from "../components/ui/Button.astro";
 import Card from "../components/ui/Card.astro";
+import { buildMetaDescription, buildMetaTitle, SEO_KEYWORD } from "../lib/seo";
+
+const metaTitle = buildMetaTitle(SEO_KEYWORD, "Página no encontrada");
+const metaDescription = buildMetaDescription(
+  "La página solicitada no existe. Encuentra recursos de rendimiento web, SEO y UX desde el inicio.",
+  "Vuelve al inicio y sigue navegando."
+);
 ---
 
-<BaseLayout title="404 · Página no encontrada">
+<BaseLayout title="404" metaTitle={metaTitle} description={metaDescription}>
   <section class="section section--404">
     <div class="container">
       <Card as="article" class="error-card">

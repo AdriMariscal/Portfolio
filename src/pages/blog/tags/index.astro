@@ -2,6 +2,7 @@
 // src/pages/blog/tags/index.astro
 import BaseLayout from "@layouts/BaseLayout.astro";
 import { getCollection } from "astro:content";
+import { buildMetaDescription, buildMetaTitle, SEO_KEYWORD } from "@lib/seo";
 
 const slugify = (s: string) =>
   s
@@ -14,9 +15,15 @@ const posts = await getCollection("blog", ({ data }) => !data.draft);
 const counts = new Map<string, number>();
 for (const p of posts) for (const t of p.data.tags ?? []) counts.set(t, (counts.get(t) ?? 0) + 1);
 const tags = [...counts.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+
+const metaTitle = buildMetaTitle(SEO_KEYWORD, "Etiquetas del blog");
+const metaDescription = buildMetaDescription(
+  "Explora artículos por etiquetas de rendimiento web, SEO técnico y desarrollo con Astro.",
+  "Elige un tema y profundiza hoy."
+);
 ---
 
-<BaseLayout title="Etiquetas">
+<BaseLayout title="Etiquetas" metaTitle={metaTitle} description={metaDescription}>
   <main class="section">
     <div class="wrap">
       <h1 class="h2" style="font-size:2rem;margin-bottom:18px">Etiquetas</h1>
