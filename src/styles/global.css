@@ -1656,6 +1656,11 @@ strong{color:var(--color-heading)}
   margin-top:4px;
 }
 
+.contact__success{
+  font-size:.9rem;
+  color:var(--color-success);
+}
+
 .contact__legal{
   font-size:.85rem;
   line-height:1.5;
