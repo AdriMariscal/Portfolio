@@ -9,14 +9,41 @@
 [context.production.environment]
   ENVIRONMENT = "production"
 
+[context.dev.environment]
+  ENVIRONMENT = "development"
+  STAGING_USER = "CHANGE_ME"
+  STAGING_PASS = "CHANGE_ME"
+
 [context."branch:staging".environment]
   ENVIRONMENT = "staging"
+  STAGING_USER = "CHANGE_ME"
+  STAGING_PASS = "CHANGE_ME"
 
 [[redirects]]
   from = "/blog/page/:splat"
   to = "/blog/pages/:splat"
   status = 301
   force = true
+
+[[redirects]]
+  from = "/es/*"
+  to = "/es/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/en/*"
+  to = "/en/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/v/*"
+  to = "/v/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
 
 [[headers]]
   for = "/*"
