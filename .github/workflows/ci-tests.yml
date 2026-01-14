@@ -84,4 +84,14 @@ jobs:
         run: npm install -g @lhci/cli@0.15.x
 
       - name: Ejecutar Lighthouse CI
+        id: lhci
+        continue-on-error: true
         run: lhci autorun
+
+      - name: Generar resumen de Lighthouse
+        if: always()
+        run: node scripts/lhci-summary.mjs
+
+      - name: Fallar si Lighthouse CI incumple presupuestos
+        if: steps.lhci.outcome == 'failure'
+        run: exit 1
