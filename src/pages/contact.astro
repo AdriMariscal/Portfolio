@@ -50,8 +50,17 @@ const metaDescription = buildMetaDescription(
             name="name"
             autocomplete="name"
             placeholder="Tu nombre completo"
+            aria-describedby="contact-name-error"
             required
           />
+          <span
+            id="contact-name-error"
+            class="field__error muted"
+            data-field-error="name"
+            aria-live="polite"
+            aria-atomic="true"
+            hidden
+          ></span>
         </label>
 
         <label class="field">
@@ -61,8 +70,17 @@ const metaDescription = buildMetaDescription(
             name="email"
             autocomplete="email"
             placeholder="tu@email.com"
+            aria-describedby="contact-email-error"
             required
           />
+          <span
+            id="contact-email-error"
+            class="field__error muted"
+            data-field-error="email"
+            aria-live="polite"
+            aria-atomic="true"
+            hidden
+          ></span>
         </label>
 
         <label class="field">
@@ -72,8 +90,17 @@ const metaDescription = buildMetaDescription(
             name="message"
             rows="6"
             placeholder="Cuéntame objetivos, plazos y si ya tienes web."
+            aria-describedby="contact-message-error"
             required
           />
+          <span
+            id="contact-message-error"
+            class="field__error muted"
+            data-field-error="message"
+            aria-live="polite"
+            aria-atomic="true"
+            hidden
+          ></span>
         </label>
 
         <div data-netlify-recaptcha="true"></div>
@@ -113,6 +140,33 @@ const metaDescription = buildMetaDescription(
       'Ese email no parece válido. Comprueba el formato e inténtalo de nuevo.';
 
     const fields = Array.from(form.querySelectorAll('input, textarea'));
+    const fieldErrors = new Map();
+    form.querySelectorAll('[data-field-error]').forEach((node) => {
+      if (node instanceof HTMLElement && node.dataset.fieldError) {
+        fieldErrors.set(node.dataset.fieldError, node);
+      }
+    });
+
+    const setFieldError = (field, message) => {
+      if (!(field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement)) {
+        return;
+      }
+
+      const errorNode = fieldErrors.get(field.name);
+      if (!errorNode) {
+        return;
+      }
+
+      if (message) {
+        errorNode.textContent = message;
+        errorNode.hidden = false;
+        field.setAttribute('aria-invalid', 'true');
+      } else {
+        errorNode.textContent = '';
+        errorNode.hidden = true;
+        field.removeAttribute('aria-invalid');
+      }
+    };
 
     const updateValidity = (field) => {
       if (!(field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement)) {
@@ -121,15 +175,18 @@ const metaDescription = buildMetaDescription(
 
       if (field.validity.valueMissing) {
         field.setCustomValidity(requiredMessage);
+        setFieldError(field, requiredMessage);
         return;
       }
 
       if (field instanceof HTMLInputElement && field.type === 'email' && field.validity.typeMismatch) {
         field.setCustomValidity(emailMessage);
+        setFieldError(field, emailMessage);
         return;
       }
 
       field.setCustomValidity('');
+      setFieldError(field, '');
     };
 
     const syncErrorMessage = () => {
@@ -170,5 +227,6 @@ const metaDescription = buildMetaDescription(
         errorMessage.hidden = true;
       }
     });
+
   }
 </script>

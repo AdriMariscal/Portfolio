@@ -34,6 +34,7 @@ const STORAGE_KEY = "am-cookie-consent-v1";
               id="cookie-analytics"
               name="cookie-analytics"
               data-cookie-input="analytics"
+              aria-label="Preferencias de cookies: analíticas"
             />
             <span>
               <strong>Analíticas</strong>
@@ -50,6 +51,7 @@ const STORAGE_KEY = "am-cookie-consent-v1";
               id="cookie-marketing"
               name="cookie-marketing"
               data-cookie-input="marketing"
+              aria-label="Preferencias de cookies: marketing"
             />
             <span>
               <strong>Marketing</strong>
@@ -75,6 +77,7 @@ const STORAGE_KEY = "am-cookie-consent-v1";
           variant="secondary"
           size="sm"
           data-cookie-reject
+          aria-label="Rechazar cookies no necesarias"
         >
           Solo necesarias
         </Button>
@@ -83,6 +86,7 @@ const STORAGE_KEY = "am-cookie-consent-v1";
           variant="primary"
           size="sm"
           data-cookie-accept-selected
+          aria-label="Guardar preferencias de cookies"
         >
           Guardar preferencias
         </Button>
@@ -92,6 +96,7 @@ const STORAGE_KEY = "am-cookie-consent-v1";
           size="sm"
           class="cookie-banner__link"
           data-cookie-accept-all
+          aria-label="Aceptar todas las cookies"
         >
           Aceptar todas
         </Button>
