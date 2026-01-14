@@ -32,6 +32,7 @@ const isActive = (href: string) => {
       class="nav-toggle"
       type="button"
       aria-expanded="false"
+      aria-controls="main-navigation"
       aria-label="Abrir menú de navegación"
       data-nav-toggle
     >
@@ -41,6 +42,7 @@ const isActive = (href: string) => {
     <nav
       class="nav"
       data-nav
+      id="main-navigation"
       aria-label="Navegación principal"
     >
       <a class="nav__link" href="/" aria-current={isActive("/")}>Inicio</a>
@@ -51,6 +53,8 @@ const isActive = (href: string) => {
       <button
         class="theme-toggle"
         type="button"
+        aria-label="Cambiar a tema claro"
+        aria-pressed="true"
         data-theme-toggle
       >
         <span class="theme-toggle__icon" aria-hidden="true"></span>
@@ -109,6 +113,7 @@ const isActive = (href: string) => {
         'aria-label',
         mode === 'dark' ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'
       );
+      themeToggle.setAttribute('aria-pressed', mode === 'dark' ? 'true' : 'false');
     };
 
     const setTheme = (next) => {
