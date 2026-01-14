@@ -32,21 +32,81 @@ const SALESFORCE_TAG_PATH = "/blog/tags/salesforce";
       <Card as="a" variant="link" href={SALESFORCE_TAG_PATH} aria-label="Entradas del blog con etiqueta Salesforce">
         <div class="card__body">
           <h3 class="card__title">10+</h3>
-          <small>Años con Salesforce</small>
+          <div class="hero__stat-label">
+            <span class="hero__stat-icon" role="img" aria-label="Experiencia técnica">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.75"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                focusable="false"
+              >
+                <path d="m18 16 4-4-4-4" />
+                <path d="m6 8-4 4 4 4" />
+                <path d="m14.5 4-5 16" />
+              </svg>
+            </span>
+            <small>Años con Salesforce</small>
+          </div>
         </div>
       </Card>
 
       <Card as="a" variant="link" href="/projects" aria-label="Ver proyectos">
         <div class="card__body">
           <h3 class="card__title">{projectsCount}</h3>
-          <small>Proyectos propios</small>
+          <div class="hero__stat-label">
+            <span class="hero__stat-icon" role="img" aria-label="Proyectos">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.75"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                focusable="false"
+              >
+                <path
+                  d="m6 14 1.45-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.55 6a2 2 0 0 1-1.94 1.5H4a2 2 0 0 1-2-2V5c0-1.1.9-2 2-2h3.93a2 2 0 0 1 1.66.9l.82 1.2a2 2 0 0 0 1.66.9H18a2 2 0 0 1 2 2v2"
+                />
+                <circle cx="14" cy="15" r="1" />
+              </svg>
+            </span>
+            <small>Proyectos propios</small>
+          </div>
         </div>
       </Card>
 
       <Card as="a" variant="link" href="/blog/tags/lighthouse/" aria-label="Qué es Google Lighthouse">
         <div class="card__body">
           <h3 class="card__title">98/100</h3>
-          <small>Lighthouse medio</small>
+          <div class="hero__stat-label">
+            <span class="hero__stat-icon" role="img" aria-label="Performance">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.75"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                focusable="false"
+              >
+                <path d="m12 14 4-4" />
+                <path d="M3.34 19a10 10 0 1 1 17.32 0" />
+              </svg>
+            </span>
+            <small>Lighthouse medio</small>
+          </div>
         </div>
       </Card>
     </div>
