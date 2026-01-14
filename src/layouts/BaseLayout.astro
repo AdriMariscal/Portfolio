@@ -54,19 +54,38 @@ const ogImageAbs = rawImage.startsWith("http")
 // Locale + site name
 const locale = "es_ES";
 const siteName = SITE.siteName ?? "Portfolio - Adrián Mariscal";
+const organizationId = `${SITE.url}#organization`;
 const personId = `${SITE.url}#persona`;
 const fontStylesheet =
   "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap";
+const organizationImage = SITE.ogImage ?? "/logo.png";
+const organizationImageAbs = organizationImage.startsWith("http")
+  ? organizationImage
+  : new URL(organizationImage, SITE.url).href;
 const schemaOrg = {
   "@context": "https://schema.org",
   "@graph": [
     {
       "@type": "WebSite",
+      "@id": SITE.url,
       "name": siteName,
       "url": SITE.url,
       "description": SITE.description,
       "inLanguage": SITE.lang ?? "es",
-      "publisher": { "@id": personId },
+      "publisher": { "@id": organizationId },
+    },
+    {
+      "@type": "Organization",
+      "@id": organizationId,
+      "name": SITE.title,
+      "url": SITE.url,
+      "description": SITE.description,
+      "image": organizationImageAbs,
+      "logo": {
+        "@type": "ImageObject",
+        "url": organizationImageAbs,
+      },
+      "founder": { "@id": personId },
     },
     {
       "@type": "Person",
@@ -81,6 +100,7 @@ const schemaOrg = {
         "Astro",
         "Node.js",
       ],
+      "worksFor": { "@id": organizationId },
     },
   ],
 };
