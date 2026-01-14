@@ -25,6 +25,9 @@ jobs:
       - name: Instalar dependencias
         run: npm install
 
+      - name: Ejecutar npm audit (alto/critico)
+        run: npm audit --audit-level=high
+
       - name: Instalar navegadores Playwright
         run: npx playwright install --with-deps
 
