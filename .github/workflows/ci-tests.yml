@@ -28,7 +28,7 @@ jobs:
           version: 9
 
       - name: Instalar dependencias
-        run: pnpm install
+        run: pnpm install --no-frozen-lockfile
 
       - name: Ejecutar npm audit (alto/critico)
         run: pnpm audit --audit-level=high
@@ -75,7 +75,7 @@ jobs:
           version: 9
 
       - name: Instalar dependencias
-        run: pnpm install
+        run: pnpm install --no-frozen-lockfile
 
       - name: Build de Astro
         run: pnpm run build
