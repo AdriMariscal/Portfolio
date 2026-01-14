@@ -1,0 +1,78 @@
+site_url: "https://adrianmariscal.es"
+display_url: "https://adrianmariscal.es"
+backend:
+  name: git-gateway
+  branch: dev
+  accept_roles:
+    - admin
+    - editor
+  commit_messages:
+    create: "cms: create {{collection}} \"{{slug}}\""
+    update: "cms: update {{collection}} \"{{slug}}\""
+    delete: "cms: delete {{collection}} \"{{slug}}\""
+    uploadMedia: "cms: upload media \"{{path}}\""
+    openAuthoring: "cms: open authoring {{collection}} \"{{slug}}\""
+publish_mode: editorial_workflow
+media_folder: "public/images/uploads"
+public_folder: "/images/uploads"
+collections:
+  - name: "blog"
+    label: "Blog"
+    folder: "src/content/blog"
+    create: true
+    slug: "{{slug}}"
+    extension: "mdx"
+    format: "frontmatter"
+    preview_path: "blog/{{slug}}"
+    summary: "{{title}} — {{date}}"
+    fields:
+      - { label: "Título", name: "title", widget: "string" }
+      - { label: "Descripción", name: "description", widget: "text", required: false }
+      - { label: "Etiquetas", name: "tags", widget: "list", required: false }
+      - { label: "Fecha", name: "date", widget: "datetime" }
+      - { label: "Actualizado", name: "updated", widget: "datetime", required: false }
+      - { label: "Publicado", name: "published", widget: "boolean", default: true }
+      - { label: "Borrador", name: "draft", widget: "boolean", default: false, required: false }
+      - { label: "Imagen", name: "image", widget: "image", required: false }
+      - { label: "Texto alternativo", name: "imageAlt", widget: "string", required: false }
+      - { label: "Pie de imagen", name: "imageCaption", widget: "string", required: false }
+      - { label: "Robots", name: "robots", widget: "string", required: false }
+      - { label: "Contenido", name: "body", widget: "markdown" }
+
+  - name: "projects"
+    label: "Proyectos"
+    folder: "src/content/projects"
+    create: true
+    slug: "{{slug}}"
+    extension: "md"
+    format: "frontmatter"
+    preview_path: "projects/{{slug}}"
+    summary: "{{title}}"
+    fields:
+      - { label: "Título", name: "title", widget: "string" }
+      - { label: "Descripción", name: "description", widget: "text", required: false }
+      - { label: "Etiquetas", name: "tags", widget: "list", required: false }
+      - { label: "Publicado", name: "published", widget: "boolean", default: true }
+      - { label: "Activo", name: "active", widget: "boolean", required: false }
+      - { label: "Estado", name: "status", widget: "string", required: false }
+      - { label: "Destacado", name: "featured", widget: "boolean", required: false }
+      - { label: "Fecha", name: "date", widget: "datetime", required: false }
+      - { label: "Actualizado", name: "updated", widget: "datetime", required: false }
+      - { label: "URL Proyecto", name: "projectUrl", widget: "string", required: false }
+      - { label: "URL Repo", name: "repoUrl", widget: "string", required: false }
+      - { label: "URL Demo", name: "demoUrl", widget: "string", required: false }
+      - label: "Changelog"
+        name: "changelog"
+        widget: "list"
+        required: false
+        fields:
+          - { label: "Versión", name: "version", widget: "string" }
+          - { label: "Fecha", name: "date", widget: "datetime", required: false }
+          - label: "Cambios"
+            name: "changes"
+            widget: "list"
+            required: false
+            fields:
+              - { label: "Tipo", name: "type", widget: "string", required: false }
+              - { label: "Texto", name: "text", widget: "string" }
+      - { label: "Contenido", name: "body", widget: "markdown" }
