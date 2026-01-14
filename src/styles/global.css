@@ -257,7 +257,7 @@ strong{color:var(--color-heading)}
   display:flex;
   align-items:center;
   justify-content:space-between;
-  height:64px;
+  height:120px;
   position:relative; /* para posicionar el menú móvil debajo */
 }
 
@@ -271,7 +271,7 @@ strong{color:var(--color-heading)}
 
 .brand__logo{
   display:block;
-  height:32px;
+  height:120px;
   width:auto;
 }
 

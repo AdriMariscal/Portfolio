@@ -12,13 +12,18 @@ type Props = {
   title?: string;
   metaTitle?: string;
   description?: string;
+  ogDescription?: string;
   ogImage?: string;
+  ogImageAlt?: string;
   ogType?: string;
   articleAuthor?: string;
   articleTags?: string[];
   articleSection?: string;
   robots?: string;
-  twitterCreator?: string;  
+  twitterCreator?: string;
+  twitterImage?: string;
+  twitterImageAlt?: string;
+  twitterCard?: string;
 };
 
 const {
@@ -26,16 +31,22 @@ const {
   metaTitle,
   description = SITE.description ??
     "Rendimiento web, SEO técnico y UX con Astro y Node.",
+  ogDescription,
   ogImage,
+  ogImageAlt,
   ogType,
   articleAuthor,
   articleTags,
   articleSection,
   robots,
-  twitterCreator,  
+  twitterCreator,
+  twitterImage,
+  twitterImageAlt,
+  twitterCard,
 } = Astro.props as Props;
 
 const resolvedTitle = metaTitle ?? title;
+const resolvedDescription = ogDescription ?? description;
 
 // Canonical absoluto usando siempre el dominio canónico del config de Astro
 // (Astro.site se construye a partir de la opción `site` de astro.config.mjs)
@@ -50,6 +61,18 @@ const rawImage = ogImage ?? SITE.ogImage ?? "/og-default.png";
 const ogImageAbs = rawImage.startsWith("http")
   ? rawImage
   : new URL(rawImage, SITE.url).href;
+const resolvedOgAlt =
+  ogImageAlt ?? SITE.ogImageAlt ?? `${SITE.title} · ${SITE.description}`;
+const twitterRawImage = twitterImage ?? SITE.twitterImage ?? rawImage;
+const twitterImageAbs = twitterRawImage.startsWith("http")
+  ? twitterRawImage
+  : new URL(twitterRawImage, SITE.url).href;
+const resolvedTwitterAlt =
+  twitterImageAlt ?? SITE.twitterImageAlt ?? resolvedOgAlt;
+const resolvedTwitterCard =
+  twitterCard ??
+  SITE.twitterCard ??
+  (twitterImageAbs === ogImageAbs ? "summary_large_image" : "summary");
 
 // Locale + site name
 const locale = "es_ES";
@@ -58,7 +81,7 @@ const organizationId = `${SITE.url}#organization`;
 const personId = `${SITE.url}#persona`;
 const fontStylesheet =
   "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap";
-const organizationImage = SITE.ogImage ?? "/logo.png";
+const organizationImage = SITE.ogImage ?? "/logos/logo_fondo_Charcoal950.png";
 const organizationImageAbs = organizationImage.startsWith("http")
   ? organizationImage
   : new URL(organizationImage, SITE.url).href;
@@ -133,11 +156,15 @@ const schemaOrg = {
     </script>
 
     <title>{resolvedTitle}</title>
-    <meta name="description" content={description} />
+    <meta name="description" content={resolvedDescription} />
     <meta name="theme-color" content={THEME.color} />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" type="image/png" sizes="500x500" href="/favicon.png" />
-    <link rel="apple-touch-icon" sizes="800x800" href="/logo_cuadrado.png" />
+    <link rel="icon" type="image/svg+xml" href="/logos/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="500x500" href="/logos/favicon.png" />
+    <link
+      rel="apple-touch-icon"
+      sizes="800x800"
+      href="/logos/logo_cuadrado_fondo_Charcoal950.png"
+    />
     <link rel="manifest" href="/site.webmanifest" />
     <link rel="canonical" href={canonical} />
     {robots && <meta name="robots" content={robots} />}    
@@ -161,10 +188,10 @@ const schemaOrg = {
     <meta property="og:site_name" content={siteName} />
     <meta property="og:type" content={type} />
     <meta property="og:title" content={resolvedTitle} />
-    <meta property="og:description" content={description} />
+    <meta property="og:description" content={resolvedDescription} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogImageAbs} />
-    <meta property="og:image:alt" content={resolvedTitle} />
+    <meta property="og:image:alt" content={resolvedOgAlt} />
 
     {type === "article" && (
       <>
@@ -184,10 +211,11 @@ const schemaOrg = {
     )}    
 
     <!-- Twitter (compatible con X/Twitter cards) -->
-    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:card" content={resolvedTwitterCard} />
     <meta name="twitter:title" content={resolvedTitle} />
-    <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={ogImageAbs} />
+    <meta name="twitter:description" content={resolvedDescription} />
+    <meta name="twitter:image" content={twitterImageAbs} />
+    <meta name="twitter:image:alt" content={resolvedTwitterAlt} />
     {twitterCreator && (
       <meta name="twitter:creator" content={twitterCreator} />
     )}
