@@ -2,6 +2,9 @@
   command = "npm run build"
   publish = "dist"
 
+[build.environment]
+  PNPM_FLAGS = "--no-frozen-lockfile"
+
 [[edge_functions]]
   path = "/*"
   function = "basic-auth"

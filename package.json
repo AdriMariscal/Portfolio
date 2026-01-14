@@ -1,12 +1,15 @@
 {
   "name": "portfolio",
   "type": "module",
-  "version": "3.20.1",
+  "version": "3.21.1",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
+    "lint": "eslint . --ext .js,.cjs,.mjs,.ts,.tsx,.astro",
+    "format": "prettier --write .",
+    "typecheck": "tsc --noEmit",
     "bump:patch": "npm version patch --no-git-tag-version",
     "bump:minor": "npm version minor --no-git-tag-version",
     "bump:major": "npm version major --no-git-tag-version",
@@ -27,7 +30,16 @@
     "@lhci/cli": "^0.15.1",
     "@playwright/test": "^1.49.0",
     "@tailwindcss/vite": "^4.1.16",
+    "@typescript-eslint/eslint-plugin": "latest",
+    "@typescript-eslint/parser": "latest",
+    "astro-eslint-parser": "latest",
+    "eslint": "latest",
+    "eslint-config-prettier": "latest",
+    "eslint-plugin-astro": "latest",
+    "prettier": "latest",
+    "prettier-plugin-astro": "latest",
     "rehype-autolink-headings": "^7.1.0",
-    "remark-images": "^4.1.0"
+    "remark-images": "^4.1.0",
+    "typescript": "latest"
   }
 }
