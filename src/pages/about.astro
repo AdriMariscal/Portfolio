@@ -14,7 +14,7 @@ const metaDescription = buildMetaDescription(
 );
 
 const canonical = new URL("/about/", SITE.url).href;
-const heroImage = "/images/blog/mac-with-metrics.jpg";
+const heroImage = "/images/yo.jpeg";
 const heroImageAbs = new URL(heroImage, SITE.url).href;
 const personId = `${SITE.url}#persona`;
 const organizationId = `${SITE.url}#organization`;
@@ -67,7 +67,7 @@ const aboutJsonLd = {
         </p>
         <div class="about-hero__actions">
           <Button href="/contact" variant="primary">Solicitar auditoría</Button>
-          <Button href="/contact?ref=packs" variant="secondary">Ver packs</Button>
+          <Button href="/services#packs" variant="secondary">Ver packs de mejora</Button>
         </div>
         <ul class="about-hero__points">
           <li>Diagnóstico basado en datos de campo (LCP, INP, CLS) y objetivos claros.</li>
@@ -79,11 +79,11 @@ const aboutJsonLd = {
       <figure class="about-photo">
         <img
           src={heroImage}
-          alt="Pantalla con métricas de rendimiento y gráficos de análisis"
+          alt="Retrato de Adrián Mariscal con camisa blanca en exterior, con la ciudad al fondo"
           loading="eager"
           decoding="async"
         />
-        <figcaption>Fotografía real: análisis de rendimiento y foco en métricas.</figcaption>
+        <figcaption>Fotografía real: Adrián Mariscal en un entorno urbano.</figcaption>
       </figure>
     </div>
   </section>
@@ -193,7 +193,7 @@ const aboutJsonLd = {
       </div>
       <div class="about-cta__actions">
         <Button href="/contact" variant="primary">Solicitar auditoría</Button>
-        <Button href="/contact?ref=packs" variant="secondary">Ver packs</Button>
+        <Button href="/services#packs" variant="secondary">Ver packs de mejora</Button>
       </div>
     </div>
   </section>
