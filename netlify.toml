@@ -14,6 +14,8 @@
 
 [context."branch:staging".environment]
   ENVIRONMENT = "staging"
+  STAGING_USER = "CHANGE_ME"
+  STAGING_PASS = "CHANGE_ME"
 
 [[redirects]]
   from = "/blog/page/:splat"
