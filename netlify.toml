@@ -11,8 +11,6 @@
 
 [context.dev.environment]
   ENVIRONMENT = "development"
-  STAGING_USER = "CHANGE_ME"
-  STAGING_PASS = "CHANGE_ME"
 
 [context."branch:staging".environment]
   ENVIRONMENT = "staging"
