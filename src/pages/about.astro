@@ -1,0 +1,371 @@
+---
+// src/pages/about.astro
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Button from "../components/ui/Button.astro";
+import Card from "../components/ui/Card.astro";
+import { buildMetaDescription, buildMetaTitle, SEO_KEYWORD } from "../lib/seo";
+import { SITE } from "../lib/config";
+
+const pageTitle = "About";
+const metaTitle = buildMetaTitle(SEO_KEYWORD, "About · Adrián Mariscal");
+const metaDescription = buildMetaDescription(
+  "Historia, metodología y valores de Adrián Mariscal, consultor de rendimiento web, SEO técnico y UX.",
+  "Solicita una auditoría y revisa los packs disponibles."
+);
+
+const canonical = new URL("/about/", SITE.url).href;
+const heroImage = "/images/blog/mac-with-metrics.jpg";
+const heroImageAbs = new URL(heroImage, SITE.url).href;
+const personId = `${SITE.url}#persona`;
+const organizationId = `${SITE.url}#organization`;
+const aboutJsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "AboutPage",
+      "@id": canonical,
+      "name": "Sobre Adrián Mariscal",
+      "description": metaDescription,
+      "url": canonical,
+      "image": heroImageAbs,
+      "inLanguage": SITE.lang ?? "es",
+      "isPartOf": { "@id": SITE.url },
+      "mainEntity": { "@id": personId },
+      "publisher": { "@id": organizationId }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Inicio",
+          "item": SITE.url
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "About",
+          "item": canonical
+        }
+      ]
+    }
+  ]
+};
+---
+
+<BaseLayout title={pageTitle} metaTitle={metaTitle} description={metaDescription}>
+  <section class="section hero section--about-hero">
+    <div class="wrap about-hero">
+      <div class="about-hero__content stack" style="--stack-gap: 18px;">
+        <p class="about-hero__kicker">Rendimiento web · SEO técnico · UX</p>
+        <h1 class="about-hero__title">Sobre Adrián Mariscal</h1>
+        <p class="about-hero__lead">
+          Diseño experiencias web rápidas y confiables, con foco en métricas reales y decisiones
+          explicadas. La combinación de rendimiento, SEO técnico y UX me permite construir sitios
+          que convierten y se sostienen en el tiempo.
+        </p>
+        <div class="about-hero__actions">
+          <Button href="/contact" variant="primary">Solicitar auditoría</Button>
+          <Button href="/contact?ref=packs" variant="secondary">Ver packs</Button>
+        </div>
+        <ul class="about-hero__points">
+          <li>Diagnóstico basado en datos de campo (LCP, INP, CLS) y objetivos claros.</li>
+          <li>Plan priorizado P0/P1/P2 con impacto en negocio y esfuerzo estimado.</li>
+          <li>Implementación end-to-end con Astro y Node cuando aporta valor real.</li>
+        </ul>
+      </div>
+
+      <figure class="about-photo">
+        <img
+          src={heroImage}
+          alt="Pantalla con métricas de rendimiento y gráficos de análisis"
+          loading="eager"
+          decoding="async"
+        />
+        <figcaption>Fotografía real: análisis de rendimiento y foco en métricas.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="section section--about-story">
+    <div class="wrap about-story">
+      <div class="stack" style="--stack-gap: 14px;">
+        <h2 class="h2 section__title">Trayectoria</h2>
+        <p class="about-text">
+          Mi trabajo nace de unir diseño web con rigor técnico. He acompañado a equipos de producto
+          y negocio a transformar sitios lentos en experiencias rápidas, medibles y coherentes con la
+          marca. La prioridad siempre es la misma: claridad en lo que hacemos, por qué lo hacemos y
+          cómo medimos el resultado.
+        </p>
+        <p class="about-text">
+          Desde la auditoría inicial hasta la entrega final, mantengo un enfoque editorial: menos
+          ruido visual, más espacio para la lectura y una narrativa clara que explique cada decisión.
+        </p>
+      </div>
+      <figure class="about-photo about-photo--wide">
+        <img
+          src="/images/blog/workflow-diagram-and-product-brief.jpg"
+          alt="Mesa de trabajo con notas, diagrama y documentación del proyecto"
+          loading="lazy"
+          decoding="async"
+        />
+        <figcaption>Briefs, métricas y documentación: la base de cada entrega.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="section section--alt section--about-method">
+    <div class="wrap stack" style="--stack-gap: 28px;">
+      <header class="section__header stack" style="--stack-gap: 10px;">
+        <h2 class="h2 section__title">Metodología</h2>
+        <p class="about-text">
+          Un proceso claro evita sorpresas. Estas son las cuatro etapas que sigo para asegurar
+          impacto real y resultados medibles.
+        </p>
+      </header>
+      <div class="about-grid">
+        <Card class="about-card">
+          <div class="card__body stack" style="--stack-gap: 10px;">
+            <h3 class="h3">1. Auditoría y contexto</h3>
+            <p class="muted">Recojo métricas de campo, reviso SEO técnico y evalúo UX.</p>
+          </div>
+        </Card>
+        <Card class="about-card">
+          <div class="card__body stack" style="--stack-gap: 10px;">
+            <h3 class="h3">2. Plan priorizado</h3>
+            <p class="muted">Ordeno acciones por impacto (P0/P1/P2) y esfuerzo real.</p>
+          </div>
+        </Card>
+        <Card class="about-card">
+          <div class="card__body stack" style="--stack-gap: 10px;">
+            <h3 class="h3">3. Implementación</h3>
+            <p class="muted">Aplicamos mejoras en diseño, frontend y arquitectura cuando aporta.</p>
+          </div>
+        </Card>
+        <Card class="about-card">
+          <div class="card__body stack" style="--stack-gap: 10px;">
+            <h3 class="h3">4. Medición y siguientes pasos</h3>
+            <p class="muted">Validamos mejoras y definimos el siguiente sprint de optimización.</p>
+          </div>
+        </Card>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--about-values">
+    <div class="wrap stack" style="--stack-gap: 28px;">
+      <header class="section__header stack" style="--stack-gap: 10px;">
+        <h2 class="h2 section__title">Valores</h2>
+        <p class="about-text">
+          Trabajo con un marco claro: precisión, calma editorial y transparencia con los trade-offs.
+        </p>
+      </header>
+      <div class="about-values">
+        <div class="about-value">
+          <h3 class="h3">Precisión</h3>
+          <p class="muted">Decisiones respaldadas por métricas, no por suposiciones.</p>
+        </div>
+        <div class="about-value">
+          <h3 class="h3">Claridad</h3>
+          <p class="muted">Documentación limpia y comunicación directa en cada entrega.</p>
+        </div>
+        <div class="about-value">
+          <h3 class="h3">Pragmatismo</h3>
+          <p class="muted">Soluciones que equilibran impacto, tiempo y mantenimiento.</p>
+        </div>
+        <div class="about-value">
+          <h3 class="h3">Transparencia</h3>
+          <p class="muted">Trade-offs explicados para que cada decisión sea consciente.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt section--about-cta">
+    <div class="wrap about-cta">
+      <div class="stack" style="--stack-gap: 10px;">
+        <h2 class="h2 section__title">¿Hablamos de tu web?</h2>
+        <p class="about-text">
+          Si necesitas claridad sobre rendimiento, SEO técnico o experiencia de usuario, podemos
+          revisar tu caso y definir el plan correcto.
+        </p>
+      </div>
+      <div class="about-cta__actions">
+        <Button href="/contact" variant="primary">Solicitar auditoría</Button>
+        <Button href="/contact?ref=packs" variant="secondary">Ver packs</Button>
+      </div>
+    </div>
+  </section>
+
+  <script type="application/ld+json" set:html={JSON.stringify(aboutJsonLd, null, 2)} />
+</BaseLayout>
+
+<style>
+  .section--about-hero {
+    padding-block: clamp(64px, 12vw, 140px);
+  }
+
+  .about-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    gap: clamp(24px, 6vw, 72px);
+    align-items: center;
+  }
+
+  .about-hero__kicker {
+    text-transform: uppercase;
+    letter-spacing: 0.24em;
+    font-size: 0.72rem;
+    color: var(--color-text-muted);
+  }
+
+  .about-hero__title {
+    font-family: var(--font-display);
+    font-size: clamp(2.4rem, 4vw, 3.5rem);
+    line-height: 1.1;
+    color: var(--color-heading);
+    margin: 0;
+  }
+
+  .about-hero__lead {
+    font-size: 1.1rem;
+    color: var(--color-text-muted);
+    max-width: 60ch;
+  }
+
+  .about-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .about-hero__points {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 12px;
+    color: var(--color-text-muted);
+  }
+
+  .about-hero__points li {
+    display: flex;
+    gap: 10px;
+  }
+
+  .about-hero__points li::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    margin-top: 0.65rem;
+    border-radius: 999px;
+    background: linear-gradient(180deg, var(--color-accent), var(--color-accent-warm));
+    box-shadow: 0 8px 18px var(--shadow-color-soft);
+    flex-shrink: 0;
+  }
+
+  .about-photo {
+    margin: 0;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-lg);
+    background: var(--color-surface);
+    overflow: hidden;
+  }
+
+  .about-photo img {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    display: block;
+  }
+
+  .about-photo figcaption {
+    padding: 12px 16px 16px;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+  }
+
+  .section--about-story {
+    padding-block: clamp(56px, 10vw, 120px);
+  }
+
+  .about-story {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+    gap: clamp(24px, 6vw, 72px);
+    align-items: start;
+  }
+
+  .about-text {
+    color: var(--color-text-muted);
+    max-width: 64ch;
+  }
+
+  .about-photo--wide img {
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+
+  .section--about-method {
+    padding-block: clamp(56px, 10vw, 120px);
+  }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+  }
+
+  .about-card {
+    height: 100%;
+  }
+
+  .section--about-values {
+    padding-block: clamp(56px, 10vw, 120px);
+  }
+
+  .about-values {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 18px;
+  }
+
+  .about-value {
+    padding: 18px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-md);
+  }
+
+  .section--about-cta {
+    padding-block: clamp(56px, 10vw, 120px);
+  }
+
+  .about-cta {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    align-items: flex-start;
+  }
+
+  .about-cta__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  @media (max-width: 900px) {
+    .about-hero,
+    .about-story {
+      grid-template-columns: 1fr;
+    }
+
+    .about-cta {
+      align-items: stretch;
+    }
+  }
+</style>
