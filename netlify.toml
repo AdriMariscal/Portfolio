@@ -21,6 +21,24 @@
   STAGING_PASS = "CHANGE_ME"
 
 [[redirects]]
+  from = "https://www.adrianmariscal.es/*"
+  to = "https://adrianmariscal.es/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://adrianmariscal.com/*"
+  to = "https://adrianmariscal.es/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://www.adrianmariscal.com/*"
+  to = "https://adrianmariscal.es/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
   from = "/blog/page/:splat"
   to = "/blog/pages/:splat"
   status = 301
