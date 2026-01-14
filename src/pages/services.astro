@@ -78,87 +78,93 @@ const servicesJsonLd = {
   </section>
 
   <section class="section section--services-core">
-    <div class="wrap stack" style="--stack-gap: 24px;">
-      <header class="section__header stack" style="--stack-gap: 8px;">
-        <h2 class="h2 section__title">Auditoría gratuita</h2>
-        <p class="services-text">
-          Es el primer paso para entender tu situación real. Incluye revisión de métricas de campo,
-          SEO técnico y experiencia de usuario, con un informe base claro en 48–72h.
+    <div class="wrap">
+      <div class="stack" style="--stack-gap: 24px;">
+        <header class="section__header stack" style="--stack-gap: 8px;">
+          <h2 class="h2 section__title">Auditoría gratuita</h2>
+          <p class="services-text">
+            Es el primer paso para entender tu situación real. Incluye revisión de métricas de campo,
+            SEO técnico y experiencia de usuario, con un informe base claro en 48–72h.
+          </p>
+        </header>
+        <div class="services-grid">
+          <Card class="services-card">
+            <div class="card__body stack" style="--stack-gap: 10px;">
+              <h3 class="h3">Informe base (gratis)</h3>
+              <ul class="services-list">
+                <li>Resumen de métricas clave (LCP, INP, CLS).</li>
+                <li>Hallazgos críticos de SEO técnico.</li>
+                <li>Prioridades rápidas para desbloquear impacto.</li>
+              </ul>
+            </div>
+          </Card>
+          <Card class="services-card">
+            <div class="card__body stack" style="--stack-gap: 10px;">
+              <h3 class="h3">Informe completo (opcional)</h3>
+              <ul class="services-list">
+                <li>Plan P0/P1/P2 con esfuerzo y dependencias.</li>
+                <li>Recomendaciones de arquitectura y stack.</li>
+                <li>Sesión de 30 min para revisar el plan.</li>
+              </ul>
+            </div>
+          </Card>
+        </div>
+        <p class="services-note muted">
+          Si encaja, la auditoría se convierte en el punto de partida para un pack de mejora con foco
+          en rendimiento, SEO técnico y UX.
         </p>
-      </header>
-      <div class="services-grid">
-        <Card class="services-card">
-          <div class="card__body stack" style="--stack-gap: 10px;">
-            <h3 class="h3">Informe base (gratis)</h3>
-            <ul class="services-list">
-              <li>Resumen de métricas clave (LCP, INP, CLS).</li>
-              <li>Hallazgos críticos de SEO técnico.</li>
-              <li>Prioridades rápidas para desbloquear impacto.</li>
-            </ul>
-          </div>
-        </Card>
-        <Card class="services-card">
-          <div class="card__body stack" style="--stack-gap: 10px;">
-            <h3 class="h3">Informe completo (opcional)</h3>
-            <ul class="services-list">
-              <li>Plan P0/P1/P2 con esfuerzo y dependencias.</li>
-              <li>Recomendaciones de arquitectura y stack.</li>
-              <li>Sesión de 30 min para revisar el plan.</li>
-            </ul>
-          </div>
-        </Card>
       </div>
-      <p class="services-note muted">
-        Si encaja, la auditoría se convierte en el punto de partida para un pack de mejora con foco
-        en rendimiento, SEO técnico y UX.
-      </p>
     </div>
   </section>
 
   <section class="section section--alt section--services-packs" id="packs">
-    <div class="wrap stack" style="--stack-gap: 24px;">
-      <header class="section__header stack" style="--stack-gap: 8px;">
-        <h2 class="h2 section__title">Packs de mejora</h2>
-        <p class="services-text">
-          Tres packs cerrados y comparables. Se activan cuando el diagnóstico confirma impacto
-          claro y un retorno real para tu negocio.
-        </p>
-      </header>
-      <div class="services-packs">
-        <Card class="services-card">
-          <div class="card__body stack" style="--stack-gap: 10px;">
-            <h3 class="h3">Pack Base</h3>
-            <p class="muted">Correcciones críticas y quick wins para mejorar la experiencia.</p>
-          </div>
-        </Card>
-        <Card class="services-card">
-          <div class="card__body stack" style="--stack-gap: 10px;">
-            <h3 class="h3">Pack Growth</h3>
-            <p class="muted">Optimización avanzada para consolidar SEO y conversión.</p>
-          </div>
-        </Card>
-        <Card class="services-card">
-          <div class="card__body stack" style="--stack-gap: 10px;">
-            <h3 class="h3">Pack End-to-End</h3>
-            <p class="muted">Revisión completa de diseño, frontend y stack cuando aporta.</p>
-          </div>
-        </Card>
-      </div>
-      <div class="services-cta">
-        <Button href="/contact" variant="primary">Quiero mi auditoría gratuita</Button>
-        <Button href="/contact" variant="secondary">Consultar disponibilidad</Button>
+    <div class="wrap">
+      <div class="stack" style="--stack-gap: 24px;">
+        <header class="section__header stack" style="--stack-gap: 8px;">
+          <h2 class="h2 section__title">Packs de mejora</h2>
+          <p class="services-text">
+            Tres packs cerrados y comparables. Se activan cuando el diagnóstico confirma impacto
+            claro y un retorno real para tu negocio.
+          </p>
+        </header>
+        <div class="services-packs">
+          <Card class="services-card">
+            <div class="card__body stack" style="--stack-gap: 10px;">
+              <h3 class="h3">Pack Base</h3>
+              <p class="muted">Correcciones críticas y quick wins para mejorar la experiencia.</p>
+            </div>
+          </Card>
+          <Card class="services-card">
+            <div class="card__body stack" style="--stack-gap: 10px;">
+              <h3 class="h3">Pack Growth</h3>
+              <p class="muted">Optimización avanzada para consolidar SEO y conversión.</p>
+            </div>
+          </Card>
+          <Card class="services-card">
+            <div class="card__body stack" style="--stack-gap: 10px;">
+              <h3 class="h3">Pack End-to-End</h3>
+              <p class="muted">Revisión completa de diseño, frontend y stack cuando aporta.</p>
+            </div>
+          </Card>
+        </div>
+        <div class="services-cta">
+          <Button href="/contact" variant="primary">Quiero mi auditoría gratuita</Button>
+          <Button href="/contact" variant="secondary">Consultar disponibilidad</Button>
+        </div>
       </div>
     </div>
   </section>
 
   <section class="section section--services-future">
-    <div class="wrap stack" style="--stack-gap: 16px;">
-      <h2 class="h2 section__title">Servicios futuros</h2>
-      <p class="services-text">
-        Esta página está preparada para ampliar la oferta: reconstrucciones performance-first,
-        consultoría continua o auditorías específicas. Cuando estén disponibles, aparecerán aquí con
-        el mismo nivel de detalle.
-      </p>
+    <div class="wrap">
+      <div class="stack" style="--stack-gap: 16px;">
+        <h2 class="h2 section__title">Servicios futuros</h2>
+        <p class="services-text">
+          Esta página está preparada para ampliar la oferta: reconstrucciones performance-first,
+          consultoría continua o auditorías específicas. Cuando estén disponibles, aparecerán aquí con
+          el mismo nivel de detalle.
+        </p>
+      </div>
     </div>
   </section>
 
