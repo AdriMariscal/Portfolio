@@ -2,16 +2,24 @@
 // src/pages/legal/terminos.astro
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { SITE_OWNER } from "../../config/siteOwner";
+import Card from "../../components/ui/Card.astro";
+import { buildMetaDescription, buildMetaTitle, SEO_KEYWORD } from "../../lib/seo";
 
 // Si quieres mostrar la fecha automática, cámbiala por:
 // const updatedAt = new Date().toLocaleDateString("es-ES");
 const updatedAt = "01/11/2025";
+
+const metaTitle = buildMetaTitle(SEO_KEYWORD, "Términos y condiciones");
+const metaDescription = buildMetaDescription(
+  "Condiciones de uso y contratación del sitio con información clara y transparente.",
+  "Revisa los términos antes de contactar."
+);
 ---
 
-<BaseLayout title="Términos y condiciones" description="Condiciones de uso del sitio y, en su caso, contratación a distancia.">
+<BaseLayout title="Términos y condiciones" metaTitle={metaTitle} description={metaDescription}>
   <section class="section section--legal">
     <div class="wrap">
-      <article class="card card--soft legal__card">
+      <Card as="article" variant="soft" class="legal__card">
         <div class="legal__body prose">
           <header class="legal__header">
             <h1>Términos y condiciones</h1>
@@ -166,7 +174,7 @@ const updatedAt = "01/11/2025";
       </ol>
 
     </div>
-      </article>
+      </Card>
     </div>
   </section>
 </BaseLayout>

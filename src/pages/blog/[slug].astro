@@ -1,20 +1,40 @@
 ---
 // src/pages/blog/[slug].astro
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import Button from '@/components/ui/Button.astro';
 import type { CollectionEntry } from 'astro:content';
 import { getCollection } from 'astro:content';
 import { toSlug } from '@/lib/content';
 import { SITE } from '@/lib/config';
+import {
+  buildHeadingTitle,
+  buildMetaDescription,
+  buildMetaTitle,
+  SEO_KEYWORD
+} from '@/lib/seo';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog', ({ data }) => !data.draft);
   return posts.map((p) => ({
     params: { slug: p.slug },
-    props: { post: p }
+    props: {
+      post: p,
+      metaTitle: buildMetaTitle(SEO_KEYWORD, p.data.title ?? SITE.title),
+      metaDescription: buildMetaDescription(
+        p.data.description ?? SITE.description ?? "Rendimiento web con Astro y Node.",
+        "Aplica los pasos y mejora tu web hoy."
+      ),
+      headingTitle: buildHeadingTitle(p.data.title ?? SITE.title)
+    }
   }));
 }
 
-const { post } = Astro.props as { post: CollectionEntry<'blog'> };
+const { post, metaTitle, metaDescription, headingTitle } = Astro.props as {
+  post: CollectionEntry<'blog'>;
+  metaTitle: string;
+  metaDescription: string;
+  headingTitle: string;
+};
 
 // Render del Markdown del post + cabeceras para el índice
 const { Content, headings } = await post.render();
@@ -77,28 +97,62 @@ const robots =
     ? (post.data as any).robots
     : undefined;
 
-// JSON-LD Article
+const organizationId = `${SITE.url}#organization`;
+const personId = `${SITE.url}#persona`;
+
+// JSON-LD Article + Breadcrumbs
 const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "BlogPosting",
-  "headline": title,
-  "description": description,
-  "image": imageAbs,
-  "url": canonical,
-  "mainEntityOfPage": { "@type": "WebPage", "@id": canonical },
-  "inLanguage": SITE.lang ?? "es",
-  ...(datePublishedISO ? { "datePublished": datePublishedISO } : {}),
-  ...(dateModifiedISO ? { "dateModified": dateModifiedISO } : {}),
-  "author": { "@type": "Person", "name": SITE.author },
-  ...(tags.length ? { "keywords": tags.join(", ") } : {}),
-  ...(tags.length ? { "articleSection": tags[0] } : {}),  
+  "@graph": [
+    {
+      "@type": "BlogPosting",
+      "@id": canonical,
+      "headline": title,
+      "description": description,
+      "image": imageAbs,
+      "url": canonical,
+      "mainEntityOfPage": { "@type": "WebPage", "@id": canonical },
+      "inLanguage": SITE.lang ?? "es",
+      ...(datePublishedISO ? { "datePublished": datePublishedISO } : {}),
+      ...(dateModifiedISO ? { "dateModified": dateModifiedISO } : {}),
+      "author": { "@id": personId },
+      "publisher": { "@id": organizationId },
+      ...(tags.length ? { "keywords": tags.join(", ") } : {}),
+      ...(tags.length ? { "articleSection": tags[0] } : {}),
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Inicio",
+          "item": SITE.url,
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Blog",
+          "item": new URL("/blog/", SITE.url).href,
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": title,
+          "item": canonical,
+        },
+      ],
+    },
+  ],
 };
 ---
 
 <BaseLayout
   title={title}
-  description={description}
+  metaTitle={metaTitle}
+  description={metaDescription}
   ogImage={imageAbs}
+  ogImageAlt={heroAlt}
   ogType="article"
   articleAuthor={SITE.author}
   articleTags={tags}
@@ -109,7 +163,7 @@ const jsonLd = {
   <article class="section post">
     <div class="wrap post__card card card--soft">
       <div class="post__body">
-      <h1 class="post__title">{title}</h1>
+      <h1 class="post__title">{headingTitle}</h1>
 
       {datePublishedISO ? (
           <p class="post__date">
@@ -122,7 +176,9 @@ const jsonLd = {
 
         {/* Botón Volver con el mismo estilo que los botones de proyecto */}
         <div class="post__actions" style="display:flex; gap:.5rem; flex-wrap:wrap; margin:.5rem 0 0">
-          <a class="btn btn--secondary btn--sm post__back" href="/blog" data-back>← Volver</a>
+          <Button href="/blog" variant="secondary" size="sm" class="post__back" data-back>
+            ← Volver
+          </Button>
         </div>
 
       {/* Imagen principal del artículo (hero), si el frontmatter define `image` */}
@@ -133,6 +189,7 @@ const jsonLd = {
             alt={heroAlt}
             loading="eager"
             decoding="async"
+            fetchpriority="high"
           />
           {heroCaption && (
             <figcaption class="post__hero-caption">

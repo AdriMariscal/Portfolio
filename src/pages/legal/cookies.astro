@@ -2,15 +2,23 @@
 // src/pages/legal/cookies.astro
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { SITE_OWNER } from "../../config/siteOwner";
+import Card from "../../components/ui/Card.astro";
+import { buildMetaDescription, buildMetaTitle, SEO_KEYWORD } from "../../lib/seo";
 
 // Ajusta la fecha cuando hagas cambios de contenido.
 const lastUpdate = "01/11/2025";
+
+const metaTitle = buildMetaTitle(SEO_KEYWORD, "Política de cookies");
+const metaDescription = buildMetaDescription(
+  "Información clara sobre cookies, privacidad y control de consentimiento en el sitio.",
+  "Revisa la política y configura tus preferencias."
+);
 ---
 
-<BaseLayout title="Cookies" description="Política de cookies del sitio.">
+<BaseLayout title="Cookies" metaTitle={metaTitle} description={metaDescription}>
   <section class="section section--legal">
     <div class="wrap">
-      <article class="card card--soft legal__card">
+      <Card as="article" variant="soft" class="legal__card">
         <div class="legal__body prose">
           <header class="legal__header">
             <h1>Política de cookies</h1>
@@ -35,10 +43,11 @@ const lastUpdate = "01/11/2025";
 
       <h2>2. Qué cookies utiliza este sitio</h2>
       <p>
-        Actualmente este sitio <strong>no utiliza cookies no esenciales</strong> (p. ej., analíticas o publicitarias).
-        Únicamente se emplean, en su caso, <strong>cookies propias, de sesión y con
-        finalidad técnica</strong> (por ejemplo, las estrictamente necesarias para que
-        el formulario de contacto funcione o para la seguridad básica).
+        Actualmente este sitio <strong>no instala cookies analíticas de terceros</strong>.
+        Sí utiliza <strong>almacenamiento local</strong> para recordar tu consentimiento y,
+        si aceptas analítica, enviar métricas de rendimiento (LCP, INP, CLS) a un
+        endpoint propio de medición. No se activan métricas ni envío de datos si
+        rechazas las cookies analíticas.
       </p>
 
       <div class="note">
@@ -63,11 +72,18 @@ const lastUpdate = "01/11/2025";
           </thead>
           <tbody>
             <tr>
-              <td>(sin cookies no esenciales)</td>
-              <td>—</td>
-              <td>—</td>
-              <td>—</td>
-              <td>—</td>
+              <td>am-cookie-consent-v1</td>
+              <td>localStorage</td>
+              <td>Guardar tu preferencia de cookies</td>
+              <td>Propia</td>
+              <td>Persistente (hasta que se borre)</td>
+            </tr>
+            <tr>
+              <td>am-rum-metrics-v1</td>
+              <td>localStorage</td>
+              <td>Histórico técnico de métricas RUM (LCP/INP/CLS)</td>
+              <td>Propia</td>
+              <td>Persistente (hasta que se borre)</td>
             </tr>
           </tbody>
         </table>
@@ -160,7 +176,7 @@ const lastUpdate = "01/11/2025";
         cualquier momento.
       </p>
     </div>
-      </article>
+      </Card>
     </div>
   </section>
 </BaseLayout>

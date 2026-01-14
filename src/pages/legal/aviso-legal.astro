@@ -2,6 +2,8 @@
 // src/pages/legal/aviso-legal.astro
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { SITE_OWNER } from "../../config/siteOwner";
+import Card from "../../components/ui/Card.astro";
+import { buildMetaDescription, buildMetaTitle, SEO_KEYWORD } from "../../lib/seo";
 
 // Fecha de última revisión visible
 const updatedAt = new Date().toLocaleDateString("es-ES", {
@@ -9,13 +11,19 @@ const updatedAt = new Date().toLocaleDateString("es-ES", {
   month: "2-digit",
   year: "numeric",
 });
+
+const metaTitle = buildMetaTitle(SEO_KEYWORD, "Aviso legal");
+const metaDescription = buildMetaDescription(
+  "Información legal del sitio, titularidad y condiciones de uso en España.",
+  "Consulta el aviso legal y contacta si lo necesitas."
+);
 ---
 
-<BaseLayout title="Aviso legal">
+<BaseLayout title="Aviso legal" metaTitle={metaTitle} description={metaDescription}>
   <main class="section section--legal">
     <div class="wrap">
       <!-- Ojo: estas clases vienen de global.css -->
-      <article class="card card--soft legal__card">
+      <Card as="article" variant="soft" class="legal__card">
         <div class="legal__body">
           <header class="legal__header">
             <h1>Aviso legal</h1>
@@ -157,14 +165,14 @@ const updatedAt = new Date().toLocaleDateString("es-ES", {
           </p>
         </section>
         </div>
-      </article>
+      </Card>
     </div>
   </main>
 
   <style>
     /* Detalles ligeros para separador y nav interno */
-    .sep{border:none;height:1px;background:var(--am-border);margin:1.25rem 0}
+    .sep{border:none;height:1px;background:var(--color-border);margin:1.25rem 0}
     .legal-nav{display:flex;gap:.75rem;flex-wrap:wrap}
-    .legal-nav a{color:var(--am-graphite)}
+    .legal-nav a{color:var(--color-text-muted)}
   </style>
 </BaseLayout>

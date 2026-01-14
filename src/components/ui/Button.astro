@@ -1,0 +1,32 @@
+---
+const {
+  href,
+  type = "button",
+  variant = "primary",
+  size = "md",
+  block = false,
+  class: className = "",
+  ...rest
+} = Astro.props;
+
+const isLink = typeof href === "string";
+const classes = [
+  "btn",
+  `btn--${variant}`,
+  size === "sm" ? "btn--sm" : "",
+  block ? "btn--block" : "",
+  className,
+]
+  .filter(Boolean)
+  .join(" ");
+---
+
+{isLink ? (
+  <a class={classes} href={href} {...rest}>
+    <slot />
+  </a>
+) : (
+  <button class={classes} type={type} {...rest}>
+    <slot />
+  </button>
+)}

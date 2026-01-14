@@ -10,27 +10,43 @@ import "../scripts/rum-core-web-vitals.ts";
 
 type Props = {
   title?: string;
+  metaTitle?: string;
   description?: string;
+  ogDescription?: string;
   ogImage?: string;
+  ogImageAlt?: string;
   ogType?: string;
   articleAuthor?: string;
   articleTags?: string[];
   articleSection?: string;
   robots?: string;
-  twitterCreator?: string;  
+  twitterCreator?: string;
+  twitterImage?: string;
+  twitterImageAlt?: string;
+  twitterCard?: string;
 };
 
 const {
   title = "Adrián Mariscal",
-  description = "Arquitecto Salesforce y desarrollo web ligero.",
+  metaTitle,
+  description = SITE.description ??
+    "Rendimiento web, SEO técnico y UX con Astro y Node.",
+  ogDescription,
   ogImage,
+  ogImageAlt,
   ogType,
   articleAuthor,
   articleTags,
   articleSection,
   robots,
-  twitterCreator,  
+  twitterCreator,
+  twitterImage,
+  twitterImageAlt,
+  twitterCard,
 } = Astro.props as Props;
+
+const resolvedTitle = metaTitle ?? title;
+const resolvedDescription = ogDescription ?? description;
 
 // Canonical absoluto usando siempre el dominio canónico del config de Astro
 // (Astro.site se construye a partir de la opción `site` de astro.config.mjs)
@@ -45,14 +61,76 @@ const rawImage = ogImage ?? SITE.ogImage ?? "/og-default.png";
 const ogImageAbs = rawImage.startsWith("http")
   ? rawImage
   : new URL(rawImage, SITE.url).href;
+const resolvedOgAlt =
+  ogImageAlt ?? SITE.ogImageAlt ?? `${SITE.title} · ${SITE.description}`;
+const twitterRawImage = twitterImage ?? SITE.twitterImage ?? rawImage;
+const twitterImageAbs = twitterRawImage.startsWith("http")
+  ? twitterRawImage
+  : new URL(twitterRawImage, SITE.url).href;
+const resolvedTwitterAlt =
+  twitterImageAlt ?? SITE.twitterImageAlt ?? resolvedOgAlt;
+const resolvedTwitterCard =
+  twitterCard ??
+  SITE.twitterCard ??
+  (twitterImageAbs === ogImageAbs ? "summary_large_image" : "summary");
 
 // Locale + site name
 const locale = "es_ES";
 const siteName = SITE.siteName ?? "Portfolio - Adrián Mariscal";
+const organizationId = `${SITE.url}#organization`;
+const personId = `${SITE.url}#persona`;
+const fontStylesheet =
+  "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap";
+const organizationImage = SITE.ogImage ?? "/logos/logo_fondo_Charcoal950.png";
+const organizationImageAbs = organizationImage.startsWith("http")
+  ? organizationImage
+  : new URL(organizationImage, SITE.url).href;
+const schemaOrg = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": SITE.url,
+      "name": siteName,
+      "url": SITE.url,
+      "description": SITE.description,
+      "inLanguage": SITE.lang ?? "es",
+      "publisher": { "@id": organizationId },
+    },
+    {
+      "@type": "Organization",
+      "@id": organizationId,
+      "name": SITE.title,
+      "url": SITE.url,
+      "description": SITE.description,
+      "image": organizationImageAbs,
+      "logo": {
+        "@type": "ImageObject",
+        "url": organizationImageAbs,
+      },
+      "founder": { "@id": personId },
+    },
+    {
+      "@type": "Person",
+      "@id": personId,
+      "name": SITE.author,
+      "url": SITE.url,
+      "jobTitle": "Consultor de rendimiento web",
+      "knowsAbout": [
+        "Rendimiento web",
+        "SEO técnico",
+        "UX",
+        "Astro",
+        "Node.js",
+      ],
+      "worksFor": { "@id": organizationId },
+    },
+  ],
+};
 ---
 
 <!doctype html>
-<html lang={SITE.lang ?? "es"}>
+<html lang={SITE.lang ?? "es"} data-theme="dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -69,32 +147,51 @@ const siteName = SITE.siteName ?? "Portfolio - Adrián Mariscal";
             return;
           }
         } catch (e) {
-          /* si localStorage falla, seguimos con prefers-color-scheme */
+          /* si localStorage falla, seguimos con el modo por defecto */
         }
 
-        const prefersDark = window.matchMedia &&
-          window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-        root.dataset.theme = prefersDark ? 'dark' : 'light';
+        // Modo oscuro por defecto; el claro queda como alternativa del toggle
+        root.dataset.theme = 'dark';
       })();
     </script>
 
-    <title>{title} — Adrián Mariscal</title>
-    <meta name="description" content={description} />
+    <title>{resolvedTitle}</title>
+    <meta name="description" content={resolvedDescription} />
     <meta name="theme-color" content={THEME.color} />
-    <link rel="icon" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="/logos/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="500x500" href="/logos/favicon.png" />
+    <link
+      rel="apple-touch-icon"
+      sizes="800x800"
+      href="/logos/logo_cuadrado_fondo_Charcoal950.png"
+    />
+    <link rel="manifest" href="/site.webmanifest" />
     <link rel="canonical" href={canonical} />
     {robots && <meta name="robots" content={robots} />}    
+
+    <!-- Fuentes: preload del CSS crítico + swap -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preload" as="style" href={fontStylesheet} />
+    <link
+      rel="stylesheet"
+      href={fontStylesheet}
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript>
+      <link rel="stylesheet" href={fontStylesheet} />
+    </noscript>
 
     <!-- Open Graph -->
     <meta property="og:locale" content={locale} />
     <meta property="og:site_name" content={siteName} />
     <meta property="og:type" content={type} />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
+    <meta property="og:title" content={resolvedTitle} />
+    <meta property="og:description" content={resolvedDescription} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogImageAbs} />
-    <meta property="og:image:alt" content={title} />
+    <meta property="og:image:alt" content={resolvedOgAlt} />
 
     {type === "article" && (
       <>
@@ -114,13 +211,20 @@ const siteName = SITE.siteName ?? "Portfolio - Adrián Mariscal";
     )}    
 
     <!-- Twitter (compatible con X/Twitter cards) -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={ogImageAbs} />
+    <meta name="twitter:card" content={resolvedTwitterCard} />
+    <meta name="twitter:title" content={resolvedTitle} />
+    <meta name="twitter:description" content={resolvedDescription} />
+    <meta name="twitter:image" content={twitterImageAbs} />
+    <meta name="twitter:image:alt" content={resolvedTwitterAlt} />
     {twitterCreator && (
       <meta name="twitter:creator" content={twitterCreator} />
-    )}    
+    )}
+
+    <!-- Schema.org (WebSite + Person) -->
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(schemaOrg, null, 2)}
+    />
   </head>
   <body>
     <a class="skip-link" href="#main-content">

@@ -2,6 +2,7 @@
 // src/components/CookieConsent.astro
 
 // No necesitamos props; el componente se autogestiona
+import Button from "./ui/Button.astro";
 const STORAGE_KEY = "am-cookie-consent-v1";
 ---
 
@@ -18,20 +19,22 @@ const STORAGE_KEY = "am-cookie-consent-v1";
     <div class="cookie-banner__content">
       <div class="cookie-banner__main">
         <h2 class="cookie-banner__title" id="cookie-banner-title">
-          Tu privacidad importa
+          Preferencias de cookies
         </h2>
         <p class="cookie-banner__text">
-          Utilizo cookies técnicas necesarias para que el sitio funcione y,
-          si lo aceptas, también podré usar cookies de analítica y marketing
-          para medir y mejorar este proyecto. Puedes cambiar tu selección
-          cuando quieras.
+          Solo uso cookies necesarias para que el sitio funcione. Si aceptas las
+          analíticas, podré medir rendimiento y mejorar el contenido. Puedes
+          ajustar tu elección cuando quieras.
         </p>
 
         <div class="cookie-banner__prefs" aria-label="Preferencias de cookies">
           <label class="cookie-banner__pref-label">
             <input
               type="checkbox"
+              id="cookie-analytics"
+              name="cookie-analytics"
               data-cookie-input="analytics"
+              aria-label="Preferencias de cookies: analíticas"
             />
             <span>
               <strong>Analíticas</strong>
@@ -45,20 +48,23 @@ const STORAGE_KEY = "am-cookie-consent-v1";
           <label class="cookie-banner__pref-label">
             <input
               type="checkbox"
+              id="cookie-marketing"
+              name="cookie-marketing"
               data-cookie-input="marketing"
+              aria-label="Preferencias de cookies: marketing"
             />
             <span>
               <strong>Marketing</strong>
               <span class="cookie-banner__pref-desc">
-                Permiten mostrar contenido o campañas promocionales más
-                relevantes si algún día las utilizo.
+                Permiten mostrar campañas o contenido promocional si algún día
+                las utilizo.
               </span>
             </span>
           </label>
         </div>
 
         <p class="cookie-banner__note">
-          Más información en la política de
+          Consulta la política de
           <a class="cookie-banner__note-link" href="/legal/cookies">
             cookies
           </a>.
@@ -66,27 +72,34 @@ const STORAGE_KEY = "am-cookie-consent-v1";
       </div>
 
       <div class="cookie-banner__actions">
-        <button
+        <Button
           type="button"
-          class="btn btn--secondary btn--sm"
+          variant="secondary"
+          size="sm"
           data-cookie-reject
+          aria-label="Rechazar cookies no necesarias"
         >
-          Rechazar no esenciales
-        </button>
-        <button
+          Solo necesarias
+        </Button>
+        <Button
           type="button"
-          class="btn btn--primary btn--sm"
+          variant="primary"
+          size="sm"
           data-cookie-accept-selected
+          aria-label="Guardar preferencias de cookies"
         >
-          Guardar selección
-        </button>
-        <button
+          Guardar preferencias
+        </Button>
+        <Button
           type="button"
+          variant="tertiary"
+          size="sm"
           class="cookie-banner__link"
           data-cookie-accept-all
+          aria-label="Aceptar todas las cookies"
         >
-          Aceptar todo
-        </button>
+          Aceptar todas
+        </Button>
       </div>
     </div>
   </div>

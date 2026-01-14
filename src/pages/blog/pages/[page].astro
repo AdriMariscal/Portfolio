@@ -2,7 +2,9 @@
 // src/pages/blog/pages/[page].astro
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import PostCard from '@/components/PostCard.astro'; 
+import Input from '@/components/ui/Input.astro';
 import { getCollection } from 'astro:content';
+import { buildMetaDescription, buildMetaTitle, SEO_KEYWORD } from '@/lib/seo';
 
 const PER_PAGE = 9; // usado para el slice fuera de getStaticPaths
 
@@ -43,9 +45,19 @@ const current = Math.max(1, Math.min(Number(Astro.params.page ?? 1), totalPages)
 const start = (current - 1) * PER_PAGE;
 const pagePosts = posts.slice(start, start + PER_PAGE);
 const visibleNow = pagePosts.length;
+
+const metaTitle = buildMetaTitle(SEO_KEYWORD, `Blog página ${current}`);
+const metaDescription = buildMetaDescription(
+  `Página ${current} con artículos sobre rendimiento web, SEO técnico y Astro.`,
+  "Explora los artículos y aplica mejoras hoy."
+);
 ---
 
-<BaseLayout title={`Blog — página ${current}`} description="Artículos del blog paginados.">
+<BaseLayout
+  title="Blog"
+  metaTitle={metaTitle}
+  description={metaDescription}
+>
   <section class="section section--blog">
     <header class="section__header">
       <h1 class="h1 section__title section__title--page">Blog</h1>
@@ -63,9 +75,9 @@ const visibleNow = pagePosts.length;
         <label class="blog-search__label" for="blog-search-input">
           Buscar artículos
         </label>
-        <input
+        <Input
           id="blog-search-input"
-          class="input blog-search__input"
+          class="blog-search__input"
           type="search"
           name="q"
           placeholder="Busca por título, descripción o etiqueta…"
@@ -207,17 +219,21 @@ const visibleNow = pagePosts.length;
           const article = document.createElement('article');
           article.className = 'card card--post post-card';
 
+          const overlay = document.createElement('a');
+          overlay.className = 'card__overlay-link';
+          overlay.href = `/blog/${post.slug}/`;
+          overlay.setAttribute(
+            'aria-label',
+            `Abrir artículo: ${post.title || 'Artículo sin título'}`
+          );
+          article.appendChild(overlay);
+
           const body = document.createElement('div');
           body.className = 'card__body';
 
           const h3 = document.createElement('h3');
           h3.className = 'card__title postcard__title';
-
-          const link = document.createElement('a');
-          link.href = `/blog/${post.slug}/`;
-          link.textContent = post.title || 'Artículo sin título';
-
-          h3.appendChild(link);
+          h3.textContent = post.title || 'Artículo sin título';
           body.appendChild(h3);
 
           if (post.date) {
@@ -248,7 +264,7 @@ const visibleNow = pagePosts.length;
 
           if (Array.isArray(post.tags) && post.tags.length) {
             const ul = document.createElement('ul');
-            ul.className = 'taglist';
+            ul.className = 'taglist card__interactive';
             ul.setAttribute('aria-label', 'Etiquetas');
 
             post.tags.slice(0, 6).forEach((t) => {
@@ -302,4 +318,3 @@ const visibleNow = pagePosts.length;
     })();
   </script>
 </BaseLayout>
-

@@ -1,0 +1,300 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Input from "@/components/ui/Input.astro";
+import { buildMetaDescription, buildMetaTitle, SEO_KEYWORD } from "@/lib/seo";
+import { SITE } from "@/lib/config";
+
+const metaTitle = buildMetaTitle(SEO_KEYWORD, "Buscador interno");
+const metaDescription = buildMetaDescription(
+  "Busca artículos y proyectos sobre rendimiento web, Astro y UX con resultados en tiempo real.",
+  "Encuentra rápido el contenido más relevante."
+);
+const canonical = new URL("/search/", SITE.url).href;
+const pageImage = SITE.ogImage ?? "/og-default.png";
+const pageImageAbs = pageImage.startsWith("http")
+  ? pageImage
+  : new URL(pageImage, SITE.url).href;
+const organizationId = `${SITE.url}#organization`;
+const searchJsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": canonical,
+      "name": "Buscador",
+      "description": metaDescription,
+      "url": canonical,
+      "image": pageImageAbs,
+      "inLanguage": SITE.lang ?? "es",
+      "isPartOf": { "@id": SITE.url },
+      "publisher": { "@id": organizationId },
+    },
+  ],
+};
+---
+
+<BaseLayout title="Buscador" metaTitle={metaTitle} description={metaDescription}>
+  <section class="section section--blog">
+    <header class="section__header">
+      <h1 class="h1 section__title section__title--page">Buscador</h1>
+      <p class="lead">
+        Encuentra artículos y proyectos del portfolio usando un buscador rápido y accesible.
+      </p>
+    </header>
+
+    <form class="site-search" role="search" aria-label="Buscar en el sitio" data-search-form>
+      <div class="site-search__field">
+        <label class="site-search__label" for="site-search-input">
+          Buscar contenido
+        </label>
+        <Input
+          id="site-search-input"
+          class="site-search__input"
+          type="search"
+          name="q"
+          placeholder="Busca por título, descripción o etiqueta…"
+          autocomplete="off"
+          data-search-input
+          aria-describedby="site-search-hint"
+          aria-controls="site-search-results"
+          aria-autocomplete="list"
+          aria-expanded="false"
+        />
+      </div>
+      <p class="site-search__hint" id="site-search-hint">
+        Se buscará en artículos y proyectos. Empieza a escribir (mínimo 2 caracteres).
+      </p>
+    </form>
+
+    <p class="site-search__status" aria-live="polite" data-search-status>
+      Introduce una búsqueda para ver resultados.
+    </p>
+
+    <div class="site-search__panel" data-search-panel hidden>
+      <ul
+        class="site-search__results"
+        id="site-search-results"
+        role="listbox"
+        aria-label="Resultados de búsqueda"
+        data-search-results
+      ></ul>
+    </div>
+  </section>
+
+  <script type="application/ld+json" set:html={JSON.stringify(searchJsonLd, null, 2)} />
+
+  <script type="module">
+    (() => {
+      const form = document.querySelector('[data-search-form]');
+      const input = document.querySelector('[data-search-input]');
+      const panel = document.querySelector('[data-search-panel]');
+      const results = document.querySelector('[data-search-results]');
+      const status = document.querySelector('[data-search-status]');
+
+      if (!form || !input || !results || !panel || !status) {
+        return;
+      }
+
+      const MIN_QUERY = 2;
+      const MAX_RESULTS = 8;
+      let index = null;
+      let documents = [];
+      let tokenEntries = [];
+      let loading = false;
+
+      const normalize = (value) =>
+        (value || "")
+          .toString()
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/\p{Diacritic}/gu, "")
+          .replace(/[^a-z0-9]+/g, " ")
+          .trim();
+
+      const tokenize = (value) =>
+        normalize(value)
+          .split(" ")
+          .map((token) => token.trim())
+          .filter((token) => token.length > 1);
+
+      const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+      const setExpanded = (expanded) => {
+        input.setAttribute("aria-expanded", expanded ? "true" : "false");
+        panel.hidden = !expanded;
+      };
+
+      const clearResults = () => {
+        results.innerHTML = "";
+        setExpanded(false);
+      };
+
+      const renderHighlightedText = (container, text, tokens) => {
+        container.textContent = "";
+        if (!text) return;
+        if (!tokens.length) {
+          container.textContent = text;
+          return;
+        }
+
+        const regex = new RegExp(`(${tokens.map(escapeRegExp).join("|")})`, "gi");
+        let lastIndex = 0;
+        for (const match of text.matchAll(regex)) {
+          const start = match.index ?? 0;
+          const end = start + match[0].length;
+          if (start > lastIndex) {
+            container.append(text.slice(lastIndex, start));
+          }
+          const mark = document.createElement("mark");
+          mark.className = "site-search__highlight";
+          mark.textContent = text.slice(start, end);
+          container.append(mark);
+          lastIndex = end;
+        }
+        if (lastIndex < text.length) {
+          container.append(text.slice(lastIndex));
+        }
+      };
+
+      const renderResults = (items, queryTokens) => {
+        results.innerHTML = "";
+
+        if (!items.length) {
+          const empty = document.createElement("p");
+          empty.className = "site-search__empty";
+          empty.textContent = "No se han encontrado resultados para esta búsqueda.";
+          results.appendChild(empty);
+          status.textContent = "Sin resultados para la búsqueda actual.";
+          setExpanded(true);
+          return;
+        }
+
+        const frag = document.createDocumentFragment();
+
+        items.forEach((item) => {
+          const li = document.createElement("li");
+          li.className = "site-search__item";
+          li.setAttribute("role", "option");
+
+          const link = document.createElement("a");
+          link.className = "site-search__link";
+          link.href = item.url;
+          link.setAttribute(
+            "aria-label",
+            `${item.type === "post" ? "Artículo" : "Proyecto"}: ${item.title}`
+          );
+
+          const meta = document.createElement("div");
+          meta.className = "site-search__meta";
+
+          const type = document.createElement("span");
+          type.className = "site-search__type";
+          type.textContent = item.type === "post" ? "Blog" : "Proyecto";
+          meta.appendChild(type);
+
+          if (item.tags.length) {
+            const tags = document.createElement("span");
+            tags.className = "site-search__tags";
+            tags.textContent = item.tags.slice(0, 3).map((tag) => `#${tag}`).join(" ");
+            meta.appendChild(tags);
+          }
+
+          const title = document.createElement("h3");
+          title.className = "site-search__title";
+          renderHighlightedText(title, item.title, queryTokens);
+
+          link.appendChild(meta);
+          link.appendChild(title);
+
+          if (item.description) {
+            const desc = document.createElement("p");
+            desc.className = "site-search__description";
+            renderHighlightedText(desc, item.description, queryTokens);
+            link.appendChild(desc);
+          }
+
+          li.appendChild(link);
+          frag.appendChild(li);
+        });
+
+        results.appendChild(frag);
+        status.textContent =
+          items.length === 1
+            ? "1 resultado encontrado."
+            : `${items.length} resultados encontrados.`;
+        setExpanded(true);
+      };
+
+      const scoreMatches = (queryTokens) => {
+        const scores = new Map();
+
+        queryTokens.forEach((token) => {
+          tokenEntries.forEach(([entryToken, matches]) => {
+            if (!entryToken.startsWith(token)) return;
+            matches.forEach(([docId, weight]) => {
+              scores.set(docId, (scores.get(docId) ?? 0) + weight);
+            });
+          });
+        });
+
+        return Array.from(scores.entries())
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, MAX_RESULTS)
+          .map(([docId]) => documents.find((doc) => doc.id === docId))
+          .filter(Boolean);
+      };
+
+      async function loadIndex() {
+        if (index || loading) return;
+        loading = true;
+        try {
+          const res = await fetch("/search.json");
+          if (!res.ok) throw new Error("Error al cargar el índice");
+          const data = await res.json();
+          index = data.index || {};
+          documents = Array.isArray(data.documents) ? data.documents : [];
+          tokenEntries = Object.entries(index);
+        } catch (err) {
+          console.error("[Search] No se pudo cargar el índice", err);
+          index = {};
+          documents = [];
+          tokenEntries = [];
+        } finally {
+          loading = false;
+        }
+      }
+
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+      });
+
+      let debounceId = 0;
+
+      input.addEventListener("input", () => {
+        window.clearTimeout(debounceId);
+        debounceId = window.setTimeout(async () => {
+          const query = input.value || "";
+          const tokens = tokenize(query);
+
+          if (tokens.length < 1 || query.trim().length < MIN_QUERY) {
+            status.textContent = "Introduce una búsqueda para ver resultados.";
+            clearResults();
+            return;
+          }
+
+          await loadIndex();
+          const matches = scoreMatches(tokens);
+          renderResults(matches, tokens);
+        }, 120);
+      });
+
+      input.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          input.value = "";
+          status.textContent = "Introduce una búsqueda para ver resultados.";
+          clearResults();
+        }
+      });
+    })();
+  </script>
+</BaseLayout>

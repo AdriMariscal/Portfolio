@@ -1,0 +1,99 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Alert from "../components/ui/Alert.astro";
+import Badge from "../components/ui/Badge.astro";
+import Button from "../components/ui/Button.astro";
+import Card from "../components/ui/Card.astro";
+import Input from "../components/ui/Input.astro";
+import { buildMetaDescription, buildMetaTitle, SEO_KEYWORD } from "../lib/seo";
+
+const metaTitle = buildMetaTitle(SEO_KEYWORD, "UI Kit y sistema de diseño");
+const metaDescription = buildMetaDescription(
+  "Biblioteca de componentes del sistema UI para sitios rápidos, accesibles y consistentes.",
+  "Explora patrones y aplica la guía hoy."
+);
+---
+
+<BaseLayout title="UI Kit" metaTitle={metaTitle} description={metaDescription}>
+  <section class="section">
+    <div class="wrap stack" style="--stack-gap: 28px;">
+      <header class="stack" style="--stack-gap: 8px;">
+        <h1 class="h2 section__title section__title--page">UI Kit</h1>
+        <p class="lead">
+          Componentes base para mantener consistencia visual y cumplir la guía de marca.
+        </p>
+      </header>
+
+      <Card class="stack" style="--stack-gap: 16px;">
+        <div class="card__body stack" style="--stack-gap: 12px;">
+          <h2 class="h3">Botones</h2>
+          <p class="muted">
+            Variantes: <strong>Primary</strong> (acción principal), <strong>Secondary</strong>
+            (acción secundaria) y <strong>Tertiary</strong> (acción discreta o de texto).
+          </p>
+          <div class="grid" style="grid-auto-flow: column; gap: 12px; width: max-content;">
+            <Button variant="primary">Primary</Button>
+            <Button variant="secondary">Secondary</Button>
+            <Button variant="tertiary">Tertiary</Button>
+          </div>
+          <div class="grid" style="grid-auto-flow: column; gap: 12px; width: max-content;">
+            <Button variant="primary" disabled>Disabled</Button>
+            <Button variant="secondary" size="sm">Small</Button>
+            <Button variant="tertiary" aria-disabled="true">Aria disabled</Button>
+          </div>
+        </div>
+      </Card>
+
+      <Card class="stack" style="--stack-gap: 16px;">
+        <div class="card__body stack" style="--stack-gap: 12px;">
+          <h2 class="h3">Inputs</h2>
+          <p class="muted">Altura 44px, radio 12–16px y focus ring Teal.</p>
+          <div class="stack" style="--stack-gap: 12px;">
+            <Input type="text" placeholder="Input normal" />
+            <Input type="text" placeholder="Input deshabilitado" disabled />
+            <Input as="textarea" rows="4" placeholder="Textarea" />
+          </div>
+        </div>
+      </Card>
+
+      <Card class="stack" style="--stack-gap: 16px;">
+        <div class="card__body stack" style="--stack-gap: 12px;">
+          <h2 class="h3">Cards & Badges</h2>
+          <div class="stack" style="--stack-gap: 12px;">
+            <Card variant="soft">
+              <div class="card__body stack" style="--stack-gap: 8px;">
+                <h3 class="card__title">Card Soft</h3>
+                <p class="muted">Usa este estilo para secciones destacadas.</p>
+                <div class="grid" style="grid-auto-flow: column; gap: 8px; width: max-content;">
+                  <Badge>Default</Badge>
+                  <Badge variant="active">Active</Badge>
+                  <Badge variant="inactive">Inactive</Badge>
+                </div>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </Card>
+
+      <Card class="stack" style="--stack-gap: 16px;">
+        <div class="card__body stack" style="--stack-gap: 12px;">
+          <h2 class="h3">Alerts</h2>
+          <div class="stack" style="--stack-gap: 12px;">
+            <Alert variant="info" title="Información">
+              Mensaje neutro para comunicar contexto.
+            </Alert>
+            <Alert variant="success" title="Éxito">
+              Confirmación de una acción correcta.
+            </Alert>
+            <Alert variant="warning" title="Aviso">
+              Estado que requiere atención antes de continuar.
+            </Alert>
+            <Alert variant="error" title="Error">
+              Algo salió mal y necesita corrección.
+            </Alert>
+          </div>
+        </div>
+      </Card>
+    </div>
+  </section>
+</BaseLayout>

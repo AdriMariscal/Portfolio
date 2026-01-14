@@ -2,14 +2,22 @@
 // src/pages/legal/privacidad.astro
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { SITE_OWNER } from "../../config/siteOwner";
+import Card from "../../components/ui/Card.astro";
+import { buildMetaDescription, buildMetaTitle, SEO_KEYWORD } from "../../lib/seo";
 
 const updated = "01/11/2025";
+
+const metaTitle = buildMetaTitle(SEO_KEYWORD, "Política de privacidad");
+const metaDescription = buildMetaDescription(
+  "Resumen transparente del tratamiento de datos personales y seguridad del sitio.",
+  "Revisa la política y contacta si necesitas ayuda."
+);
 ---
 
-<BaseLayout title="Privacidad" description="Política de privacidad y protección de datos personales (RGPD/LOPDGDD).">
+<BaseLayout title="Privacidad" metaTitle={metaTitle} description={metaDescription}>
   <section class="section section--legal">
     <div class="wrap">
-      <article class="card card--soft legal__card">
+      <Card as="article" variant="soft" class="legal__card">
         <div class="legal__body prose">
           <header class="legal__header">
             <h1>Privacidad</h1>
@@ -86,7 +94,7 @@ const updated = "01/11/2025";
           <p>No se realizan decisiones automatizadas ni se elaboran perfiles con efectos jurídicos o significativos.</p>
 
           <h2>10. Cookies y tecnologías similares</h2>
-          <p>Este sitio utiliza las cookies estrictamente necesarias para su funcionamiento y, en su caso, otras con finalidades adicionales. Tienes toda la información y tus opciones de configuración en la <a href="/legal/cookies">Política de Cookies</a>.</p>
+          <p>Este sitio utiliza las cookies estrictamente necesarias para su funcionamiento y, si aceptas la analítica, envía métricas de rendimiento agregadas (LCP, INP, CLS) a un endpoint propio. Tienes toda la información y tus opciones de configuración en la <a href="/legal/cookies">Política de Cookies</a>.</p>
 
           <h2>11. Cambios en la política</h2>
           <p>La presente política podrá actualizarse para reflejar cambios normativos o del servicio. Si la modificación fuera sustancial, se procurará su comunicación destacada.</p>
@@ -98,7 +106,7 @@ const updated = "01/11/2025";
             {" "}o escribir a la dirección indicada en el apartado 1.
           </p>
         </div>
-      </article>
+      </Card>
     </div>
   </section>
 </BaseLayout>

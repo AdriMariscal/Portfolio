@@ -22,14 +22,39 @@ jobs:
         with:
           node-version: 20
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
       - name: Instalar dependencias
-        run: npm install
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Ejecutar npm audit (alto/critico)
+        run: pnpm audit --audit-level=high
+
+      - name: Ejecutar lint
+        run: pnpm run lint
+
+      - name: Ejecutar typecheck
+        run: pnpm run typecheck
+
+      - name: Ejecutar tests unitarios con cobertura
+        run: pnpm run test:unit:coverage
+
+      - name: Subir reporte de cobertura
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vitest-coverage
+          path: coverage/
+          if-no-files-found: ignore
 
       - name: Instalar navegadores Playwright
         run: npx playwright install --with-deps
 
       - name: Ejecutar tests E2E
-        run: npm run test:e2e
+        run: pnpm run test:e2e
 
       - name: Subir artefactos de Playwright (resultados y capturas)
         if: always()
@@ -55,14 +80,29 @@ jobs:
         with:
           node-version: 20
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
       - name: Instalar dependencias
-        run: npm install
+        run: pnpm install --no-frozen-lockfile
 
       - name: Build de Astro
-        run: npm run build
+        run: pnpm run build
 
       - name: Instalar Lighthouse CI (CLI)
         run: npm install -g @lhci/cli@0.15.x
 
       - name: Ejecutar Lighthouse CI
+        id: lhci
+        continue-on-error: true
         run: lhci autorun
+
+      - name: Generar resumen de Lighthouse
+        if: always()
+        run: node scripts/lhci-summary.mjs
+
+      - name: Fallar si Lighthouse CI incumple presupuestos
+        if: steps.lhci.outcome == 'failure'
+        run: exit 1

@@ -1,16 +1,40 @@
 ---
 // src/pages/projects/[slug].astro
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import { getCollection, getEntry } from "astro:content";
+import { getCollection } from "astro:content";
+import Badge from "@/components/ui/Badge.astro";
+import Button from "@/components/ui/Button.astro";
+import Card from "@/components/ui/Card.astro";
+import { SITE } from "@/lib/config";
+import {
+  buildHeadingTitle,
+  buildMetaDescription,
+  buildMetaTitle,
+  SEO_KEYWORD
+} from "@/lib/seo";
 
 export async function getStaticPaths() {
   const entries = await getCollection("projects", ({ data }) => data.published !== false);
-  return entries.map(({ slug }) => ({ params: { slug } }));
+  return entries.map((entry) => ({
+    params: { slug: entry.slug },
+    props: {
+      project: entry,
+      metaTitle: buildMetaTitle(SEO_KEYWORD, entry.data.title ?? SITE.title),
+      metaDescription: buildMetaDescription(
+        entry.data.description ?? SITE.description,
+        "Descubre el proyecto y pide una auditoría."
+      ),
+      headingTitle: buildHeadingTitle(entry.data.title ?? SITE.title)
+    }
+  }));
 }
 
-const { slug } = Astro.params;
-const project = await getEntry("projects", slug);
-if (!project) throw new Error(`Proyecto no encontrado: ${slug}`);
+const { project, metaTitle, metaDescription, headingTitle } = Astro.props as {
+  project: Awaited<ReturnType<typeof getCollection>>[number];
+  metaTitle: string;
+  metaDescription: string;
+  headingTitle: string;
+};
 
 const { Content } = await project.render();
 const data: any = project.data;
@@ -50,20 +74,79 @@ type Release = { version?: string; date?: string; changes?: Change[] };
 const changelog: Release[] = Array.isArray(data.changelog) ? data.changelog : [];
 const latest = changelog.length ? changelog[0] : undefined;
 const latestDate = latest?.date ? fmtDate(latest.date) : undefined;
+
+const canonical = Astro.url?.href ?? new URL(`/projects/${project.slug}/`, SITE.url).href;
+const rawImage = data.image ?? data.ogImage ?? SITE.ogImage ?? "/og-default.png";
+const imageAbs = rawImage.startsWith("http")
+  ? rawImage
+  : new URL(rawImage, SITE.url).href;
+const organizationId = `${SITE.url}#organization`;
+const personId = `${SITE.url}#persona`;
+const toISO = (d: unknown) => {
+  if (!d) return undefined;
+  const dt = d instanceof Date ? d : new Date(String(d));
+  const t = dt.getTime();
+  return Number.isFinite(t) ? dt.toISOString() : undefined;
+};
+const datePublishedISO = toISO(data.date ?? null);
+const projectJsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "CreativeWork",
+      "@id": canonical,
+      "name": title,
+      "description": metaDescription,
+      "url": canonical,
+      "image": imageAbs,
+      "inLanguage": SITE.lang ?? "es",
+      "author": { "@id": personId },
+      "publisher": { "@id": organizationId },
+      ...(datePublishedISO ? { "datePublished": datePublishedISO } : {}),
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Inicio",
+          "item": SITE.url,
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Proyectos",
+          "item": new URL("/projects/", SITE.url).href,
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": title,
+          "item": canonical,
+        },
+      ],
+    },
+  ],
+};
 ---
 
-<BaseLayout title={title} description={undefined}>
+<BaseLayout
+  title={title}
+  metaTitle={metaTitle}
+  description={metaDescription}
+>
   <article class="section post project-detail">
     <!-- margen inferior ajustado a 24px -->
-    <div class="wrap post__card card card--soft">
+    <Card as="div" variant="soft" class="wrap post__card">
       <div class="post__body">
-          <h1 class="post__title">{title}</h1>
+          <h1 class="post__title">{headingTitle}</h1>
 
         <p class="post__date project-detail__meta">
           <strong class="project-detail__meta-label">Estado:</strong>{" "}
-          <span class={`badge ${isActive ? "badge--active" : "badge--inactive"}`}>
+          <Badge variant={isActive ? "active" : "inactive"}>
             {isActive ? "Activo" : "Inactivo"}
-          </span>
+          </Badge>
           {latest?.version && (
             <>
               {" · "}<strong>Última versión:</strong> {latest.version}
@@ -75,19 +158,19 @@ const latestDate = latest?.date ? fmtDate(latest.date) : undefined;
           {(projectUrl || repoUrl || demoUrl) && (
           <div class="post__actions">
           {projectUrl && (
-              <a class="btn btn--secondary btn--sm" href={projectUrl} target="_blank" rel="noopener noreferrer">
+              <Button href={projectUrl} variant="secondary" size="sm" target="_blank" rel="noopener noreferrer">
                 Ver proyecto →
-            </a>
+              </Button>
             )}
             {repoUrl && (
-              <a class="btn btn--secondary btn--sm" href={repoUrl} target="_blank" rel="noopener noreferrer">
+              <Button href={repoUrl} variant="secondary" size="sm" target="_blank" rel="noopener noreferrer">
                 Ver código
-              </a>
+              </Button>
             )}
             {demoUrl && (
-              <a class="btn btn--secondary btn--sm" href={demoUrl} target="_blank" rel="noopener noreferrer">
+              <Button href={demoUrl} variant="secondary" size="sm" target="_blank" rel="noopener noreferrer">
                 Ver demo
-              </a>
+              </Button>
           )}
           </div>
           )}
@@ -108,7 +191,7 @@ const latestDate = latest?.date ? fmtDate(latest.date) : undefined;
           </footer>
         ) : null}
       </div>
-    </div>
+    </Card>
   </article>
 
   {/* Changelog con sección compacta y respiración inferior */}
@@ -120,7 +203,7 @@ const latestDate = latest?.date ? fmtDate(latest.date) : undefined;
             {changelog.map((rel, i) => {
             const d = fmtDate(rel?.date);
               return (
-              <article class="card card--soft" style={i > 0 ? "margin-top: 1rem" : undefined}>
+              <Card as="article" variant="soft" style={i > 0 ? "margin-top: 1rem" : undefined}>
                   <div class="card__body">
                     <h3 class="h4" style="margin:0 0 .5rem">
                     {rel?.version}{d && ` (${d})`}
@@ -136,10 +219,15 @@ const latestDate = latest?.date ? fmtDate(latest.date) : undefined;
               </ul>
                   ) : null}
                   </div>
-                </article>
+                </Card>
               );
             })}
           </div>
     </article>
   ) : null}
+
+  <script
+    type="application/ld+json"
+    set:html={JSON.stringify(projectJsonLd, null, 2)}
+  />
 </BaseLayout>

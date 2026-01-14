@@ -1,0 +1,14 @@
+---
+const {
+  variant = "default",
+  class: className = "",
+  ...rest
+} = Astro.props;
+
+const variantClass = variant !== "default" ? `badge--${variant}` : "";
+const classes = ["badge", variantClass, className].filter(Boolean).join(" ");
+---
+
+<span class={classes} {...rest}>
+  <slot />
+</span>

@@ -2,6 +2,15 @@
   command = "npm run build"
   publish = "dist"
 
+[build.environment]
+  PNPM_FLAGS = "--no-frozen-lockfile"
+
+[[plugins]]
+  package = "@netlify/plugin-lighthouse"
+  [plugins.inputs]
+    output_path = "reports/lighthouse"
+    thresholds = { performance = 0.9, accessibility = 0.9, seo = 0.9 }
+
 [[edge_functions]]
   path = "/*"
   function = "basic-auth"
@@ -9,11 +18,145 @@
 [context.production.environment]
   ENVIRONMENT = "production"
 
+[context.dev.environment]
+  ENVIRONMENT = "development"
+
 [context."branch:staging".environment]
   ENVIRONMENT = "staging"
+  STAGING_USER = "CHANGE_ME"
+  STAGING_PASS = "CHANGE_ME"
+
+[context.deploy-preview]
+  command = "npm run build"
+  publish = "dist"
+
+[[redirects]]
+  from = "https://www.adrianmariscal.es/*"
+  to = "https://adrianmariscal.es/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://adrianmariscal.com/*"
+  to = "https://adrianmariscal.es/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://www.adrianmariscal.com/*"
+  to = "https://adrianmariscal.es/:splat"
+  status = 301
+  force = true
 
 [[redirects]]
   from = "/blog/page/:splat"
   to = "/blog/pages/:splat"
   status = 301
   force = true
+
+[[redirects]]
+  from = "/es/*"
+  to = "/es/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/en/*"
+  to = "/en/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/v/*"
+  to = "/v/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/404.html"
+  status = 404
+
+[[headers]]
+  for = "/admin/*"
+  [headers.values]
+    Content-Security-Policy = "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://identity.netlify.com; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: https:; connect-src 'self' https://identity.netlify.com https://api.netlify.com; frame-src https://identity.netlify.com; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline' https://js.hcaptcha.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https://ingester.services-prod.nsvcs.net https://ingester.services-prod.nsvcs.net/rum_collection https://hcaptcha.com https://api.hcaptcha.com; frame-src https://hcaptcha.com https://js.hcaptcha.com https://*.hcaptcha.com; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests"
+    Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()"
+    Link = "<https://fonts.googleapis.com>; rel=preconnect, <https://fonts.gstatic.com>; rel=preconnect; crossorigin, <https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap>; rel=preload; as=style"
+
+[[headers]]
+  for = "/_astro/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/images/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "/fonts/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.woff2"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.woff"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.png"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "/*.jpg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "/*.jpeg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "/*.webp"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "/*.avif"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "/*.svg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[build.processing]
+  skip_processing = false
+
+[build.processing.images]
+  compress = true

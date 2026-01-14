@@ -3,6 +3,8 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import ProjectCard from "../../components/ProjectCard.astro";
 import { getCollection } from "astro:content";
+import { buildMetaDescription, buildMetaTitle, SEO_KEYWORD } from "../../lib/seo";
+import { SITE } from "../../lib/config";
 
 // Traemos todos los proyectos
 const all = await getCollection("projects");
@@ -23,12 +25,54 @@ active.sort(byOrderThenTitle);
 inactive.sort(byOrderThenTitle);
 
 // SEO
-const pageTitle = "Proyectos · Adrián Mariscal";
-const pageDescription =
-  "Proyectos propios y micro-productos. Marca “active” indica los que están en marcha ahora mismo.";
+const pageTitle = "Proyectos";
+const metaTitle = buildMetaTitle(SEO_KEYWORD, "Proyectos y casos reales");
+const pageDescription = buildMetaDescription(
+  "Proyectos propios enfocados en rendimiento web, SEO técnico y UX con resultados medibles.",
+  "Explora los casos y solicita una auditoría."
+);
+const canonical = new URL("/projects/", SITE.url).href;
+const pageImage = SITE.ogImage ?? "/og-default.png";
+const pageImageAbs = pageImage.startsWith("http")
+  ? pageImage
+  : new URL(pageImage, SITE.url).href;
+const organizationId = `${SITE.url}#organization`;
+const projectsJsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "CollectionPage",
+      "@id": canonical,
+      "name": "Proyectos",
+      "description": pageDescription,
+      "url": canonical,
+      "image": pageImageAbs,
+      "inLanguage": SITE.lang ?? "es",
+      "isPartOf": { "@id": SITE.url },
+      "publisher": { "@id": organizationId },
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Inicio",
+          "item": SITE.url,
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Proyectos",
+          "item": canonical,
+        },
+      ],
+    },
+  ],
+};
 ---
 
-<BaseLayout title={pageTitle} description={pageDescription}>
+<BaseLayout title={pageTitle} metaTitle={metaTitle} description={pageDescription}>
   <!-- Cabecera de página -->
   <section class="section hero section--projects-hero">
     <div class="wrap projects-header">
@@ -64,4 +108,9 @@ const pageDescription =
       </div>
     </section>
   )}
+
+  <script
+    type="application/ld+json"
+    set:html={JSON.stringify(projectsJsonLd, null, 2)}
+  />
 </BaseLayout>
