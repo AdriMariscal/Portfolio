@@ -38,7 +38,7 @@ export default defineConfig({
   integrations: [
     mdx(),
     sitemap({
-      filter: (page) => !page.pathname.startsWith('/staging/'),
+      filter: (page) => !page.pathname?.startsWith('/staging/'),
     }),
   ],
 
