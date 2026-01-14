@@ -286,9 +286,23 @@ strong{color:var(--color-heading)}
 }
 
 .nav__link{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
   padding:8px 10px;
   border-radius:10px;
   color:var(--color-text-muted);
+}
+
+.nav__icon{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--color-text-muted);
+}
+
+.nav__link[aria-current="true"] .nav__icon{
+  color:var(--color-heading);
 }
 
 .nav__link[aria-current="true"]{
@@ -443,6 +457,24 @@ strong{color:var(--color-heading)}
 }
 .hero__lead{color:var(--color-text-muted)}
 .hero__stats .card__title{font-size:1.4rem}
+.hero__stat-label{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  color:var(--color-text-muted);
+}
+
+.hero__stat-icon{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--color-text-muted);
+}
+
+.hero__stat-icon svg{
+  width:18px;
+  height:18px;
+}
 
 /* ==========================================================================
    Botones
@@ -1846,7 +1878,6 @@ strong{color:var(--color-heading)}
 
 /* Icono/emoji con fondo suave */
 .error-card__icon{
-  font-size:2.5rem;
   width:72px;
   height:72px;
   display:inline-flex;
@@ -1856,6 +1887,11 @@ strong{color:var(--color-heading)}
   background:var(--color-accent-soft);
   border:1px solid var(--color-accent-border);
   margin:4px auto 12px;
+}
+
+.error-card__icon svg{
+  width:28px;
+  height:28px;
 }
 
 /* Título grande con la display font */
