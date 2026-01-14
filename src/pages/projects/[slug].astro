@@ -74,6 +74,61 @@ type Release = { version?: string; date?: string; changes?: Change[] };
 const changelog: Release[] = Array.isArray(data.changelog) ? data.changelog : [];
 const latest = changelog.length ? changelog[0] : undefined;
 const latestDate = latest?.date ? fmtDate(latest.date) : undefined;
+
+const canonical = Astro.url?.href ?? new URL(`/projects/${project.slug}/`, SITE.url).href;
+const rawImage = data.image ?? data.ogImage ?? SITE.ogImage ?? "/og-default.png";
+const imageAbs = rawImage.startsWith("http")
+  ? rawImage
+  : new URL(rawImage, SITE.url).href;
+const organizationId = `${SITE.url}#organization`;
+const personId = `${SITE.url}#persona`;
+const toISO = (d: unknown) => {
+  if (!d) return undefined;
+  const dt = d instanceof Date ? d : new Date(String(d));
+  const t = dt.getTime();
+  return Number.isFinite(t) ? dt.toISOString() : undefined;
+};
+const datePublishedISO = toISO(data.date ?? null);
+const projectJsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "CreativeWork",
+      "@id": canonical,
+      "name": title,
+      "description": metaDescription,
+      "url": canonical,
+      "image": imageAbs,
+      "inLanguage": SITE.lang ?? "es",
+      "author": { "@id": personId },
+      "publisher": { "@id": organizationId },
+      ...(datePublishedISO ? { "datePublished": datePublishedISO } : {}),
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Inicio",
+          "item": SITE.url,
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Proyectos",
+          "item": new URL("/projects/", SITE.url).href,
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": title,
+          "item": canonical,
+        },
+      ],
+    },
+  ],
+};
 ---
 
 <BaseLayout
@@ -170,4 +225,9 @@ const latestDate = latest?.date ? fmtDate(latest.date) : undefined;
           </div>
     </article>
   ) : null}
+
+  <script
+    type="application/ld+json"
+    set:html={JSON.stringify(projectJsonLd, null, 2)}
+  />
 </BaseLayout>
