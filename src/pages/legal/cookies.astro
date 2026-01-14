@@ -43,10 +43,11 @@ const metaDescription = buildMetaDescription(
 
       <h2>2. Qué cookies utiliza este sitio</h2>
       <p>
-        Actualmente este sitio <strong>no utiliza cookies no esenciales</strong> (p. ej., analíticas o publicitarias).
-        Únicamente se emplean, en su caso, <strong>cookies propias, de sesión y con
-        finalidad técnica</strong> (por ejemplo, las estrictamente necesarias para que
-        el formulario de contacto funcione o para la seguridad básica).
+        Actualmente este sitio <strong>no instala cookies analíticas de terceros</strong>.
+        Sí utiliza <strong>almacenamiento local</strong> para recordar tu consentimiento y,
+        si aceptas analítica, enviar métricas de rendimiento (LCP, INP, CLS) a un
+        endpoint propio de medición. No se activan métricas ni envío de datos si
+        rechazas las cookies analíticas.
       </p>
 
       <div class="note">
@@ -71,11 +72,18 @@ const metaDescription = buildMetaDescription(
           </thead>
           <tbody>
             <tr>
-              <td>(sin cookies no esenciales)</td>
-              <td>—</td>
-              <td>—</td>
-              <td>—</td>
-              <td>—</td>
+              <td>am-cookie-consent-v1</td>
+              <td>localStorage</td>
+              <td>Guardar tu preferencia de cookies</td>
+              <td>Propia</td>
+              <td>Persistente (hasta que se borre)</td>
+            </tr>
+            <tr>
+              <td>am-rum-metrics-v1</td>
+              <td>localStorage</td>
+              <td>Histórico técnico de métricas RUM (LCP/INP/CLS)</td>
+              <td>Propia</td>
+              <td>Persistente (hasta que se borre)</td>
             </tr>
           </tbody>
         </table>

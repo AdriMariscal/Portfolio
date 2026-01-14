@@ -1,0 +1,192 @@
+---
+// src/pages/metrics/rum.astro
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Card from "../../components/ui/Card.astro";
+import { buildMetaDescription, buildMetaTitle, SEO_KEYWORD } from "../../lib/seo";
+
+const metaTitle = buildMetaTitle(SEO_KEYWORD, "Panel de métricas RUM");
+const metaDescription = buildMetaDescription(
+  "Panel interno para visualizar tendencias de Core Web Vitals tras el consentimiento.",
+  "Incluye LCP, INP y CLS agregados."
+);
+---
+
+<BaseLayout title="Métricas RUM" metaTitle={metaTitle} description={metaDescription}>
+  <section class="section section--metrics">
+    <div class="wrap">
+      <header class="section__header">
+        <p class="eyebrow">RUM · Core Web Vitals</p>
+        <h1>Panel interno de métricas</h1>
+        <p class="muted">
+          Este panel resume LCP, INP y CLS de usuarios reales cuando aceptan
+          cookies de analítica. Si no hay consentimiento, no se envían datos.
+        </p>
+      </header>
+
+      <Card as="section" variant="soft" class="metrics-card">
+        <div class="metrics-card__header">
+          <div>
+            <h2 class="metrics-card__title">Tendencia por día</h2>
+            <p class="muted metrics-card__subtitle">
+              Los valores se muestran como media y P75 (percentil 75) por día.
+            </p>
+          </div>
+          <span class="badge badge--inactive" data-rum-updated>Sin datos</span>
+        </div>
+
+        <div class="metrics-card__body" data-rum-state="loading">
+          <p class="muted">Cargando métricas…</p>
+        </div>
+      </Card>
+    </div>
+  </section>
+
+  <script>
+    const endpoint = "/.netlify/functions/rum-metrics";
+    const localKey = "am-rum-metrics-v1";
+    const stateEl = document.querySelector("[data-rum-state]");
+    const updatedEl = document.querySelector("[data-rum-updated]");
+
+    const formatMetric = (value, name) => {
+      if (value === null || typeof value === "undefined") return "—";
+      if (name === "CLS") return value.toFixed(3);
+      return `${Math.round(value)} ms`;
+    };
+
+    const percentile = (values, p) => {
+      if (!values.length) return null;
+      const sorted = [...values].sort((a, b) => a - b);
+      const index = Math.min(sorted.length - 1, Math.floor((sorted.length - 1) * p));
+      return sorted[index];
+    };
+
+    const buildFromEntries = (entries = []) => {
+      const days = new Map();
+      entries.forEach((entry) => {
+        if (!entry?.ts || !entry?.name) return;
+        const date = new Date(entry.ts).toISOString().slice(0, 10);
+        if (!days.has(date)) {
+          days.set(date, {
+            LCP: { values: [], sum: 0, count: 0 },
+            INP: { values: [], sum: 0, count: 0 },
+            CLS: { values: [], sum: 0, count: 0 },
+          });
+        }
+        const bucket = days.get(date)?.[entry.name];
+        if (!bucket || typeof entry.value !== "number") return;
+        bucket.values.push(entry.value);
+        bucket.sum += entry.value;
+        bucket.count += 1;
+      });
+
+      return Array.from(days.entries())
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([date, metrics]) => ({
+          date,
+          metrics: {
+            LCP: {
+              count: metrics.LCP.count,
+              avg: metrics.LCP.count ? metrics.LCP.sum / metrics.LCP.count : null,
+              p75: percentile(metrics.LCP.values, 0.75),
+            },
+            INP: {
+              count: metrics.INP.count,
+              avg: metrics.INP.count ? metrics.INP.sum / metrics.INP.count : null,
+              p75: percentile(metrics.INP.values, 0.75),
+            },
+            CLS: {
+              count: metrics.CLS.count,
+              avg: metrics.CLS.count ? metrics.CLS.sum / metrics.CLS.count : null,
+              p75: percentile(metrics.CLS.values, 0.75),
+            },
+          },
+        }));
+    };
+
+    const renderTable = (days = []) => {
+      if (!days.length) {
+        stateEl.innerHTML =
+          '<p class="muted">Todavía no hay datos. Acepta cookies analíticas y navega por el sitio para generar métricas.</p>';
+        return;
+      }
+
+      const rows = days
+        .map((day) => {
+          const { LCP, INP, CLS } = day.metrics;
+          return `
+            <tr>
+              <td>${day.date}</td>
+              <td>${formatMetric(LCP.avg, "LCP")} · P75 ${formatMetric(LCP.p75, "LCP")}</td>
+              <td>${formatMetric(INP.avg, "INP")} · P75 ${formatMetric(INP.p75, "INP")}</td>
+              <td>${formatMetric(CLS.avg, "CLS")} · P75 ${formatMetric(CLS.p75, "CLS")}</td>
+              <td>${LCP.count + INP.count + CLS.count}</td>
+            </tr>
+          `;
+        })
+        .join("");
+
+      stateEl.innerHTML = `
+        <div class="table-scroll">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Día</th>
+                <th>LCP (ms)</th>
+                <th>INP (ms)</th>
+                <th>CLS</th>
+                <th>Muestras</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rows}
+            </tbody>
+          </table>
+        </div>
+      `;
+    };
+
+    const loadLocal = () => {
+      try {
+        const raw = window.localStorage.getItem(localKey);
+        if (!raw) return { updatedAt: null, days: [] };
+        const parsed = JSON.parse(raw);
+        if (!parsed || typeof parsed !== "object") return { updatedAt: null, days: [] };
+        return { updatedAt: parsed.updatedAt, days: buildFromEntries(parsed.entries) };
+      } catch {
+        return { updatedAt: null, days: [] };
+      }
+    };
+
+    const updateBadge = (updatedAt, sourceLabel) => {
+      if (!updatedEl) return;
+      if (!updatedAt) {
+        updatedEl.textContent = "Sin datos";
+        updatedEl.classList.remove("badge--active");
+        updatedEl.classList.add("badge--inactive");
+        return;
+      }
+      const date = new Date(updatedAt);
+      updatedEl.textContent = `Actualizado ${date.toLocaleString()} · ${sourceLabel}`;
+      updatedEl.classList.remove("badge--inactive");
+      updatedEl.classList.add("badge--active");
+    };
+
+    const loadMetrics = async () => {
+      try {
+        const response = await fetch(endpoint, { headers: { Accept: "application/json" } });
+        if (!response.ok) throw new Error("No response");
+        const data = await response.json();
+        renderTable(data.days);
+        updateBadge(data.updatedAt, data.source === "memory" ? "memoria" : "endpoint");
+      } catch {
+        const fallback = loadLocal();
+        renderTable(fallback.days);
+        updateBadge(fallback.updatedAt, "local");
+      }
+    };
+
+    if (stateEl) {
+      loadMetrics();
+    }
+  </script>
+</BaseLayout>

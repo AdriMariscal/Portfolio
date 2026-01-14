@@ -2046,3 +2046,39 @@ strong{color:var(--color-heading)}
 .error-card__links{
   margin:0;
 }
+
+/* ====== Panel de métricas RUM ====== */
+.section--metrics .section__header{
+  max-width:680px;
+}
+
+.metrics-card{
+  display:flex;
+  flex-direction:column;
+  gap:1.5rem;
+}
+
+.metrics-card__header{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:1rem;
+  flex-wrap:wrap;
+}
+
+.metrics-card__title{
+  font-family:var(--font-display);
+  font-size:clamp(1.3rem, 2vw, 1.6rem);
+  margin:0 0 0.35rem;
+  color:var(--color-heading);
+}
+
+.metrics-card__subtitle{
+  margin:0;
+}
+
+.metrics-card__body{
+  display:flex;
+  flex-direction:column;
+  gap:1rem;
+}
