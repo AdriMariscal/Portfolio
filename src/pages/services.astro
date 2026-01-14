@@ -1,0 +1,251 @@
+---
+// src/pages/services.astro
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Button from "../components/ui/Button.astro";
+import Card from "../components/ui/Card.astro";
+import { buildMetaDescription, buildMetaTitle, SEO_KEYWORD } from "../lib/seo";
+import { SITE } from "../lib/config";
+
+const pageTitle = "Servicios";
+const metaTitle = buildMetaTitle(SEO_KEYWORD, "Servicios · Auditoría y packs de mejora");
+const metaDescription = buildMetaDescription(
+  "Servicios de Adrián Mariscal: auditoría gratuita con informe base y opción de informe completo, además de packs de mejora enfocados en rendimiento web, SEO técnico y UX.",
+  "Solicita la auditoría gratuita y revisa los packs disponibles."
+);
+
+const canonical = new URL("/services/", SITE.url).href;
+const personId = `${SITE.url}#persona`;
+const organizationId = `${SITE.url}#organization`;
+const servicesJsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "CollectionPage",
+      "@id": canonical,
+      "name": "Servicios",
+      "description": metaDescription,
+      "url": canonical,
+      "inLanguage": SITE.lang ?? "es",
+      "isPartOf": { "@id": SITE.url },
+      "publisher": { "@id": organizationId }
+    },
+    {
+      "@type": "Service",
+      "name": "Auditoría de rendimiento web",
+      "description":
+        "Auditoría gratuita con informe base y opción de informe completo para definir un plan priorizado P0/P1/P2.",
+      "provider": { "@id": personId },
+      "areaServed": "ES",
+      "serviceType": "Web Performance, SEO técnico y UX"
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Inicio",
+          "item": SITE.url
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Servicios",
+          "item": canonical
+        }
+      ]
+    }
+  ]
+};
+---
+
+<BaseLayout title={pageTitle} metaTitle={metaTitle} description={metaDescription}>
+  <section class="section hero section--services-hero">
+    <div class="wrap services-hero">
+      <div class="stack" style="--stack-gap: 16px;">
+        <p class="services-hero__kicker">Performance-first · SEO técnico · UX</p>
+        <h1 class="services-hero__title">Servicios</h1>
+        <p class="services-hero__lead">
+          Una auditoría clara es la puerta de entrada. El objetivo: entender dónde estás, qué
+          impacto tiene cada mejora y cuál es el plan más eficiente para tu web.
+        </p>
+        <div class="services-hero__actions">
+          <Button href="/contact" variant="primary">Solicitar auditoría gratuita</Button>
+          <Button href="#packs" variant="secondary">Ver packs de mejora</Button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--services-core">
+    <div class="wrap">
+      <div class="stack" style="--stack-gap: 24px;">
+        <header class="section__header stack" style="--stack-gap: 8px;">
+          <h2 class="h2 section__title">Auditoría gratuita</h2>
+          <p class="services-text">
+            Es el primer paso para entender tu situación real. Incluye revisión de métricas de campo,
+            SEO técnico y experiencia de usuario, con un informe base claro en 48–72h.
+          </p>
+        </header>
+        <div class="services-grid">
+          <Card class="services-card">
+            <div class="card__body stack" style="--stack-gap: 10px;">
+              <h3 class="h3">Informe base (gratis)</h3>
+              <ul class="services-list">
+                <li>Resumen de métricas clave (LCP, INP, CLS).</li>
+                <li>Hallazgos críticos de SEO técnico.</li>
+                <li>Prioridades rápidas para desbloquear impacto.</li>
+              </ul>
+            </div>
+          </Card>
+          <Card class="services-card">
+            <div class="card__body stack" style="--stack-gap: 10px;">
+              <h3 class="h3">Informe completo (opcional)</h3>
+              <ul class="services-list">
+                <li>Plan P0/P1/P2 con esfuerzo y dependencias.</li>
+                <li>Recomendaciones de arquitectura y stack.</li>
+                <li>Sesión de 30 min para revisar el plan.</li>
+              </ul>
+            </div>
+          </Card>
+        </div>
+        <p class="services-note muted">
+          Si encaja, la auditoría se convierte en el punto de partida para un pack de mejora con foco
+          en rendimiento, SEO técnico y UX.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt section--services-packs" id="packs">
+    <div class="wrap">
+      <div class="stack" style="--stack-gap: 24px;">
+        <header class="section__header stack" style="--stack-gap: 8px;">
+          <h2 class="h2 section__title">Packs de mejora</h2>
+          <p class="services-text">
+            Tres packs cerrados y comparables. Se activan cuando el diagnóstico confirma impacto
+            claro y un retorno real para tu negocio.
+          </p>
+        </header>
+        <div class="services-packs">
+          <Card class="services-card">
+            <div class="card__body stack" style="--stack-gap: 10px;">
+              <h3 class="h3">Pack Base</h3>
+              <p class="muted">Correcciones críticas y quick wins para mejorar la experiencia.</p>
+            </div>
+          </Card>
+          <Card class="services-card">
+            <div class="card__body stack" style="--stack-gap: 10px;">
+              <h3 class="h3">Pack Growth</h3>
+              <p class="muted">Optimización avanzada para consolidar SEO y conversión.</p>
+            </div>
+          </Card>
+          <Card class="services-card">
+            <div class="card__body stack" style="--stack-gap: 10px;">
+              <h3 class="h3">Pack End-to-End</h3>
+              <p class="muted">Revisión completa de diseño, frontend y stack cuando aporta.</p>
+            </div>
+          </Card>
+        </div>
+        <div class="services-cta">
+          <Button href="/contact" variant="primary">Quiero mi auditoría gratuita</Button>
+          <Button href="/contact" variant="secondary">Consultar disponibilidad</Button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--services-future">
+    <div class="wrap">
+      <div class="stack" style="--stack-gap: 16px;">
+        <h2 class="h2 section__title">Servicios futuros</h2>
+        <p class="services-text">
+          Esta página está preparada para ampliar la oferta: reconstrucciones performance-first,
+          consultoría continua o auditorías específicas. Cuando estén disponibles, aparecerán aquí con
+          el mismo nivel de detalle.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <script type="application/ld+json" set:html={JSON.stringify(servicesJsonLd, null, 2)} />
+</BaseLayout>
+
+<style>
+  .section--services-hero {
+    padding-block: clamp(64px, 12vw, 140px);
+  }
+
+  .services-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(16px, 4vw, 32px);
+  }
+
+  .services-hero__kicker {
+    text-transform: uppercase;
+    letter-spacing: 0.24em;
+    font-size: 0.72rem;
+    color: var(--color-text-muted);
+  }
+
+  .services-hero__title {
+    font-family: var(--font-display);
+    font-size: clamp(2.4rem, 4vw, 3.5rem);
+    line-height: 1.1;
+    color: var(--color-heading);
+    margin: 0;
+  }
+
+  .services-hero__lead {
+    font-size: 1.1rem;
+    color: var(--color-text-muted);
+    max-width: 64ch;
+  }
+
+  .services-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .services-text {
+    color: var(--color-text-muted);
+    max-width: 64ch;
+  }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 18px;
+  }
+
+  .services-card {
+    height: 100%;
+  }
+
+  .services-list {
+    margin: 0;
+    padding-left: 1.1rem;
+    display: grid;
+    gap: 6px;
+    color: var(--color-text-muted);
+  }
+
+  .services-note {
+    margin: 0;
+    max-width: 70ch;
+  }
+
+  .services-packs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+  }
+
+  .services-cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+</style>
