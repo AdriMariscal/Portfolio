@@ -39,6 +39,17 @@ jobs:
       - name: Ejecutar typecheck
         run: pnpm run typecheck
 
+      - name: Ejecutar tests unitarios con cobertura
+        run: pnpm run test:unit:coverage
+
+      - name: Subir reporte de cobertura
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vitest-coverage
+          path: coverage/
+          if-no-files-found: ignore
+
       - name: Instalar navegadores Playwright
         run: npx playwright install --with-deps
 
