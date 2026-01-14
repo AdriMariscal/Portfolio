@@ -11,6 +11,7 @@ const metaDescription = buildMetaDescription(
   "Contacta para mejorar rendimiento web, SEO técnico y UX con un plan claro y medible.",
   "Agenda tu auditoría gratuita hoy."
 );
+const hcaptchaSiteKey = import.meta.env.PUBLIC_HCAPTCHA_SITE_KEY ?? "";
 ---
 
 <BaseLayout title="Contacto" metaTitle={metaTitle} description={metaDescription}>
@@ -29,19 +30,10 @@ const metaDescription = buildMetaDescription(
         name="contact"
         method="POST"
         action="/thanks"
-        data-netlify="true"
-        netlify-honeypot="bot-field"
-        data-netlify-recaptcha="true"
         data-contact-form
         aria-describedby="contact-privacy-note contact-error-message"
         novalidate
       >
-        <!-- Netlify -->
-        <input type="hidden" name="form-name" value="contact" />
-        <p hidden>
-          <label>Don’t fill this out: <input name="bot-field" /></label>
-        </p>
-
         <div class="card__body stack" style="--stack-gap: 18px;">
         <label class="field">
           <span>Nombre</span>
@@ -84,6 +76,36 @@ const metaDescription = buildMetaDescription(
         </label>
 
         <label class="field">
+          <span>Objetivo (opcional)</span>
+          <Input
+            type="text"
+            name="goal"
+            autocomplete="off"
+            placeholder="Ej: mejorar conversiones, bajar LCP o lanzar en 6 semanas."
+          />
+        </label>
+
+        <label class="field">
+          <span>Presupuesto (opcional)</span>
+          <Input
+            type="text"
+            name="budget"
+            autocomplete="off"
+            placeholder="Ej: 1.500–3.000 € o “por definir”."
+          />
+        </label>
+
+        <label class="field">
+          <span>Stack actual (opcional)</span>
+          <Input
+            type="text"
+            name="stack"
+            autocomplete="off"
+            placeholder="Ej: WordPress, Webflow, Shopify, Astro."
+          />
+        </label>
+
+        <label class="field">
           <span>Mensaje</span>
           <Input
             as="textarea"
@@ -103,12 +125,19 @@ const metaDescription = buildMetaDescription(
           ></span>
         </label>
 
-        <div data-netlify-recaptcha="true"></div>
+        <div class="h-captcha" data-sitekey={hcaptchaSiteKey}></div>
 
         <div class="contact__actions">
           <Button variant="primary" type="submit" block>
             Solicitar auditoría gratuita
           </Button>
+          <p
+            class="contact__success muted"
+            data-contact-success
+            role="status"
+            aria-live="polite"
+            hidden
+          ></p>
           <p
             id="contact-error-message"
             class="contact__error muted"
@@ -132,12 +161,16 @@ const metaDescription = buildMetaDescription(
 <script>
   const form = document.querySelector('[data-contact-form]');
   const errorMessage = document.querySelector('[data-contact-error]');
+  const successMessage = document.querySelector('[data-contact-success]');
 
-  if (form && errorMessage) {
+  if (form && errorMessage && successMessage) {
     const requiredMessage =
       'Revisa los campos marcados. Hay información obligatoria pendiente.';
     const emailMessage =
       'Ese email no parece válido. Comprueba el formato e inténtalo de nuevo.';
+    const defaultSuccessMessage =
+      'Gracias por tu mensaje. En breve te respondo con los siguientes pasos.';
+    const submitButton = form.querySelector('button[type="submit"]');
 
     const fields = Array.from(form.querySelectorAll('input, textarea'));
     const fieldErrors = new Map();
@@ -205,18 +238,6 @@ const metaDescription = buildMetaDescription(
       errorMessage.hidden = false;
     };
 
-    form.addEventListener('submit', (event) => {
-      fields.forEach(updateValidity);
-      if (!form.checkValidity()) {
-        event.preventDefault();
-        syncErrorMessage();
-        const firstInvalid = form.querySelector(':invalid');
-        if (firstInvalid && typeof firstInvalid.focus === 'function') {
-          firstInvalid.focus();
-        }
-      }
-    });
-
     form.addEventListener('input', (event) => {
       const target = event.target;
       if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement) {
@@ -227,6 +248,63 @@ const metaDescription = buildMetaDescription(
         errorMessage.hidden = true;
       }
     });
+    form.addEventListener('submit', async (event) => {
+      fields.forEach(updateValidity);
+      if (!form.checkValidity()) {
+        event.preventDefault();
+        syncErrorMessage();
+        const firstInvalid = form.querySelector(':invalid');
+        if (firstInvalid && typeof firstInvalid.focus === 'function') {
+          firstInvalid.focus();
+        }
+        return;
+      }
+
+      event.preventDefault();
+      errorMessage.hidden = true;
+      successMessage.hidden = true;
+
+      if (submitButton instanceof HTMLButtonElement) {
+        submitButton.disabled = true;
+        submitButton.setAttribute('aria-busy', 'true');
+      }
+
+      try {
+        const formData = new FormData(form);
+        const payload = new URLSearchParams(formData);
+
+        const response = await fetch('/.netlify/functions/contact', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+          },
+          body: payload.toString(),
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(data?.message || 'No se pudo enviar el formulario.');
+        }
+
+        successMessage.textContent = data?.message || defaultSuccessMessage;
+        successMessage.hidden = false;
+        form.reset();
+        if (typeof window !== 'undefined' && window.hcaptcha?.reset) {
+          window.hcaptcha.reset();
+        }
+      } catch (error) {
+        errorMessage.textContent =
+          error instanceof Error ? error.message : 'No se pudo enviar el formulario.';
+        errorMessage.hidden = false;
+      } finally {
+        if (submitButton instanceof HTMLButtonElement) {
+          submitButton.disabled = false;
+          submitButton.removeAttribute('aria-busy');
+        }
+      }
+    });
 
   }
 </script>
+
+<script src="https://js.hcaptcha.com/1/api.js" async defer></script>
