@@ -17,6 +17,7 @@ export const THEME = {
 
 export const NAV = [
   { href: "/", label: "Inicio" },
+  { href: "/about", label: "About" },
   { href: "/projects", label: "Proyectos" },
   { href: "/blog", label: "Blog" },
   { href: "/contact", label: "Contacto" },
