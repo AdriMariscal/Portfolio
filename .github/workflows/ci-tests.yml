@@ -22,17 +22,28 @@ jobs:
         with:
           node-version: 20
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
       - name: Instalar dependencias
-        run: npm install
+        run: pnpm install
 
       - name: Ejecutar npm audit (alto/critico)
-        run: npm audit --audit-level=high
+        run: pnpm audit --audit-level=high
+
+      - name: Ejecutar lint
+        run: pnpm run lint
+
+      - name: Ejecutar typecheck
+        run: pnpm run typecheck
 
       - name: Instalar navegadores Playwright
         run: npx playwright install --with-deps
 
       - name: Ejecutar tests E2E
-        run: npm run test:e2e
+        run: pnpm run test:e2e
 
       - name: Subir artefactos de Playwright (resultados y capturas)
         if: always()
@@ -58,11 +69,16 @@ jobs:
         with:
           node-version: 20
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
       - name: Instalar dependencias
-        run: npm install
+        run: pnpm install
 
       - name: Build de Astro
-        run: npm run build
+        run: pnpm run build
 
       - name: Instalar Lighthouse CI (CLI)
         run: npm install -g @lhci/cli@0.15.x
