@@ -17,8 +17,25 @@ const metaDescription = buildMetaDescription(
     <div class="container">
       <Card as="article" class="error-card">
         <div class="card__body error-card__body">
-          <!-- Icono/emoji con fondo suave -->
-          <div class="error-card__icon" aria-hidden="true">🧭</div>
+          <!-- Icono coherente con la guía -->
+          <div class="error-card__icon" role="img" aria-label="Página no encontrada">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.75"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              focusable="false"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <path d="m15 9-6 6" />
+              <path d="m9 9 6 6" />
+            </svg>
+          </div>
 
           <h1 class="error-card__title">404</h1>
 
