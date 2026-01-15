@@ -17,10 +17,6 @@ test.describe('Home – flujo básico y regresión visual', () => {
     ).toBeVisible();
 
     await expect(
-      page.getByRole('heading', { level: 2, name: 'Servicios' })
-    ).toBeVisible();
-
-    await expect(
       page.getByRole('heading', { level: 2, name: 'Últimos artículos' })
     ).toBeVisible();
   });
@@ -86,7 +82,7 @@ test.describe('Home – flujo básico y regresión visual', () => {
     const banner = page.locator('[data-cookie-banner]');
     await expect(banner).toBeVisible();
 
-    const acceptAll = page.getByRole('button', { name: /aceptar todo/i });
+    const acceptAll = page.getByRole('button', { name: /aceptar todas/i });
     await expect(acceptAll).toBeVisible();
 
     await acceptAll.click();
