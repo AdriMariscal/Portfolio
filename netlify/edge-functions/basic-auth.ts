@@ -14,20 +14,7 @@ export default async function basicAuth(request, context) {
     const isAdminRequest = url.pathname.startsWith("/admin");
 
     if (isAdminRequest) {
-      const adminResponse = await context.next();
-      const adminHeaders = new Headers(adminResponse.headers);
-      Object.keys(securityHeaders).forEach((key) => {
-        adminHeaders.set(key, securityHeaders[key]);
-      });
-      adminHeaders.set(
-        "Content-Security-Policy",
-        "default-src * data: blob: 'unsafe-inline' 'unsafe-eval'; script-src * data: blob: 'unsafe-inline' 'unsafe-eval'; style-src * data: blob: 'unsafe-inline'; connect-src * data: blob:; img-src * data: blob:; font-src * data: blob:; frame-src * data: blob:; object-src *; base-uri 'self'; frame-ancestors 'none'"
-      );
-      return new Response(adminResponse.body, {
-        status: adminResponse.status,
-        statusText: adminResponse.statusText,
-        headers: adminHeaders,
-      });
+      return context.next();
     }
 
     // staging personalizado + branch deploy staging + deploy previews
