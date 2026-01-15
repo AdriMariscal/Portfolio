@@ -1,5 +1,3 @@
-import type { Context } from "https://edge.netlify.com";
-
 // Edge Function que protege staging + deploy previews con Basic Auth
 export default async function basicAuth(request: Request, context: Context) {
   const url = new URL(request.url);
