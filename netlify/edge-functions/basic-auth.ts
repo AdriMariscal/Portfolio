@@ -5,8 +5,6 @@ export default async function basicAuth(request: Request, context: Context) {
   const url = new URL(request.url);
   const hostname = url.hostname;
   const securityHeaders = {
-    "Content-Security-Policy":
-      "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https://ingester.services-prod.nsvcs.net https://ingester.services-prod.nsvcs.net/rum_collection; frame-src 'none'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests",
     "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
     "X-Content-Type-Options": "nosniff",
     "X-Frame-Options": "DENY",
@@ -14,6 +12,7 @@ export default async function basicAuth(request: Request, context: Context) {
     "Permissions-Policy":
       "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()",
   };
+  const isAdminRequest = url.pathname.startsWith("/admin");
 
   // staging personalizado + branch deploy staging + deploy previews
   const isStagingDomain = hostname === "staging.adrianmariscal.es";
@@ -73,6 +72,12 @@ export default async function basicAuth(request: Request, context: Context) {
   Object.entries(securityHeaders).forEach(([key, value]) => {
     headers.set(key, value);
   });
+  if (!isAdminRequest) {
+    headers.set(
+      "Content-Security-Policy",
+      "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https://ingester.services-prod.nsvcs.net https://ingester.services-prod.nsvcs.net/rum_collection; frame-src 'none'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests"
+    );
+  }
 
   return new Response(response.body, {
     status: response.status,
