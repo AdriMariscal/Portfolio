@@ -1,7 +1,7 @@
 # Page snapshot
 
 ```yaml
-- generic [active] [ref=e1]:
+- generic [ref=e1]:
   - link "Saltar al contenido principal" [ref=e2] [cursor=pointer]:
     - /url: "#main-content"
   - banner [ref=e3]:
@@ -38,8 +38,8 @@
           - /url: /contact
           - img [ref=e47]
           - generic [ref=e50]: Contacto
-        - button "Cambiar a tema claro" [pressed] [ref=e51] [cursor=pointer]:
-          - generic [ref=e53]: Claro
+        - button "Cambiar a tema oscuro" [active] [ref=e51] [cursor=pointer]:
+          - generic [ref=e53]: Oscuro
   - main "Contenido principal" [ref=e54]:
     - region "Impulsa tu web con rendimiento, SEO y UX" [ref=e55]:
       - generic [ref=e56]:
@@ -243,20 +243,5 @@
         - link "Términos" [ref=e220] [cursor=pointer]:
           - /url: /legal/terminos
       - button "Gestionar preferencias de cookies" [ref=e221] [cursor=pointer]: Gestionar cookies
-      - generic [ref=e222]: © 2026 Adrián Mariscal · v3.32.0
-  - generic [ref=e225]:
-    - button "Menu" [ref=e226]:
-      - img [ref=e228]
-      - generic: Menu
-    - button "Inspect" [ref=e232]:
-      - img [ref=e234]
-      - generic: Inspect
-    - button "Audit" [ref=e236]:
-      - generic [ref=e237]:
-        - img [ref=e238]
-        - img [ref=e241]
-      - generic: Audit
-    - button "Settings" [ref=e244]:
-      - img [ref=e246]
-      - generic: Settings
+      - generic [ref=e222]: © 2026 Adrián Mariscal · v3.34.7
 ```
