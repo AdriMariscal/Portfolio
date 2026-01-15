@@ -4,6 +4,10 @@ import type { Context } from "https://edge.netlify.com";
 export default async function basicAuth(request: Request, context: Context) {
   const url = new URL(request.url);
   const hostname = url.hostname;
+  const baseCsp =
+    "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https://ingester.services-prod.nsvcs.net https://ingester.services-prod.nsvcs.net/rum_collection; frame-src 'none'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests";
+  const adminCsp =
+    "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.auth0.com; script-src-elem 'self' https://cdn.jsdelivr.net https://cdn.auth0.com; script-src-attr 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https://*.auth0.com https://api.netlify.com https://ingester.services-prod.nsvcs.net https://ingester.services-prod.nsvcs.net/rum_collection; frame-src https://*.auth0.com; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests";
   const securityHeaders = {
     "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
     "X-Content-Type-Options": "nosniff",
@@ -40,6 +44,7 @@ export default async function basicAuth(request: Request, context: Context) {
       status: 401,
       headers: {
         "WWW-Authenticate": 'Basic realm="Staging", charset="UTF-8"',
+        "Content-Security-Policy": contentSecurityPolicy,
         ...securityHeaders,
       },
     });
@@ -69,6 +74,7 @@ export default async function basicAuth(request: Request, context: Context) {
   // Credenciales correctas → continuamos con la petición normal
   const response = await context.next();
   const headers = new Headers(response.headers);
+  headers.set("Content-Security-Policy", contentSecurityPolicy);
   Object.entries(securityHeaders).forEach(([key, value]) => {
     headers.set(key, value);
   });
