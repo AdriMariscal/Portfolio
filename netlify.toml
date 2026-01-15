@@ -1,5 +1,5 @@
 [build]
-  command = "npm run build"
+  command = "npm run build:auth0-config && npm run build"
   publish = "dist"
 
 [build.environment]
@@ -27,7 +27,7 @@
   STAGING_PASS = "CHANGE_ME"
 
 [context.deploy-preview]
-  command = "npm run build"
+  command = "npm run build:auth0-config && npm run build"
   publish = "dist"
 
 [[redirects]]
@@ -77,7 +77,12 @@
 [[headers]]
   for = "/admin/*"
   [headers.values]
-    Content-Security-Policy = "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://identity.netlify.com; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: https:; connect-src 'self' https://identity.netlify.com https://api.netlify.com; frame-src https://identity.netlify.com; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests"
+    Content-Security-Policy = "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.auth0.com; script-src-elem 'self' https://cdn.jsdelivr.net https://cdn.auth0.com; script-src-attr 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: https:; connect-src 'self' https://*.auth0.com https://api.netlify.com; frame-src https://*.auth0.com; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests"
+
+[[headers]]
+  for = "/admin"
+  [headers.values]
+    Content-Security-Policy = "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.auth0.com; script-src-elem 'self' https://cdn.jsdelivr.net https://cdn.auth0.com; script-src-attr 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: https:; connect-src 'self' https://*.auth0.com https://api.netlify.com; frame-src https://*.auth0.com; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests"
 
 [[headers]]
   for = "/*"
