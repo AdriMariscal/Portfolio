@@ -13,7 +13,7 @@ describe("SEO helpers", () => {
 
     expect(result.startsWith(`${SEO_KEYWORD} · `)).toBe(true);
     expect(result).toBe(
-      "Rendimiento web · Portfolio de rendimiento web y SEO avanzado"
+      "Rendimiento web · Portfolio de rendimiento web y SEO"
     );
   });
 

@@ -1,5 +1,6 @@
 // src/lib/content.ts
 import { getCollection } from "astro:content";
+import type { CollectionEntry } from "astro:content";
 
 /** Nº total de proyectos (para la métrica del Hero) */
 export async function countProjects() {
@@ -10,15 +11,19 @@ export async function countProjects() {
 /** Proyectos destacados (para la sección Featured) */
 export async function getFeaturedProjects() {
   const projects = await getCollection("projects");
-  return projects.filter((p) => p.data.featured === true);
+  return projects.filter(
+    (project: CollectionEntry<"projects">) => project.data.featured === true
+  );
 }
 
 /** Últimos posts (para “Últimos artículos” del index) */
 export async function getRecentPosts(limit = 3) {
   const posts = await getCollection("blog");
-  const published = posts.filter((p) => !p.data.draft);
+  const published = posts.filter(
+    (post: CollectionEntry<"blog">) => !post.data.draft
+  );
   published.sort(
-    (a, b) =>
+    (a: CollectionEntry<"blog">, b: CollectionEntry<"blog">) =>
       new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
   );
   return published.slice(0, limit);

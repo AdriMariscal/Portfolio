@@ -1,0 +1,58 @@
+name: Update Playwright snapshots
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_branch:
+        description: "Branch to update snapshots on"
+        default: "dev"
+        required: true
+      pr_title:
+        description: "Pull request title"
+        default: "Update Playwright snapshots"
+        required: true
+
+jobs:
+  update-snapshots:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.base_branch }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Update snapshots
+        run: pnpm run test:e2e -- --update-snapshots --project=chromium
+
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: "Update Playwright snapshots"
+          title: ${{ inputs.pr_title }}
+          branch: "ci/update-playwright-snapshots"
+          base: ${{ inputs.base_branch }}
+          body: |
+            ## Resumen
+            - actualiza snapshots de Playwright con el estado actual de la UI.
+
+            ## Pruebas
+            - `pnpm run test:e2e -- --update-snapshots --project=chromium`
+
+            Resuelve #0
+          labels: "codex"

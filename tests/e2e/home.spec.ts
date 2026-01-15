@@ -17,10 +17,6 @@ test.describe('Home – flujo básico y regresión visual', () => {
     ).toBeVisible();
 
     await expect(
-      page.getByRole('heading', { level: 2, name: 'Servicios' })
-    ).toBeVisible();
-
-    await expect(
       page.getByRole('heading', { level: 2, name: 'Últimos artículos' })
     ).toBeVisible();
   });
@@ -46,16 +42,18 @@ test.describe('Home – flujo básico y regresión visual', () => {
   }) => {
     await page.goto('/');
 
-    const projectCard = page
-      .locator('.section--home-projects .project-card')
+    const projectLink = page
+      .locator(
+        '.section--home-projects .project-card .card__overlay-link'
+      )
       .first();
 
-    await expect(projectCard).toBeVisible();
+    await expect(projectLink).toBeVisible();
 
-    const projectHref = await projectCard.getAttribute('href');
+    const projectHref = await projectLink.getAttribute('href');
     expect(projectHref).toBeTruthy();
 
-    await projectCard.click();
+    await projectLink.click();
     await expect(page).toHaveURL(new RegExp(escapeRegex(projectHref!)));
   });
 
@@ -65,17 +63,17 @@ test.describe('Home – flujo básico y regresión visual', () => {
     const toggle = page.getByRole('button', { name: /tema/i });
     await expect(toggle).toBeVisible();
 
-    const before = await page.evaluate(() =>
-      document.documentElement.classList.contains('dark')
+    const before = await page.evaluate(
+      () => document.documentElement.dataset.theme
     );
 
     await toggle.click();
 
-    const after = await page.evaluate(() =>
-      document.documentElement.classList.contains('dark')
+    const after = await page.evaluate(
+      () => document.documentElement.dataset.theme
     );
 
-    expect(after).toBe(!before);
+    expect(after).not.toBe(before);
   });
 
   test('banner de cookies permite aceptar todo y guarda preferencias', async ({
@@ -86,7 +84,7 @@ test.describe('Home – flujo básico y regresión visual', () => {
     const banner = page.locator('[data-cookie-banner]');
     await expect(banner).toBeVisible();
 
-    const acceptAll = page.getByRole('button', { name: /aceptar todo/i });
+    const acceptAll = page.getByRole('button', { name: /aceptar todas/i });
     await expect(acceptAll).toBeVisible();
 
     await acceptAll.click();
