@@ -18,7 +18,7 @@
     if (typeof createAuth0Client !== "function") {
       if (root) {
         root.innerHTML =
-          "<p>No se pudo cargar Auth0. Comprueba la política CSP y el script de Auth0 en esta página.</p>";
+          "<p>No se pudo cargar Auth0 (SDK no disponible). Comprueba que <a href='/admin/auth0-config.js'>auth0-config.js</a> y el script de Auth0 se hayan cargado correctamente.</p>";
       }
       return;
     }
