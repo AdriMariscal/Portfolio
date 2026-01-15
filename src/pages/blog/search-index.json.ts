@@ -1,5 +1,6 @@
 // src/pages/blog/search-index.json.ts
 import { getCollection } from "astro:content";
+import type { CollectionEntry } from "astro:content";
 
 type BlogIndexItem = {
   slug: string;
@@ -19,9 +20,13 @@ const toISO = (value: unknown): string | null => {
 
 export async function GET() {
   // Mismo criterio que en [slug].astro: solo posts que NO son draft
-  const posts = await getCollection("blog", ({ data }) => !data.draft);
+  const posts = await getCollection(
+    "blog",
+    ({ data }: CollectionEntry<"blog">) => !data.draft
+  );
 
-  const index: BlogIndexItem[] = posts.map(({ slug, data }) => {
+  const index: BlogIndexItem[] = posts.map(
+    ({ slug, data }: CollectionEntry<"blog">) => {
     const rawDate = (data as any).date;
     return {
       slug,
@@ -30,7 +35,8 @@ export async function GET() {
       tags: Array.isArray(data.tags) ? data.tags : [],
       date: toISO(rawDate),
     };
-  });
+    }
+  );
 
   // Orden descendente por fecha, como el listado normal
   index.sort((a, b) => {
