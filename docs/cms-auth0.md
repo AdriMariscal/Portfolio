@@ -55,8 +55,8 @@ Si al pulsar **Iniciar sesión** no ocurre nada y en la consola aparece un error
 de **CSP** bloqueando `cdn.auth0.com`, revisa el header de `/admin/*` en
 `netlify.toml` (debe incluir `script-src-elem` con `https://cdn.auth0.com`).
 Si el error persiste, asegúrate de que también exista un header específico
-para `/admin` (sin asterisco), ya que algunos navegadores reportan la política
-del documento raíz en lugar de `/admin/`.
+para `/admin`, `/admin/` y `/admin/index.html`, ya que algunos navegadores
+reportan la política del documento raíz en lugar de `/admin/`.
 
 Para evitar que Netlify bloquee el build por “secrets scanning” (son valores públicos),
 añade también `SECRETS_SCAN_OMIT_KEYS` con el valor:
