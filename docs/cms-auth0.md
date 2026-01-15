@@ -57,7 +57,8 @@ de **CSP** bloqueando `cdn.auth0.com`, revisa el header de `/admin/*` en
 Si el error persiste, asegúrate de que también exista un header específico
 para `/admin`, `/admin/` y `/admin/index.html`, ya que algunos navegadores
 reportan la política del documento raíz en lugar de `/admin/`.
-Como fallback, `/admin/index.html` incluye un meta CSP con las mismas fuentes.
+Como fallback, hay un `_headers` en `public/admin/` que asegura la CSP en
+`/admin`, `/admin/` y `/admin/index.html` incluso si `netlify.toml` no se aplica.
 
 Para evitar que Netlify bloquee el build por “secrets scanning” (son valores públicos),
 añade también `SECRETS_SCAN_OMIT_KEYS` con el valor:
