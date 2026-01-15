@@ -243,5 +243,5 @@
         - link "Términos" [ref=e220] [cursor=pointer]:
           - /url: /legal/terminos
       - button "Gestionar preferencias de cookies" [ref=e221] [cursor=pointer]: Gestionar cookies
-      - generic [ref=e222]: © 2026 Adrián Mariscal · v3.32.0
+      - generic [ref=e222]: © 2026 Adrián Mariscal · v3.34.7
 ```

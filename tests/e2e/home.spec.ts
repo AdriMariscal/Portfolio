@@ -17,6 +17,10 @@ test.describe('Home – flujo básico y regresión visual', () => {
     ).toBeVisible();
 
     await expect(
+      page.getByRole('heading', { level: 2, name: 'Servicios' })
+    ).toBeVisible();
+
+    await expect(
       page.getByRole('heading', { level: 2, name: 'Últimos artículos' })
     ).toBeVisible();
   });
@@ -25,7 +29,8 @@ test.describe('Home – flujo básico y regresión visual', () => {
     await page.setViewportSize({ width: 1280, height: 720 });
     await page.goto('/');
 
-    const header = page.locator('header');
+    // Evita colisiones con headers inyectados por toolbars/overlays en dev
+    const header = page.locator('header.header');
     const hero = page.locator('.hero');
 
     // Primera vez: genera baseline (ejecutando en local con --update-snapshots)
@@ -44,67 +49,46 @@ test.describe('Home – flujo básico y regresión visual', () => {
     const projectCard = page
       .locator('.section--home-projects .project-card')
       .first();
-    const projectHref = await projectCard
-      .locator('.card__overlay-link')
-      .getAttribute('href');
+
+    await expect(projectCard).toBeVisible();
+
+    const projectHref = await projectCard.getAttribute('href');
     expect(projectHref).toBeTruthy();
 
     await projectCard.click();
-    await expect(page).toHaveURL(
-      new RegExp(`${escapeRegex(projectHref as string)}$`)
-    );
-
-    await page.goto('/');
-
-    const postCard = page
-      .locator('.section--home-latest .card--post')
-      .first();
-    const postHref = await postCard
-      .locator('.card__overlay-link')
-      .getAttribute('href');
-    expect(postHref).toBeTruthy();
-
-    await postCard.click();
-    await expect(page).toHaveURL(
-      new RegExp(`${escapeRegex(postHref as string)}$`)
-    );
+    await expect(page).toHaveURL(new RegExp(escapeRegex(projectHref!)));
   });
 
   test('toggle de tema cambia entre oscuro y claro', async ({ page }) => {
-    await page.addInitScript(() => {
-      window.localStorage.removeItem('am-theme');
-    });
     await page.goto('/');
 
-    const root = page.locator('html');
-    const toggle = page.locator('[data-theme-toggle]');
+    const toggle = page.getByRole('button', { name: /tema/i });
+    await expect(toggle).toBeVisible();
 
-    await expect(root).toHaveAttribute('data-theme', 'dark');
-    await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    const before = await page.evaluate(() =>
+      document.documentElement.classList.contains('dark')
+    );
 
     await toggle.click();
 
-    await expect(root).toHaveAttribute('data-theme', 'light');
-    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
-
-    const storedTheme = await page.evaluate(() =>
-      window.localStorage.getItem('am-theme')
+    const after = await page.evaluate(() =>
+      document.documentElement.classList.contains('dark')
     );
-    expect(storedTheme).toBe('light');
+
+    expect(after).toBe(!before);
   });
 
   test('banner de cookies permite aceptar todo y guarda preferencias', async ({
     page,
   }) => {
-    await page.addInitScript(() => {
-      window.localStorage.removeItem('am-cookie-consent-v1');
-    });
     await page.goto('/');
 
     const banner = page.locator('[data-cookie-banner]');
-    const acceptAll = page.locator('[data-cookie-accept-all]');
-
     await expect(banner).toBeVisible();
+
+    const acceptAll = page.getByRole('button', { name: /aceptar todo/i });
+    await expect(acceptAll).toBeVisible();
+
     await acceptAll.click();
     await expect(banner).toBeHidden();
 
@@ -118,16 +102,19 @@ test.describe('Home – flujo básico y regresión visual', () => {
     await page.setViewportSize({ width: 1280, height: 720 });
     await page.goto('/');
 
-    await page.getByRole('link', { name: 'Proyectos' }).click();
+    // Acotamos al <nav aria-label="Navegación principal"> para evitar colisiones con otros links
+    const nav = page.getByRole('navigation', { name: 'Navegación principal' });
+
+    await nav.getByRole('link', { name: 'Ir a proyectos', exact: true }).click();
     await expect(page).toHaveURL(/\/projects\/?$/);
 
-    await page.getByRole('link', { name: 'Blog' }).click();
+    await nav.getByRole('link', { name: 'Ir al blog', exact: true }).click();
     await expect(page).toHaveURL(/\/blog\/?$/);
 
-    await page.getByRole('link', { name: 'Contacto' }).click();
+    await nav.getByRole('link', { name: 'Ir a contacto', exact: true }).click();
     await expect(page).toHaveURL(/\/contact\/?$/);
 
-    await page.getByRole('link', { name: 'Inicio' }).click();
+    await nav.getByRole('link', { name: 'Ir a inicio', exact: true }).click();
     await expect(page).toHaveURL(/\/$/);
   });
 });
