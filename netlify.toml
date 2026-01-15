@@ -1,5 +1,5 @@
 [build]
-  command = "npm run build"
+  command = "npm run build:auth0-config && npm run build"
   publish = "dist"
 
 [build.environment]
@@ -27,7 +27,7 @@
   STAGING_PASS = "CHANGE_ME"
 
 [context.deploy-preview]
-  command = "npm run build"
+  command = "npm run build:auth0-config && npm run build"
   publish = "dist"
 
 [[redirects]]
