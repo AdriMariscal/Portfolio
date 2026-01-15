@@ -13,12 +13,14 @@
 3. **Configura URLs permitidas en la app de Auth0**:
    - **Allowed Callback URLs**:
      - `https://adrianmariscal.es/admin/`
+     - `https://staging.adrianmariscal.es/admin/`
      - `https://<tu-sitio>.netlify.app/admin/` (si usas deploy previews)
      - `http://localhost:4321/admin/` (desarrollo local con Astro)
    - **Allowed Logout URLs**:
      - mismas URLs que arriba
    - **Allowed Web Origins**:
      - `https://adrianmariscal.es`
+     - `https://staging.adrianmariscal.es`
      - `https://<tu-sitio>.netlify.app`
      - `http://localhost:4321`
 4. **(Opcional) Crea un API en Auth0** si necesitas `audience`.
@@ -33,8 +35,8 @@
 ## Configurar el frontend del CMS
 
 1. Edita `public/admin/auth0-config.js`:
-   - `AUTH0_DOMAIN` → tu dominio de Auth0 (ej: `mi-tenant.eu.auth0.com`)
-   - `AUTH0_CLIENT_ID` → el Client ID de la SPA
+   - `AUTH0_DOMAIN` → tu dominio de Auth0 (ej: `adrianmariscal.eu.auth0.com`)
+   - `AUTH0_CLIENT_ID` → el Client ID de la SPA (ej: el que termina en `...RMarP`)
    - `AUTH0_AUDIENCE` → opcional (déjalo vacío si no lo usas)
 2. Guarda los cambios y despliega.
 
