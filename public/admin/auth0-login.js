@@ -15,6 +15,14 @@
   let auth0Client;
 
   const initAuth0 = async () => {
+    if (typeof createAuth0Client !== "function") {
+      if (root) {
+        root.innerHTML =
+          "<p>No se pudo cargar Auth0. Comprueba la política CSP y el script de Auth0 en esta página.</p>";
+      }
+      return;
+    }
+
     auth0Client = await createAuth0Client({
       domain: AUTH0_DOMAIN,
       clientId: AUTH0_CLIENT_ID,
@@ -49,5 +57,11 @@
     }
   };
 
-  initAuth0();
+  initAuth0().catch((error) => {
+    console.error("[auth0-login] Error inicializando Auth0", error);
+    if (root) {
+      root.innerHTML =
+        "<p>Ocurrió un error inicializando Auth0. Revisa la consola para más detalles.</p>";
+    }
+  });
 })();
