@@ -14,7 +14,20 @@ export default async function basicAuth(request, context) {
     const isAdminRequest = url.pathname.startsWith("/admin");
 
     if (isAdminRequest) {
-      return context.next();
+      const adminResponse = await context.next();
+      const adminHeaders = new Headers(adminResponse.headers);
+      Object.keys(securityHeaders).forEach((key) => {
+        adminHeaders.set(key, securityHeaders[key]);
+      });
+      adminHeaders.set(
+        "Content-Security-Policy",
+        "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.auth0.com; script-src-elem 'self' https://cdn.jsdelivr.net https://cdn.auth0.com; script-src-attr 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https://*.auth0.com https://api.netlify.com https://ingester.services-prod.nsvcs.net https://ingester.services-prod.nsvcs.net/rum_collection; frame-src https://*.auth0.com; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests"
+      );
+      return new Response(adminResponse.body, {
+        status: adminResponse.status,
+        statusText: adminResponse.statusText,
+        headers: adminHeaders,
+      });
     }
 
     // staging personalizado + branch deploy staging + deploy previews
