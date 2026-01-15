@@ -42,6 +42,7 @@ export default [
       "test-results/**",
     ],
   },
+  ...astro.configs.recommended,
   {
     files: ["**/*.{js,cjs,mjs,ts,tsx}"],
     languageOptions: {
@@ -61,21 +62,12 @@ export default [
   {
     files: ["**/*.astro"],
     languageOptions: {
-      parser: astroParser,
-      parserOptions: {
-        parser: tsParser,
-        extraFileExtensions: [".astro"],
-        ecmaVersion: "latest",
-        sourceType: "module",
-      },
       globals: sharedGlobals,
     },
     plugins: {
-      astro,
       "@typescript-eslint": tseslint,
     },
     rules: {
-      ...astro.configs.recommended.rules,
       ...tseslint.configs.recommended.rules,
       ...sharedRules,
     },
