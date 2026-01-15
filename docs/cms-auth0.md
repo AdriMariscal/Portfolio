@@ -51,6 +51,10 @@ Si instalaste la integración de Auth0 en Netlify, ya tienes estas variables cre
 El build usa automáticamente `AUTH0_DOMAIN` y `AUTH0_CLIENT_ID` para generar
 `public/admin/auth0-config.js`.
 
+Si al pulsar **Iniciar sesión** no ocurre nada y en la consola aparece un error
+de **CSP** bloqueando `cdn.auth0.com`, revisa el header de `/admin/*` en
+`netlify.toml` (debe incluir `script-src-elem` con `https://cdn.auth0.com`).
+
 Para evitar que Netlify bloquee el build por “secrets scanning” (son valores públicos),
 añade también `SECRETS_SCAN_OMIT_KEYS` con el valor:
 
