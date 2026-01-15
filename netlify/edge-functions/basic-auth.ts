@@ -81,10 +81,6 @@ export default async function basicAuth(request, context) {
     Object.keys(securityHeaders).forEach((key) => {
       headers.set(key, securityHeaders[key]);
     });
-    headers.set(
-      "Content-Security-Policy",
-      "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https://ingester.services-prod.nsvcs.net https://ingester.services-prod.nsvcs.net/rum_collection; frame-src 'none'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests"
-    );
 
     return new Response(response.body, {
       status: response.status,
