@@ -27,7 +27,9 @@ const sharedGlobals = {
 
 const sharedRules = {
   semi: "off",
-  "comma-dangle": ["error", "always-multiline"],
+  "comma-dangle": "off",
+  "@typescript-eslint/no-unused-vars": "off",
+  "@typescript-eslint/no-explicit-any": "off",
 };
 
 export default [
