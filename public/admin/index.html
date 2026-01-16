@@ -76,6 +76,23 @@
   </head>
   <body>
     <p class="cms-loading">Cargando CMS…</p>
-    <script src="https://cdn.jsdelivr.net/npm/decap-cms@3/dist/decap-cms.js"></script>
+    <script>
+      const cmsHash = window.location.hash ?? "";
+      const hasRecoveryToken =
+        cmsHash.includes("invite_token=") || cmsHash.includes("recovery_token=");
+
+      if (cmsHash) {
+        console.info("[decap] Hash detectado:", cmsHash);
+      }
+
+      if (hasRecoveryToken) {
+        window.CMS_MANUAL_INIT = true;
+        window.__decapInitFromHash = true;
+      }
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/decap-cms@3/dist/decap-cms.js"
+      onload="if (window.__decapInitFromHash && window.CMS) { window.CMS.init(); }"
+    ></script>
   </body>
 </html>
