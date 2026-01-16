@@ -22,6 +22,18 @@
       loginButton.disabled = true;
     }
   };
+  const getCreateAuth0Client = () => {
+    if (typeof createAuth0Client === "function") {
+      return createAuth0Client;
+    }
+    if (
+      window.auth0 &&
+      typeof window.auth0.createAuth0Client === "function"
+    ) {
+      return window.auth0.createAuth0Client;
+    }
+    return null;
+  };
 
   if (!AUTH0_DOMAIN || !AUTH0_CLIENT_ID) {
     if (root) {
@@ -35,7 +47,7 @@
   let auth0Client;
 
   const loadAuth0Sdk = async () => {
-    if (typeof createAuth0Client === "function") {
+    if (getCreateAuth0Client()) {
       return;
     }
     if (sdkLoadPromise) {
@@ -51,7 +63,7 @@
           script.onerror = reject;
           document.head.appendChild(script);
         }).catch(() => undefined);
-        if (typeof createAuth0Client === "function") {
+        if (getCreateAuth0Client()) {
           return;
         }
       }
@@ -71,7 +83,17 @@
       return;
     }
 
-    auth0Client = await createAuth0Client({
+    const createClient = getCreateAuth0Client();
+    if (!createClient) {
+      showSdkError();
+      return;
+    }
+
+    if (loginButton) {
+      loginButton.disabled = false;
+    }
+
+    auth0Client = await createClient({
       domain: AUTH0_DOMAIN,
       clientId: AUTH0_CLIENT_ID,
       authorizationParams: {
