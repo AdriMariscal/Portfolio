@@ -164,7 +164,9 @@
     const idTokenClaims = await auth0Client.getIdTokenClaims();
     const idToken = idTokenClaims?.__raw;
     const accessToken = await auth0Client.getTokenSilently();
-    const cmsToken = idToken || accessToken;
+    // Prefer access tokens when using an audience, fallback to ID token.
+    const cmsToken =
+      (AUTH0_AUDIENCE ? accessToken : idToken) || idToken || accessToken;
     if (!cmsToken) {
       throw new Error("No se pudo obtener un token válido para el CMS.");
     }
