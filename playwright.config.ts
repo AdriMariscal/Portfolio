@@ -14,6 +14,8 @@ export default defineConfig({
     // Usamos la misma URL que Astro dev
     baseURL: `http://127.0.0.1:${PORT}`,
     trace: 'on-first-retry',
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
   },
   projects: [
     {
@@ -25,7 +27,7 @@ export default defineConfig({
   ],
   // Levanta Astro dev antes de los tests
   webServer: {
-    command: 'npm run dev -- --port=4321 --host=0.0.0.0',
+    command: 'npm run build && npm run preview -- --port=4321 --host=0.0.0.0',
     port: 4321,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

@@ -1,5 +1,6 @@
 // src/pages/search.json.ts
 import { getCollection } from "astro:content";
+import type { CollectionEntry } from "astro:content";
 
 type SearchDocument = {
   id: string;
@@ -50,15 +51,15 @@ const toIndexObject = (index: Map<string, Map<string, number>>): TokenIndex => {
 export async function GET() {
   const posts = await getCollection(
     "blog",
-    ({ data }) => !data.draft && (data.published ?? true)
+    ({ data }: CollectionEntry<"blog">) => !data.draft && (data.published ?? true)
   );
   const projects = await getCollection(
     "projects",
-    ({ data }) => data.published ?? true
+    ({ data }: CollectionEntry<"projects">) => data.published ?? true
   );
 
   const documents: SearchDocument[] = [
-    ...posts.map((post) => ({
+    ...posts.map((post: CollectionEntry<"blog">) => ({
       id: `post-${post.slug}`,
       title: post.data.title ?? "Artículo sin título",
       description: post.data.description ?? "",
@@ -66,7 +67,7 @@ export async function GET() {
       type: "post" as const,
       url: `/blog/${post.slug}/`,
     })),
-    ...projects.map((project) => ({
+    ...projects.map((project: CollectionEntry<"projects">) => ({
       id: `project-${project.slug}`,
       title: project.data.title ?? "Proyecto sin título",
       description: project.data.description ?? "",

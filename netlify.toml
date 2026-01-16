@@ -1,5 +1,5 @@
 [build]
-  command = "npm run build"
+  command = "npm run build:auth0-config && npm run build"
   publish = "dist"
 
 [build.environment]
@@ -27,7 +27,7 @@
   STAGING_PASS = "CHANGE_ME"
 
 [context.deploy-preview]
-  command = "npm run build"
+  command = "npm run build:auth0-config && npm run build"
   publish = "dist"
 
 [[redirects]]
@@ -75,14 +75,19 @@
   status = 404
 
 [[headers]]
-  for = "/admin/*"
+  for = "/admin/auth0-config.js"
   [headers.values]
-    Content-Security-Policy = "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://identity.netlify.com; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: https:; connect-src 'self' https://identity.netlify.com https://api.netlify.com; frame-src https://identity.netlify.com; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests"
+    Cache-Control = "no-store, max-age=0"
+
+[[headers]]
+  for = "/admin/auth0-login.js"
+  [headers.values]
+    Cache-Control = "no-store, max-age=0"
 
 [[headers]]
   for = "/*"
   [headers.values]
-    Content-Security-Policy = "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline' https://js.hcaptcha.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https://ingester.services-prod.nsvcs.net https://ingester.services-prod.nsvcs.net/rum_collection https://hcaptcha.com https://api.hcaptcha.com; frame-src https://hcaptcha.com https://js.hcaptcha.com https://*.hcaptcha.com; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests"
+    Content-Security-Policy = ""
     Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
     X-Content-Type-Options = "nosniff"
     X-Frame-Options = "DENY"

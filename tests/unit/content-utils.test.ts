@@ -1,5 +1,9 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { computeBackHref, slugifyTag, toSlug } from "../../src/lib/content";
+
+vi.mock("astro:content", () => ({
+  getCollection: vi.fn(),
+}));
 
 describe("Content utilities", () => {
   it("normalizes diacritics and symbols for slugs", () => {
