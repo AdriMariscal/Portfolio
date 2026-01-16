@@ -49,6 +49,18 @@
   force = true
 
 [[redirects]]
+  from = "/#/invite_token=:token"
+  to = "/admin/#/invite_token=:token"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/#/recovery_token=:token"
+  to = "/admin/#/recovery_token=:token"
+  status = 301
+  force = true
+
+[[redirects]]
   from = "/blog/page/:splat"
   to = "/blog/pages/:splat"
   status = 301
