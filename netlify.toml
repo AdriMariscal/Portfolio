@@ -75,6 +75,16 @@
   status = 404
 
 [[headers]]
+  for = "/admin/auth0-config.js"
+  [headers.values]
+    Cache-Control = "no-store, max-age=0"
+
+[[headers]]
+  for = "/admin/auth0-login.js"
+  [headers.values]
+    Cache-Control = "no-store, max-age=0"
+
+[[headers]]
   for = "/*"
   [headers.values]
     Content-Security-Policy = ""
