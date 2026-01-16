@@ -1,7 +1,22 @@
 (() => {
+  const root = document.getElementById("auth0-root");
+  const hasTokenFromHash =
+    window.location.hash.includes("invite_token=") ||
+    window.location.hash.includes("recovery_token=");
+
+  if (hasTokenFromHash) {
+    const cmsScript = document.createElement("script");
+    cmsScript.src =
+      "https://cdn.jsdelivr.net/npm/decap-cms@3/dist/decap-cms.js";
+    document.body.appendChild(cmsScript);
+    if (root) {
+      root.remove();
+    }
+    return;
+  }
+
   const { AUTH0_DOMAIN, AUTH0_CLIENT_ID, AUTH0_AUDIENCE } =
     window.AUTH0_CONFIG || {};
-  const root = document.getElementById("auth0-root");
   const sdkUrls = [
     "/admin/auth0-spa-js.production.js",
     "https://cdn.auth0.com/js/auth0-spa-js/2.1/auth0-spa-js.production.js",
