@@ -35,8 +35,17 @@
     return;
   }
 
-  const { AUTH0_DOMAIN, AUTH0_CLIENT_ID, AUTH0_AUDIENCE } =
-    window.AUTH0_CONFIG || {};
+  const {
+    AUTH0_DOMAIN,
+    AUTH0_CLIENT_ID,
+    AUTH0_AUDIENCE,
+    AUTH0_ISSUER_BASE_URL,
+  } = window.AUTH0_CONFIG || {};
+  const normalizeDomain = (value) =>
+    (value ?? "").replace(/^https?:\/\//, "").replace(/\/$/, "");
+  const resolvedDomain = normalizeDomain(
+    AUTH0_DOMAIN || AUTH0_ISSUER_BASE_URL,
+  );
   const sdkUrls = [
     "/admin/auth0-spa-js.production.js",
     "https://cdn.auth0.com/js/auth0-spa-js/2.1/auth0-spa-js.production.js",
@@ -70,7 +79,7 @@
     return null;
   };
 
-  if (!AUTH0_DOMAIN || !AUTH0_CLIENT_ID) {
+  if (!resolvedDomain || !AUTH0_CLIENT_ID) {
     if (root) {
       root.innerHTML =
         "<p>Faltan las variables de Auth0. Revisa <a href='/admin/auth0-config.js'>auth0-config.js</a>.</p>";
@@ -129,7 +138,7 @@
     }
 
     auth0Client = await createClient({
-      domain: AUTH0_DOMAIN,
+      domain: resolvedDomain,
       clientId: AUTH0_CLIENT_ID,
       authorizationParams: {
         redirect_uri: window.location.origin + "/admin/",
