@@ -3,11 +3,25 @@
     window.AUTH0_CONFIG || {};
   const root = document.getElementById("auth0-root");
   const sdkUrls = [
+    "/admin/auth0-spa-js.production.js",
     "https://cdn.auth0.com/js/auth0-spa-js/2.1/auth0-spa-js.production.js",
     "https://cdn.jsdelivr.net/npm/@auth0/auth0-spa-js@2.1.0/dist/auth0-spa-js.production.js",
     "https://unpkg.com/@auth0/auth0-spa-js@2.1.0/dist/auth0-spa-js.production.js",
   ];
   let sdkLoadPromise;
+  const showSdkError = () => {
+    if (!root) {
+      return;
+    }
+    const status = document.createElement("p");
+    status.className = "auth-card__status";
+    status.innerHTML =
+      "No se pudo cargar Auth0 (SDK no disponible). Comprueba que <a href='/admin/auth0-config.js'>auth0-config.js</a> y el script de Auth0 se hayan cargado correctamente.";
+    root.appendChild(status);
+    if (loginButton) {
+      loginButton.disabled = true;
+    }
+  };
 
   if (!AUTH0_DOMAIN || !AUTH0_CLIENT_ID) {
     if (root) {
@@ -42,7 +56,7 @@
         }
       }
       throw new Error(
-        "Auth0 SDK no disponible tras cargar CDNs alternativos.",
+        "Auth0 SDK no disponible tras cargar fuentes alternativas.",
       );
     })();
     return sdkLoadPromise;
@@ -52,10 +66,7 @@
     try {
       await loadAuth0Sdk();
     } catch (error) {
-      if (root) {
-        root.innerHTML =
-          "<p>No se pudo cargar Auth0 (SDK no disponible). Comprueba que <a href='/admin/auth0-config.js'>auth0-config.js</a> y el script de Auth0 se hayan cargado correctamente.</p>";
-      }
+      showSdkError();
       console.error("[auth0-login] Error cargando el SDK de Auth0", error);
       return;
     }
