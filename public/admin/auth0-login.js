@@ -161,8 +161,14 @@
       return;
     }
 
-    const token = await auth0Client.getTokenSilently();
-    window.CMS_AUTH_TOKEN = token;
+    const idTokenClaims = await auth0Client.getIdTokenClaims();
+    const idToken = idTokenClaims?.__raw;
+    const accessToken = await auth0Client.getTokenSilently();
+    const cmsToken = idToken || accessToken;
+    if (!cmsToken) {
+      throw new Error("No se pudo obtener un token válido para el CMS.");
+    }
+    window.CMS_AUTH_TOKEN = cmsToken;
     loadDecapCms();
     if (root) {
       root.remove();

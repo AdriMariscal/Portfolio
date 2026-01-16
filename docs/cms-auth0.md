@@ -85,6 +85,8 @@ El build genera `public/admin/auth0-config.js` automáticamente en `npm run buil
 ## Notas importantes
 
 - Este flujo usa Auth0 para iniciar sesión en el CMS y carga Decap CMS después del login.
+- El CMS prioriza el **ID token** de Auth0 (JWT) para autenticarse y usa el access token
+  como fallback si es necesario.
 - Si usas Git Gateway, asegúrate de que el token emitido por Auth0 está permitido por Netlify
   (esto se gestiona en la extensión de Auth0). Si no, el CMS podrá entrar pero no escribir
   contenidos en el repo.
