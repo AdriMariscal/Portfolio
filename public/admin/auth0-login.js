@@ -5,13 +5,16 @@
     window.location.hash.includes("recovery_token=");
 
   if (hasTokenFromHash) {
+    if (root) {
+      root.innerHTML = `
+        <h1 class="auth-card__title">Acceso CMS</h1>
+        <p class="auth-card__subtitle">Procesando recuperación de contraseña…</p>
+      `;
+    }
     const cmsScript = document.createElement("script");
     cmsScript.src =
       "https://cdn.jsdelivr.net/npm/decap-cms@3/dist/decap-cms.js";
     document.body.appendChild(cmsScript);
-    if (root) {
-      root.remove();
-    }
     return;
   }
 
