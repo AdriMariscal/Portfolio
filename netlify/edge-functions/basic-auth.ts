@@ -12,8 +12,9 @@ export default async function basicAuth(request, context) {
         "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()",
     };
     const isAdminRequest = url.pathname.startsWith("/admin");
+    const isNetlifyRequest = url.pathname.startsWith("/.netlify/");
 
-    if (isAdminRequest) {
+    if (isAdminRequest || isNetlifyRequest) {
       return context.next();
     }
 
