@@ -1,5 +1,5 @@
 [build]
-  command = "npm run build:auth0-config && npm run build"
+  command = "npm run build"
   publish = "dist"
 
 [build.environment]
@@ -27,7 +27,7 @@
   STAGING_PASS = "CHANGE_ME"
 
 [context.deploy-preview]
-  command = "npm run build:auth0-config && npm run build"
+  command = "npm run build"
   publish = "dist"
 
 [[redirects]]
@@ -85,16 +85,6 @@
   from = "/*"
   to = "/404.html"
   status = 404
-
-[[headers]]
-  for = "/admin/auth0-config.js"
-  [headers.values]
-    Cache-Control = "no-store, max-age=0"
-
-[[headers]]
-  for = "/admin/auth0-login.js"
-  [headers.values]
-    Cache-Control = "no-store, max-age=0"
 
 [[headers]]
   for = "/*"
