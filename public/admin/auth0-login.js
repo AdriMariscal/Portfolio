@@ -1,20 +1,37 @@
 (() => {
   const root = document.getElementById("auth0-root");
-  const hasTokenFromHash =
-    window.location.hash.includes("invite_token=") ||
-    window.location.hash.includes("recovery_token=");
+  const hasTokenFromHash = (() => {
+    const rawHash = window.location.hash || "";
+    if (!rawHash) {
+      return false;
+    }
+    const params = new URLSearchParams(rawHash.replace(/^#/, ""));
+    return params.has("invite_token") || params.has("recovery_token");
+  })();
+
+  const loadDecapCms = () => {
+    if (document.querySelector("script[data-decap-cms]")) {
+      return;
+    }
+    const cmsScript = document.createElement("script");
+    cmsScript.src =
+      "https://cdn.jsdelivr.net/npm/decap-cms@3/dist/decap-cms.js";
+    cmsScript.dataset.decapCms = "true";
+    document.body.appendChild(cmsScript);
+  };
 
   if (hasTokenFromHash) {
     if (root) {
       root.innerHTML = `
         <h1 class="auth-card__title">Acceso CMS</h1>
-        <p class="auth-card__subtitle">Procesando recuperación de contraseña…</p>
+        <p class="auth-card__subtitle">Procesando token…</p>
       `;
+    } else {
+      const status = document.createElement("p");
+      status.textContent = "Procesando token…";
+      document.body.appendChild(status);
     }
-    const cmsScript = document.createElement("script");
-    cmsScript.src =
-      "https://cdn.jsdelivr.net/npm/decap-cms@3/dist/decap-cms.js";
-    document.body.appendChild(cmsScript);
+    loadDecapCms();
     return;
   }
 
@@ -137,9 +154,7 @@
 
     const token = await auth0Client.getTokenSilently();
     window.CMS_AUTH_TOKEN = token;
-    const cmsScript = document.createElement("script");
-    cmsScript.src = "https://cdn.jsdelivr.net/npm/decap-cms@3/dist/decap-cms.js";
-    document.body.appendChild(cmsScript);
+    loadDecapCms();
     if (root) {
       root.remove();
     }
