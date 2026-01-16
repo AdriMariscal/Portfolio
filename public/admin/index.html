@@ -66,33 +66,86 @@
         padding: 24px;
       }
 
-      .cms-loading {
+      .auth-shell {
+        width: min(560px, 100%);
+      }
+
+      .auth-card {
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-soft);
+        padding: 32px;
+        display: grid;
+        gap: 16px;
+      }
+
+      .auth-card__eyebrow {
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.2em;
+        color: var(--color-text-muted);
+      }
+
+      .auth-card__title {
         font-family: var(--font-display);
-        font-size: 1.5rem;
-        color: var(--color-heading);
+        font-size: 2rem;
         margin: 0;
+        color: var(--color-heading);
+      }
+
+      .auth-card__subtitle {
+        margin: 0;
+        color: var(--color-text);
+        line-height: 1.5;
+      }
+
+      .auth-card__button {
+        border: none;
+        border-radius: 999px;
+        padding: 12px 24px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        background: var(--color-accent);
+        color: var(--color-accent-contrast);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: var(--shadow-soft);
+      }
+
+      .auth-card__button:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+        box-shadow: none;
+      }
+
+      .auth-card__button:not(:disabled):hover {
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-strong);
+      }
+
+      .auth-card__status {
+        margin: 0;
+        font-size: 0.95rem;
+        color: var(--color-text-muted);
       }
     </style>
   </head>
   <body>
-    <p class="cms-loading">Cargando CMS…</p>
-    <script>
-      const cmsHash = window.location.hash ?? "";
-      const hasRecoveryToken =
-        cmsHash.includes("invite_token=") || cmsHash.includes("recovery_token=");
-
-      if (cmsHash) {
-        console.info("[decap] Hash detectado:", cmsHash);
-      }
-
-      if (hasRecoveryToken) {
-        window.CMS_MANUAL_INIT = true;
-        window.__decapInitFromHash = true;
-      }
-    </script>
-    <script
-      src="https://cdn.jsdelivr.net/npm/decap-cms@3/dist/decap-cms.js"
-      onload="if (window.__decapInitFromHash && window.CMS) { window.CMS.init(); }"
-    ></script>
+    <main class="auth-shell">
+      <section id="auth0-root" class="auth-card">
+        <span class="auth-card__eyebrow">Acceso privado</span>
+        <h1 class="auth-card__title">CMS</h1>
+        <p class="auth-card__subtitle">
+          Inicia sesión con Auth0 para administrar el contenido.
+        </p>
+        <button id="auth0-login" class="auth-card__button" disabled>
+          Iniciar sesión
+        </button>
+        <p class="auth-card__status">Cargando configuración…</p>
+      </section>
+    </main>
+    <script src="/admin/auth0-config.js"></script>
+    <script src="/admin/auth0-login.js" defer></script>
   </body>
 </html>

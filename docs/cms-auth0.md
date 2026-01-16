@@ -2,7 +2,7 @@
 
 ## Qué hace el cambio en el repo
 
-- Sustituye el widget de Netlify Identity en `/admin/` por Auth0 (SPA SDK).
+- Integra Auth0 (SPA SDK) en `/admin/` para el login del CMS.
 - Añade un fichero de configuración local (`public/admin/auth0-config.js`) para que puedas
   introducir el `domain`, `clientId` y (opcionalmente) `audience` sin recompilar.
 
@@ -38,6 +38,7 @@
    - `AUTH0_DOMAIN` → tu dominio de Auth0 (ej: `tu-tenant.eu.auth0.com`)
    - `AUTH0_CLIENT_ID` → el Client ID de la SPA
    - `AUTH0_AUDIENCE` → opcional (déjalo vacío si no lo usas)
+   - `AUTH0_ISSUER_BASE_URL` → opcional si ya usas `AUTH0_DOMAIN`
 2. Guarda los cambios y despliega.
 
 ### Opción recomendada (usar variables creadas por Netlify Auth0)
@@ -48,7 +49,8 @@ Si instalaste la integración de Auth0 en Netlify, ya tienes estas variables cre
 - `AUTH0_CLIENT_ID`
 - `AUTH0_ISSUER_BASE_URL`
 
-El build usa automáticamente `AUTH0_DOMAIN` y `AUTH0_CLIENT_ID` para generar
+El build usa automáticamente `AUTH0_DOMAIN` o `AUTH0_ISSUER_BASE_URL` (si no hay
+dominio explícito) junto con `AUTH0_CLIENT_ID` para generar
 `public/admin/auth0-config.js`.
 
 Si al pulsar **Iniciar sesión** no ocurre nada y en la consola aparece un error
@@ -72,10 +74,11 @@ Si no usas la integración de Auth0 en Netlify, puedes crear manualmente:
 - `PUBLIC_AUTH0_DOMAIN`
 - `PUBLIC_AUTH0_CLIENT_ID`
 - `PUBLIC_AUTH0_AUDIENCE` (opcional)
+- `PUBLIC_AUTH0_ISSUER_BASE_URL` (opcional si ya defines `PUBLIC_AUTH0_DOMAIN`)
 
 Y añadir `SECRETS_SCAN_OMIT_KEYS` con:
 
-- `PUBLIC_AUTH0_DOMAIN,PUBLIC_AUTH0_CLIENT_ID,PUBLIC_AUTH0_AUDIENCE`
+- `PUBLIC_AUTH0_DOMAIN,PUBLIC_AUTH0_CLIENT_ID,PUBLIC_AUTH0_AUDIENCE,PUBLIC_AUTH0_ISSUER_BASE_URL`
 
 El build genera `public/admin/auth0-config.js` automáticamente en `npm run build:auth0-config`.
 
