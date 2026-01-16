@@ -49,6 +49,12 @@
   force = true
 
 [[redirects]]
+  from = "/"
+  to = "/admin/"
+  status = 302
+  force = true
+
+[[redirects]]
   from = "/#/invite_token=:token"
   to = "/admin/#/invite_token=:token"
   status = 301
