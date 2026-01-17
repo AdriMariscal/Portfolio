@@ -1,4 +1,4 @@
-backend:
+﻿backend:
   name: github
   repo: "AdriMariscal/portfolio"
   branch: dev
@@ -24,7 +24,7 @@ collections:
     extension: "mdx"
     format: "frontmatter"
     preview_path: "blog/{{slug}}"
-    summary: "{{title}} — {{date}}"
+    summary: "{{title}} - {{date}}"
     fields:
       - { label: "Título", name: "title", widget: "string" }
       - { label: "Descripción", name: "description", widget: "text", required: false }

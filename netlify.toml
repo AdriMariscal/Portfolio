@@ -87,6 +87,11 @@
   status = 404
 
 [[headers]]
+  for = "/admin/*"
+  [headers.values]
+    Cross-Origin-Opener-Policy = "same-origin-allow-popups"
+
+[[headers]]
   for = "/*"
   [headers.values]
     Content-Security-Policy = ""
