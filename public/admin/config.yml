@@ -1,11 +1,11 @@
-site_url: "https://adrianmariscal.es"
-display_url: "https://adrianmariscal.es"
 backend:
-  name: git-gateway
+  name: github
+  repo: "AdriMariscal/portfolio"
   branch: dev
-  accept_roles:
-    - admin
-    - editor
+  base_url: "https://api.netlify.com"
+  auth_endpoint: "auth"
+  auth_type: "pkce"
+  site_id: "8ae7b5b9-b9c0-490f-9bd2-15996e47536c"
   commit_messages:
     create: "cms: create {{collection}} \"{{slug}}\""
     update: "cms: update {{collection}} \"{{slug}}\""
@@ -24,7 +24,7 @@ collections:
     extension: "mdx"
     format: "frontmatter"
     preview_path: "blog/{{slug}}"
-    summary: "{{title}} — {{date}}"
+    summary: "{{title}} - {{date}}"
     fields:
       - { label: "Título", name: "title", widget: "string" }
       - { label: "Descripción", name: "description", widget: "text", required: false }

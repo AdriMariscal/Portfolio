@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "build:auth0-config": "node scripts/write-auth0-config.mjs",
+    "prebuild": "node scripts/set-cms-site-url.mjs",
     "preview": "astro preview",
     "astro": "astro",
     "lint": "eslint . --ext .js,.cjs,.mjs,.ts,.tsx,.astro",
