@@ -1,0 +1,6 @@
+window.AUTH0_CONFIG = {
+  AUTH0_DOMAIN: "",
+  AUTH0_CLIENT_ID: "",
+  AUTH0_AUDIENCE: "",
+  AUTH0_ISSUER_BASE_URL: "",
+};
