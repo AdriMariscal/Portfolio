@@ -7,6 +7,62 @@
     <link rel="icon" href="/logos/favicon.png" type="image/png" />
   </head>
   <body>
+    <script>
+      (function () {
+        const params = new URLSearchParams(window.location.search);
+        if (!params.has("cmsDebug")) {
+          return;
+        }
+
+        const prefix = "[CMS-DEBUG]";
+        const log = (...args) => console.log(prefix, ...args);
+        const readCmsUser = () => {
+          try {
+            return localStorage.getItem("netlify-cms-user");
+          } catch (error) {
+            log("localStorage error", error);
+            return null;
+          }
+        };
+
+        log("enabled", { href: window.location.href, origin: window.location.origin });
+
+        window.addEventListener("message", (event) => {
+          log("message", { origin: event.origin, data: event.data });
+        });
+
+        window.addEventListener("storage", (event) => {
+          log("storage", { key: event.key, newValue: event.newValue });
+        });
+
+        let lastCmsUser = null;
+        const pollCmsUser = () => {
+          const current = readCmsUser();
+          if (current !== lastCmsUser) {
+            log("netlify-cms-user", current);
+            lastCmsUser = current;
+          }
+        };
+
+        pollCmsUser();
+        setInterval(pollCmsUser, 1000);
+
+        fetch("/admin/config.yml", { cache: "no-store" })
+          .then(async (response) => {
+            const text = await response.text();
+            log("config.yml", { status: response.status, length: text.length });
+            if (!text.includes("auth_type: \"pkce\"")) {
+              log("config.yml warning: auth_type is not pkce");
+            }
+            if (!text.includes("site_id:")) {
+              log("config.yml warning: missing site_id");
+            }
+          })
+          .catch((error) => {
+            log("config.yml error", error);
+          });
+      })();
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/decap-cms@3/dist/decap-cms.js"></script>
   </body>
 </html>
