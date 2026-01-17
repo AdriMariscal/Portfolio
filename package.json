@@ -1,10 +1,11 @@
 {
   "name": "portfolio",
   "type": "module",
-  "version": "3.49.9",
+  "version": "3.49.10",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
+    "prebuild": "node scripts/set-cms-site-url.mjs",
     "preview": "astro preview",
     "astro": "astro",
     "lint": "eslint . --ext .js,.cjs,.mjs,.ts,.tsx,.astro",
