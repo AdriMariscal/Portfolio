@@ -1,11 +1,10 @@
 site_url: "https://adrianmariscal.es"
 display_url: "https://adrianmariscal.es"
 backend:
-  name: git-gateway
+  name: github
+  repo: "AdriMariscal/portfolio"
   branch: dev
-  accept_roles:
-    - admin
-    - editor
+  auth_endpoint: "https://api.netlify.com/auth"
   commit_messages:
     create: "cms: create {{collection}} \"{{slug}}\""
     update: "cms: update {{collection}} \"{{slug}}\""
