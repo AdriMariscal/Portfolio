@@ -4,7 +4,8 @@ backend:
   name: github
   repo: "AdriMariscal/portfolio"
   branch: dev
-  auth_endpoint: "https://api.netlify.com/auth"
+  base_url: "https://api.netlify.com"
+  auth_endpoint: "auth"
   commit_messages:
     create: "cms: create {{collection}} \"{{slug}}\""
     update: "cms: update {{collection}} \"{{slug}}\""
