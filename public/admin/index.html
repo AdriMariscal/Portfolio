@@ -5,6 +5,242 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CMS - Portfolio</title>
     <link rel="icon" href="/logos/favicon.png" type="image/png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap"
+    />
+    <style>
+      :root {
+        color-scheme: dark;
+        --font-ui: "Inter", system-ui, -apple-system, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+        --font-display: "Sora", "Inter", system-ui, sans-serif;
+
+        --cms-bg: #0a0a0a;
+        --cms-surface: #1f2426;
+        --cms-surface-alt: #2f3437;
+        --cms-border: #3a4246;
+        --cms-heading: #fbe7b5;
+        --cms-text: #e8d3a3;
+        --cms-text-muted: #cccccc;
+        --cms-accent: #2dd4bf;
+        --cms-accent-strong: #0f766e;
+        --cms-accent-warm: #f59e0b;
+        --cms-accent-cool: #38bdf8;
+        --cms-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+        --cms-shadow-soft: 0 8px 20px rgba(0, 0, 0, 0.35);
+        --cms-radius-sm: 10px;
+        --cms-radius-md: 12px;
+        --cms-radius-lg: 20px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--cms-text);
+        font-family: var(--font-ui);
+        background: radial-gradient(
+            circle at 10% 10%,
+            rgba(45, 212, 191, 0.18),
+            transparent 55%
+          ),
+          radial-gradient(
+            circle at 90% 0%,
+            rgba(56, 189, 248, 0.16),
+            transparent 45%
+          ),
+          radial-gradient(
+            circle at 20% 85%,
+            rgba(245, 158, 11, 0.18),
+            transparent 50%
+          ),
+          var(--cms-bg);
+      }
+
+      #nc-root {
+        min-height: 100vh;
+        animation: cmsFadeIn 320ms ease-out;
+      }
+
+      #nc-root,
+      #nc-root * {
+        font-family: var(--font-ui) !important;
+      }
+
+      #nc-root h1,
+      #nc-root h2,
+      #nc-root h3,
+      #nc-root h4,
+      #nc-root h5,
+      #nc-root h6 {
+        font-family: var(--font-display) !important;
+        color: var(--cms-heading) !important;
+        letter-spacing: 0.01em;
+      }
+
+      #nc-root a {
+        color: var(--cms-heading);
+      }
+
+      #nc-root a:hover {
+        color: var(--cms-accent);
+      }
+
+      #nc-root header,
+      #nc-root nav,
+      #nc-root aside {
+        background: rgba(31, 36, 38, 0.94) !important;
+        border-color: var(--cms-border) !important;
+        box-shadow: var(--cms-shadow-soft);
+      }
+
+      #nc-root main {
+        background: transparent !important;
+      }
+
+      #nc-root input,
+      #nc-root textarea,
+      #nc-root select {
+        background: var(--cms-surface) !important;
+        color: var(--cms-text) !important;
+        border: 1px solid var(--cms-border) !important;
+        border-radius: var(--cms-radius-sm) !important;
+        box-shadow: none !important;
+      }
+
+      #nc-root input::placeholder,
+      #nc-root textarea::placeholder {
+        color: var(--cms-text-muted) !important;
+      }
+
+      #nc-root input:focus,
+      #nc-root textarea:focus,
+      #nc-root select:focus {
+        outline: none !important;
+        border-color: var(--cms-accent) !important;
+        box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.28) !important;
+      }
+
+      #nc-root button,
+      #nc-root [type="button"],
+      #nc-root [type="submit"],
+      #nc-root .nc-button {
+        font-family: var(--font-display) !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.02em;
+        background: linear-gradient(
+          135deg,
+          var(--cms-accent-strong),
+          var(--cms-accent)
+        ) !important;
+        color: #0a0a0a !important;
+        border: 1px solid transparent !important;
+        border-radius: 999px !important;
+        padding: 0.65rem 1.2rem !important;
+        box-shadow: var(--cms-shadow-soft) !important;
+        transition: transform 120ms ease, filter 120ms ease, box-shadow 120ms ease;
+      }
+
+      #nc-root button:hover,
+      #nc-root [type="button"]:hover,
+      #nc-root [type="submit"]:hover,
+      #nc-root .nc-button:hover {
+        transform: translateY(-1px);
+        filter: brightness(1.06);
+        box-shadow: var(--cms-shadow);
+      }
+
+      #nc-root button:active,
+      #nc-root [type="button"]:active,
+      #nc-root [type="submit"]:active,
+      #nc-root .nc-button:active {
+        transform: translateY(0);
+        filter: brightness(0.98);
+      }
+
+      #nc-root [role="button"] {
+        border-radius: 999px;
+      }
+
+      #nc-root table,
+      #nc-root [class*="Table"] {
+        background: var(--cms-surface) !important;
+        color: var(--cms-text) !important;
+        border-color: var(--cms-border) !important;
+      }
+
+      #nc-root hr,
+      #nc-root [class*="Divider"] {
+        border-color: var(--cms-border) !important;
+      }
+
+      #nc-root [class*="Card"],
+      #nc-root [class*="card"],
+      #nc-root [class*="Panel"] {
+        background: var(--cms-surface) !important;
+        color: var(--cms-text) !important;
+        border: 1px solid var(--cms-border) !important;
+        border-radius: var(--cms-radius-lg) !important;
+        box-shadow: var(--cms-shadow-soft) !important;
+      }
+
+      #nc-root [class*="Sidebar"],
+      #nc-root [class*="Nav"] {
+        color: var(--cms-text) !important;
+      }
+
+      #nc-root [class*="Badge"],
+      #nc-root [class*="Pill"] {
+        background: rgba(45, 212, 191, 0.18) !important;
+        border: 1px solid rgba(45, 212, 191, 0.45) !important;
+        color: var(--cms-heading) !important;
+        border-radius: 999px !important;
+      }
+
+      #nc-root [class*="Toggle"],
+      #nc-root input[type="checkbox"] {
+        accent-color: var(--cms-accent);
+      }
+
+      @keyframes cmsFadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 720px) {
+        body {
+          background: radial-gradient(
+              circle at 30% 10%,
+              rgba(45, 212, 191, 0.18),
+              transparent 50%
+            ),
+            radial-gradient(
+              circle at 70% 0%,
+              rgba(56, 189, 248, 0.14),
+              transparent 45%
+            ),
+            var(--cms-bg);
+        }
+
+        #nc-root [class*="Card"],
+        #nc-root [class*="card"],
+        #nc-root [class*="Panel"] {
+          border-radius: var(--cms-radius-md) !important;
+        }
+      }
+    </style>
   </head>
   <body>
     <noscript>Necesitas habilitar JavaScript para usar el CMS.</noscript>
