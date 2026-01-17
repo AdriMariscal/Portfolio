@@ -14,7 +14,8 @@ const siteUrl =
 const displayUrl = process.env.CMS_DISPLAY_URL || siteUrl;
 
 const original = fs.readFileSync(configPath, "utf8");
-const withoutUrls = original
+const normalized = original.replace(/\ufeff/g, "");
+const withoutUrls = normalized
   .replace(/^site_url:.*\r?\n/gm, "")
   .replace(/^display_url:.*\r?\n/gm, "");
 
