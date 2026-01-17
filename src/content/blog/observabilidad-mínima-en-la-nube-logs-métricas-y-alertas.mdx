@@ -1,0 +1,231 @@
+---
+title: "Observabilidad mínima en la nube: logs, métricas y alertas"
+description: "Método en 5 pasos para montar observabilidad mínima viable en un
+  MVP: señales clave, logs JSON, métricas básicas y alertas accionables,
+  controlando el coste."
+tags:
+  - '["cloud"'
+  - '"finops"'
+  - '"infraestructura"'
+  - '"pymes"]'
+date: 2026-01-15T10:15:00.000+01:00
+published: true
+draft: false
+image: https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?auto=format&fit=crop&w=2400&q=80
+imageAlt: Portátil mostrando un dashboard de métricas en pantalla
+imageCaption: Un panel mínimo, con señales claras y dueños asignados, suele
+  ganar a diez dashboards sin acción.
+robots: max-snippet:-1, max-image-preview:large
+---
+# Observabilidad mínima en la nube: logs, métricas y alertas
+
+Cuando un MVP empieza a tener usuarios reales, los fallos dejan de ser “bugs” y pasan a ser pérdida de ventas, soporte y confianza. El problema es que “montar observabilidad” puede convertirse en otro proyecto (y otra factura) si no se acota bien.
+
+En este post planteo una **observabilidad mínima viable (OMV)**: lo suficiente para detectar y resolver incidentes habituales **sin ruido** y **sin sustos de coste**.
+
+## Qué es “observabilidad mínima viable” (y qué no es)
+
+**OMV** significa:
+
+- **Pocas señales**, elegidas por impacto (no por disponibilidad de dashboards).
+- **Logs estructurados** que permitan reconstruir un caso en minutos.
+- **Métricas básicas** para alertas fiables (sin depender de leer logs).
+- **Alertas accionables** (con dueño y acción definida).
+- **Revisión mensual** para recortar ruido y controlar volumen/retención.
+
+No significa:
+
+- Instrumentar “todo” desde el día 1.
+- Tener 15 paneles si nadie los mira.
+- Alertar por cada excepción aislada.
+- Pagar retención infinita “por si acaso”.
+
+## El método en 5 pasos
+
+### ## 1. Elige señales clave por flujo de negocio
+
+Empieza por **2–3 flujos críticos** (p. ej.: “solicitud enviada”, “pago”, “login”, “generar PDF”, “API de presupuesto”). Para cada flujo, define señales que respondan a:
+
+- **Disponibilidad**: ¿el sistema responde?
+- **Errores**: ¿responde bien o está fallando?
+- **Latencia**: ¿responde a tiempo?
+- **Saturación/capacidad**: ¿se está quedando sin margen? (colas, rate limits, CPU/memoria si aplica)
+
+Un set mínimo típico (MVP web/API):
+
+- **Tasa de error** (5xx o “error lógico” en tu dominio).
+- **Latencia p95** del endpoint/flujo principal.
+- **Disponibilidad** (healthcheck o uptime sintético).
+- **Fallos de jobs** (si hay colas/cron).
+
+Consejo práctico: define estas señales con una frase operativa:  
+“Si esto se dispara, ¿qué decisión tomo hoy?”
+
+### ## 2. Logs estructurados (útiles y baratos)
+
+Los logs son tu “grabación” del incidente. Para OMV, prioriza **logs estructurados (JSON)** con campos consistentes y con correlación.
+
+Campos mínimos recomendados:
+
+- `timestamp`, `level`, `service`, `env`
+- `request_id` (o `trace_id` si lo tienes)
+- `route` / `operation`
+- `status` / `result`
+- `duration_ms`
+- `error_code` (tuyo) + `error_message` (saneado)
+- `user_id` **solo si es imprescindible** y preferiblemente pseudonimizado/hasheado
+
+Ejemplo (JSON log):
+
+```json
+{
+  "timestamp": "2026-01-15T10:42:12.123Z",
+  "level": "info",
+  "service": "api",
+  "env": "prod",
+  "request_id": "req_01H...",
+  "route": "POST /api/quote",
+  "status": 200,
+  "duration_ms": 184,
+  "result": "ok"
+}
+```
+
+Reglas anti-ruido (y anti-RGPD):
+
+- Evita loggear **PII** (emails, teléfonos, direcciones) salvo necesidad explícita; si aparece, **redacta**.
+- Separa `info` (operativo) de `debug` (solo en dev o con sampling fuerte).
+- No conviertas un stack trace enorme en tu “métrica”: el stack trace está bien, pero **no en cada request**.
+
+### ## 3. Métricas básicas (para alertar sin leer logs)
+
+Si los logs son “detalle”, las métricas son “señal”. Para alertas, las métricas suelen ser más estables que “buscar en logs”.
+
+Tipos mínimos:
+
+- **Counter**: cuántas veces pasa algo (requests, errores).
+- **Histogram**: distribución de latencias (p50/p95/p99).
+- **Gauge**: valor actual (cola, jobs pendientes, uso).
+
+Métricas mínimas recomendadas (API típica):
+
+- `http_requests_total{route,method,status}`
+- `http_request_duration_ms` (histogram)
+- `app_errors_total{type,route}` (si tu dominio tiene errores propios)
+- `jobs_failed_total{job}` (si aplica)
+- `queue_depth{queue}` (si aplica)
+
+Ejemplo (Node/TS con `prom-client`, simplificado):
+
+```ts
+import client from "prom-client";
+
+const registry = new client.Registry();
+client.collectDefaultMetrics({ register: registry });
+
+const httpDuration = new client.Histogram({
+  name: "http_request_duration_ms",
+  help: "Duración de requests HTTP",
+  labelNames: ["route", "method", "status"],
+  buckets: [50, 100, 200, 400, 800, 1500, 3000]
+});
+
+registry.registerMetric(httpDuration);
+
+// En tu handler/middleware:
+const end = httpDuration.startTimer({ route: "/api/quote", method: "POST" });
+// ... lógica
+end({ status: "200" });
+```
+
+Nota: si más adelante quieres trazas distribuidas, **OpenTelemetry** encaja bien, pero no es requisito para arrancar OMV.
+
+### ## 4. Alertas accionables (sin ruido)
+
+La regla que más recorta ruido:
+
+**No se crea una alerta si no puedes responder estas 3 cosas:**
+1) **Dueño** (quién mira)  
+2) **Acción** (qué hace)  
+3) **Ventana** (cuánto tiempo antes de molestar)
+
+Buenas prácticas para un MVP:
+
+- Alertas “de pager” (interrupción): pocas, críticas, con ventana corta.
+- Alertas “de ticket” (no interrumpen): latencia degradada, tendencias, capacity warnings.
+- Evita alertar por “1 error”: alerta por **tasa** y por **duración**.
+
+Umbrales iniciales razonables (ajústalos a tu realidad):
+
+- **Error rate** > 2–5% durante 5–10 min en endpoint crítico.
+- **Latencia p95** > tu objetivo (p. ej. > 800ms) durante 10 min.
+- **Disponibilidad**: healthcheck caído 2–3 checks seguidos.
+- **Jobs fallando**: N fallos consecutivos o % de fallos anormal durante X min.
+
+Consejo: empieza conservador, revisa un mes y **endurece** donde haya impacto real.
+
+### ## 5. Revisión mensual (y recorte de coste)
+
+La OMV mejora si la tratas como un sistema vivo:
+
+- ¿Qué alertas fueron útiles? ¿Cuáles fueron falsas?
+- ¿Qué logs se consultaron de verdad? ¿Qué campos faltaron?
+- ¿Qué métricas nadie usa? (elimínalas o bájalas de frecuencia/retención)
+- ¿Qué top-3 incidentes tuvimos? ¿qué señal habría reducido el MTTR?
+
+Esta revisión es también tu palanca para **controlar coste**.
+
+## Control de coste: retención, sampling y límites
+
+La observabilidad suele crecer por tres vías: **volumen**, **retención** y **cardinalidad**.
+
+Checklist de control:
+
+- **Retención por defecto corta** en logs (p. ej. 7–14 días) y más larga en métricas (p. ej. 30–90 días), ajustando según necesidades legales/operativas.
+- **Sampling**: reduce `debug` y eventos repetitivos; mantén 100% para errores críticos si el volumen lo permite.
+- **Cardinalidad**: evita etiquetas/campos tipo `user_id`, `email`, `session_id` como labels en métricas. Úsalos en logs (y con cuidado), no en series.
+- **Límites por servicio**: define cuotas (ingesta diaria) y alertas de gasto para la propia observabilidad.
+- **Ambientes**: en `dev` y `staging`, baja retención y sube sampling agresivo.
+
+## Checklist rápida de OMV (10 minutos para saber si vas bien)
+
+- [ ] Tengo 2–3 flujos críticos definidos (con dueño de negocio o técnico).
+- [ ] Mido error rate y latencia p95 del flujo principal.
+- [ ] Mis logs son JSON y tienen `request_id` + `duration_ms`.
+- [ ] No estoy metiendo PII en logs (o está redactada).
+- [ ] Tengo 3–6 alertas como máximo, todas con dueño + acción.
+- [ ] Uso ventanas/duración para evitar alertas por picos puntuales.
+- [ ] Tengo retención definida y reviso volumen/costes mensualmente.
+
+## Plantilla: matriz de alertas (qué, umbral, dueño, acción)
+
+Tabla base (rellénala y úsala como “contrato” de alertas):
+
+| Alerta | Señal (métrica/log) | Umbral inicial | Ventana | Severidad | Dueño | Acción inmediata |
+|---|---|---:|---:|---|---|---|
+| Error rate alto (flujo crítico) | `errors / requests` | > 3% | 10 min | P1 | Dev on-call | Revisar último deploy, rollback si procede, inspeccionar top routes/errors |
+| Latencia p95 degradada | `p95 latency` | > 800ms | 10 min | P2 | Dev | Identificar endpoint, revisar dependencias externas, activar mitigación (cache/feature flag) |
+| Healthcheck caído | Uptime sintético | 2 fallos seguidos | 2–3 min | P1 | Dev | Confirmar caída, comprobar proveedor/red, activar página de estado o modo degradado |
+| Jobs fallando | `jobs_failed_total` | > 5 fallos | 15 min | P2 | Dev | Pausar job/cola, revisar input, reintentar con backoff |
+
+Versión CSV (para copiar/pegar en Sheets):
+
+```csv
+Alerta,Señal,Umbral,Ventana,Severidad,Dueño,Acción
+Error rate alto (flujo crítico),errors/requests,>3%,10 min,P1,Dev on-call,"Revisar deploy; rollback si procede; inspeccionar top rutas/errores"
+Latencia p95 degradada,p95 latency,>800ms,10 min,P2,Dev,"Identificar endpoint; revisar dependencias; activar mitigación"
+Healthcheck caído,uptime sintético,2 fallos seguidos,3 min,P1,Dev,"Confirmar caída; comprobar proveedor/red; modo degradado"
+Jobs fallando,jobs_failed_total,>5 fallos,15 min,P2,Dev,"Pausar job/cola; revisar input; reintentar con backoff"
+```
+
+## Lecturas relacionadas (por si quieres ampliar)
+
+- Checklist y artículos de puesta en producción en la nube: **/blog/tags/cloud/**  
+- Guardrails de coste y operación (FinOps): **/blog/tags/finops/**  
+- Control de costes y riesgos en BaaS/side projects: **/blog/tags/baas/**  
+
+## Cierre
+
+Una OMV bien planteada no se mide por cuántas gráficas tienes, sino por una pregunta simple: **cuando algo se rompe, ¿tardas minutos u horas en entender qué pasa y qué hacer?**
+
+Si quieres, puedo revisar tu caso y proponerte una OMV priorizada (señales, logs, métricas y matriz de alertas) ajustada a tu stack y a tu presupuesto: [Contacto](/contact/).
