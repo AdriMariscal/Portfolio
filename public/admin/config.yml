@@ -6,6 +6,7 @@ backend:
   branch: dev
   base_url: "https://api.netlify.com"
   auth_endpoint: "auth"
+  site_id: "8ae7b5b9-b9c0-490f-9bd2-15996e47536c"
   commit_messages:
     create: "cms: create {{collection}} \"{{slug}}\""
     update: "cms: update {{collection}} \"{{slug}}\""
