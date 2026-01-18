@@ -28,8 +28,8 @@ module.exports = {
         'categories:seo': ['error', { minScore: 0.9 }],
         // Presupuestos de métricas clave
         'cumulative-layout-shift': ['error', { maxNumericValue: 0.1 }],
-        'interaction-to-next-paint': ['error', { maxNumericValue: 200 }],
-        'total-javascript': ['error', { maxNumericValue: 102400 }],
+        'total-blocking-time': ['error', { maxNumericValue: 200 }],
+        'total-byte-weight': ['error', { maxNumericValue: 512000 }],
       },
     },
 
