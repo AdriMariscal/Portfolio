@@ -1,9 +1,14 @@
+import type { Context } from "https://edge.netlify.com";
+
 // Edge Function que protege staging + deploy previews con Basic Auth
-export default async function basicAuth(request, context) {
+export default async function basicAuth(
+  request: Request,
+  context: Context
+) {
   try {
     const url = new URL(request.url);
     const hostname = url.hostname;
-    const securityHeaders = {
+    const securityHeaders: Record<string, string> = {
       "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
       "X-Content-Type-Options": "nosniff",
       "X-Frame-Options": "DENY",
@@ -79,8 +84,8 @@ export default async function basicAuth(request, context) {
     // Credenciales correctas → continuamos con la petición normal
     const response = await context.next();
     const headers = new Headers(response.headers);
-    Object.keys(securityHeaders).forEach((key) => {
-      headers.set(key, securityHeaders[key]);
+    Object.entries(securityHeaders).forEach(([key, value]) => {
+      headers.set(key, value);
     });
 
     return new Response(response.body, {
