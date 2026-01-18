@@ -1,0 +1,66 @@
+name: Editorial localize remote images
+
+on:
+  pull_request:
+    types: [unlabeled]
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  localize-images:
+    if: >
+      github.event.label.name == 'decap-cms/draft' &&
+      (startsWith(github.event.pull_request.head.ref, 'cms/') ||
+      startsWith(github.event.pull_request.head.ref, 'post/')) &&
+      github.event.pull_request.base.ref == 'dev' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Collect content files
+        id: files
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const pr = context.payload.pull_request;
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pr.number,
+              per_page: 100,
+            });
+            const contentFiles = files
+              .map((file) => file.filename)
+              .filter((name) => name.startsWith('src/content/') && (name.endsWith('.md') || name.endsWith('.mdx')));
+            fs.writeFileSync('pr-content-files.txt', contentFiles.join('\n'));
+            core.setOutput('count', contentFiles.length.toString());
+
+      - name: Localize remote images
+        if: steps.files.outputs.count != '0'
+        run: node scripts/localize-remote-images.mjs --file-list pr-content-files.txt
+
+      - name: Commit changes
+        run: |
+          if git diff --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/content public/images/uploads
+          git commit -m "chore: localize remote images"
+          git push

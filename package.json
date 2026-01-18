@@ -1,7 +1,7 @@
 {
   "name": "portfolio",
   "type": "module",
-  "version": "3.49.2",
+  "version": "3.50.0",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
@@ -19,7 +19,8 @@
     "test:unit:coverage": "vitest run --coverage",
     "test:e2e:setup": "node scripts/playwright-ensure-browsers.mjs",
     "pretest:e2e": "pnpm run test:e2e:setup",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "localize:images": "node scripts/localize-remote-images.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.8",
