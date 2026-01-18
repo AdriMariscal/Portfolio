@@ -1,0 +1,154 @@
+name: Editorial workflow multi-branch PRs
+
+on:
+  pull_request:
+    types: [labeled, unlabeled]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  editorial-prs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create staging/main PRs from CMS status
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const label = context.payload.label?.name;
+            if (!pr || !label) {
+              return;
+            }
+
+            const cmsPrefixes = ["cms/", "post/"];
+            const isCmsBranch = cmsPrefixes.some((prefix) => pr.head.ref.startsWith(prefix));
+            if (!isCmsBranch || pr.base.ref !== "dev") {
+              return;
+            }
+
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const headOwner = pr.head.repo?.owner?.login || owner;
+            const head = `${headOwner}:${pr.head.ref}`;
+            const allowedPrefixes = ["src/content/", "public/images/uploads/"];
+
+            const listPrs = async (base) => {
+              const { data } = await github.rest.pulls.list({
+                owner,
+                repo,
+                base,
+                head,
+                state: "all",
+              });
+              return data;
+            };
+
+            const ensureCmsOnlyChanges = async () => {
+              const files = await github.paginate(github.rest.pulls.listFiles, {
+                owner,
+                repo,
+                pull_number: pr.number,
+                per_page: 100,
+              });
+              const invalid = files.filter(
+                (file) => !allowedPrefixes.some((prefix) => file.filename.startsWith(prefix))
+              );
+              if (invalid.length === 0) {
+                return true;
+              }
+
+              const preview = invalid
+                .slice(0, 10)
+                .map((file) => `- ${file.filename}`)
+                .join("\n");
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: pr.number,
+                body: [
+                  "He detectado archivos fuera del scope del CMS.",
+                  "Solo se permiten cambios en:",
+                  "- `src/content/**`",
+                  "- `public/images/uploads/**`",
+                  "",
+                  "Archivos fuera de scope (primeros 10):",
+                  preview || "- (sin detalles)",
+                  "",
+                  "Por favor, deja la rama solo con cambios del CMS.",
+                ].join("\n"),
+              });
+
+              if (context.payload.action === "labeled" && label === "decap-cms/pending_publish") {
+                await github.rest.issues.removeLabel({
+                  owner,
+                  repo,
+                  issue_number: pr.number,
+                  name: "decap-cms/pending_publish",
+                });
+              }
+
+              core.setFailed("PR contains files outside CMS scope.");
+              return false;
+            };
+
+            const ensurePr = async (base, titlePrefix) => {
+              const existing = await listPrs(base);
+              const open = existing.find((item) => item.state === "open");
+              const merged = existing.find((item) => item.merged_at);
+              if (open || merged) {
+                return open || merged;
+              }
+
+              const { data } = await github.rest.pulls.create({
+                owner,
+                repo,
+                base,
+                head,
+                title: `${titlePrefix}: ${pr.title}`,
+                body: [
+                  "Automated from Decap CMS editorial workflow.",
+                  "",
+                  `Source PR #${pr.number}: ${pr.html_url}`,
+                ].join("\n"),
+              });
+              return data;
+            };
+
+            if (context.payload.action === "unlabeled" && label === "decap-cms/draft") {
+              if (!(await ensureCmsOnlyChanges())) {
+                return;
+              }
+
+              await ensurePr("staging", "In Review");
+              return;
+            }
+
+            if (context.payload.action === "labeled" && label === "decap-cms/pending_publish") {
+              if (!(await ensureCmsOnlyChanges())) {
+                return;
+              }
+
+              const stagingPrs = await listPrs("staging");
+              const hasStaging = stagingPrs.some((item) => item.state === "open" || item.merged_at);
+              if (!hasStaging) {
+                await github.rest.issues.createComment({
+                  owner,
+                  repo,
+                  issue_number: pr.number,
+                  body: "No puedo crear la PR a `main` sin una PR previa a `staging`. Primero pasa el contenido a In Review.",
+                });
+                await github.rest.issues.removeLabel({
+                  owner,
+                  repo,
+                  issue_number: pr.number,
+                  name: "decap-cms/pending_publish",
+                });
+                core.setFailed("Missing staging PR for Ready → main.");
+                return;
+              }
+
+              await ensurePr("main", "Ready");
+            }
