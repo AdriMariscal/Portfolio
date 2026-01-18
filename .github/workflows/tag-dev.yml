@@ -1,3 +1,4 @@
+# Creates dev prerelease tags on pushes to dev.
 name: Tag dev pre-release
 
 on:

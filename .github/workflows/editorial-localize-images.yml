@@ -1,3 +1,4 @@
+# Localizes remote images for CMS content pull requests.
 name: Editorial localize remote images
 
 on:
