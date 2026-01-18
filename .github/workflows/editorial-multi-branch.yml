@@ -20,6 +20,7 @@ jobs:
           script: |
             const pr = context.payload.pull_request;
             const label = context.payload.label?.name;
+            const action = context.payload.action;
             if (!pr || !label) {
               return;
             }
@@ -118,7 +119,10 @@ jobs:
               return data;
             };
 
-            if (context.payload.action === "unlabeled" && label === "decap-cms/draft") {
+            const isDraftRemoved = action === "unlabeled" && label === "decap-cms/draft";
+            const isPendingReview = action === "labeled" && label === "decap-cms/pending_review";
+
+            if (isDraftRemoved || isPendingReview) {
               if (!(await ensureCmsOnlyChanges())) {
                 return;
               }
@@ -127,7 +131,7 @@ jobs:
               return;
             }
 
-            if (context.payload.action === "labeled" && label === "decap-cms/pending_publish") {
+            if (action === "labeled" && label === "decap-cms/pending_publish") {
               if (!(await ensureCmsOnlyChanges())) {
                 return;
               }
