@@ -1,3 +1,4 @@
+# Manages staging/main PRs for CMS editorial branches.
 name: Editorial workflow multi-branch PRs
 
 on:
