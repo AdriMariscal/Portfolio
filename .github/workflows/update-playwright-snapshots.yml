@@ -1,3 +1,4 @@
+# Updates Playwright snapshots and opens a pull request.
 name: Update Playwright snapshots
 
 on:

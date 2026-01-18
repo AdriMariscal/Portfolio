@@ -1,3 +1,4 @@
+# Creates production release tags on pushes to main.
 name: Tag production release
 
 on:

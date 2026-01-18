@@ -1,3 +1,4 @@
+# Creates release candidate tags on pushes to staging.
 name: Tag RC pre-release
 
 on:

@@ -1,11 +1,19 @@
+# Auto-merges CMS pull requests after required CI workflows succeed.
 name: Editorial workflow auto-merge
 
 on:
   workflow_run:
-    workflows: ["CI – E2E + Lighthouse"]
+    workflows:
+      - CI Lint
+      - CI Typecheck
+      - CI Unit Tests
+      - CI Audit
+      - CI E2E
+      - CI Lighthouse
     types: [completed]
 
 permissions:
+  actions: read
   contents: write
   pull-requests: write
   issues: write
@@ -30,6 +38,14 @@ jobs:
             const repo = context.repo.repo;
             const allowedBranchPrefixes = ["cms/", "post/"];
             const allowedFilePrefixes = ["src/content/", "public/images/uploads/"];
+            const requiredWorkflows = [
+              "CI Lint",
+              "CI Typecheck",
+              "CI Unit Tests",
+              "CI Audit",
+              "CI E2E",
+              "CI Lighthouse",
+            ];
 
             const listFiles = async (pullNumber) => {
               return github.paginate(github.rest.pulls.listFiles, {
@@ -92,6 +108,50 @@ jobs:
               });
             };
 
+            const listWorkflowRuns = async (headSha) => {
+              const { data } = await github.rest.actions.listWorkflowRunsForRepo({
+                owner,
+                repo,
+                head_sha: headSha,
+                event: "pull_request",
+                per_page: 100,
+              });
+              return data.workflow_runs || [];
+            };
+
+            const hasAllRequiredWorkflows = async (headSha, pullNumber) => {
+              const runs = await listWorkflowRuns(headSha);
+              const pending = [];
+
+              for (const workflowName of requiredWorkflows) {
+                const matches = runs
+                  .filter((item) => item.name === workflowName)
+                  .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                if (matches.length === 0) {
+                  pending.push(`${workflowName}=missing`);
+                  continue;
+                }
+
+                const latest = matches[0];
+                if (latest.status !== "completed") {
+                  pending.push(`${workflowName}=in_progress`);
+                  continue;
+                }
+
+                if (latest.conclusion !== "success") {
+                  pending.push(`${workflowName}=${latest.conclusion || "failed"}`);
+                  continue;
+                }
+              }
+
+              if (pending.length > 0) {
+                core.info(`Skipping PR #${pullNumber}: CI not ready (${pending.join(", ")})`);
+                return false;
+              }
+
+              return true;
+            };
+
             for (const prRef of prs) {
               const { data: pr } = await github.rest.pulls.get({
                 owner,
@@ -112,6 +172,10 @@ jobs:
               }
 
               if (!(await hasOnlyCmsFiles(pr.number))) {
+                continue;
+              }
+
+              if (!(await hasAllRequiredWorkflows(pr.head.sha, pr.number))) {
                 continue;
               }
 
