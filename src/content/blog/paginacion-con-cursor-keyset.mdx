@@ -4,7 +4,7 @@ description: "Aprende por qué page=N falla en listados grandes y cómo implemen
 tags: ["pagination", "backend", "performance", "astro", "netlify"]
 published: true
 date: 2025-12-23
-image: "/images/blog/latop-wordpress.jpg"
+image: "/images/uploads/latop-wordpress.jpg"
 imageAlt: "Portátil en un escritorio con un listado tipo tabla y un botón de «Cargar más», junto a una referencia visual a un valor nextCursor de una API"
 imageCaption: "Cuando el dataset crece, paginar bien deja de ser “detalle” y se vuelve parte de la experiencia."
 robots: "max-snippet:-1, max-image-preview:large"
@@ -24,7 +24,7 @@ No es tu imaginación. En listados grandes (y especialmente en datasets que camb
   En esta guía verás por qué `page=N` se vuelve lenta e inconsistente, cómo aplicar **paginación por cursor (keyset)** con una receta práctica (orden estable + cursor compuesto), un ejemplo en SQL y un endpoint en TypeScript, y cómo consumirlo desde Astro con “Cargar más” o infinite scroll.
 </Callout>
 
-![Diagrama comparando paginación por offset vs cursor, mostrando cómo una inserción “mueve” el offset y genera duplicados](/images/blog/offset-vs-cursor.png)
+![Diagrama comparando paginación por offset vs cursor, mostrando cómo una inserción “mueve” el offset y genera duplicados](/images/uploads/offset-vs-cursor.png)
 
 ---
 

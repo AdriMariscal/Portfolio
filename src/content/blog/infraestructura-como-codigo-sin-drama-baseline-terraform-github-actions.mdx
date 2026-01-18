@@ -4,7 +4,7 @@ description: "Elimina el click-ops con un baseline IaC mínimo (dev/staging/prod
 tags: ["infraestructura", "cloud", "ci-cd", "github-actions", "pymes", "finops"]
 published: true
 date: 2025-12-30
-image: "/images/blog/mac-with-vsc.jpg"
+image: "/images/uploads/mac-with-vsc.jpg"
 imageAlt: "Portátil con un pull request en GitHub mostrando un plan de Terraform y checks de CI en verde"
 imageCaption: "Menos clicks, más trazabilidad: la infraestructura también puede ser revisable en PR."
 robots: "max-snippet:-1, max-image-preview:large"
@@ -65,7 +65,7 @@ El error típico es intentar modelar el 100% de la nube en Terraform desde el d�
 | Observabilidad | Un mínimo de logs/métricas y alertas | Un APM completo si aún estás validando producto |
 | Red | Lo imprescindible (seguridad por defecto) | Arquitecturas complejas (VPC/peering) sin demanda real |
 
-![Diagrama conceptual de baseline dev/staging/prod con piezas comunes y variables por entorno](/images/blog/diagrama-infraestructura.png)
+![Diagrama conceptual de baseline dev/staging/prod con piezas comunes y variables por entorno](/images/uploads/diagrama-infraestructura.png)
 
 La idea es muy simple: el baseline debe ser **fácil de explicar** en 5 minutos. Si no, todavía no es baseline: es un proyecto en sí mismo.
 
@@ -263,7 +263,7 @@ Notas rápidas:
 - En un baseline con varios entornos, puedes ejecutar planes por matriz (`dev`, `staging`) y dejar `prod` para un flujo más controlado.
 - Si publicas el plan como comentario, evita volcar información sensible. A veces basta con un resumen de recursos cambiados.
 
-![Captura genérica de un job de GitHub Actions ejecutando terraform fmt/init/plan con checks en verde](/images/blog/laptop-on-wooden-table.jpg)
+![Captura genérica de un job de GitHub Actions ejecutando terraform fmt/init/plan con checks en verde](/images/uploads/laptop-on-wooden-table.jpg)
 
 ### 4.4 `apply` controlado: “automático” no significa “sin control”
 
