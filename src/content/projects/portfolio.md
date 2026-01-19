@@ -21,7 +21,7 @@ projectUrl: https://adrianmariscal.es
 repoUrl: null
 demoUrl: null
 changelog:
-  - version: 3.53.3
+  - version: 3.53.4
     date: 2026-01-18T21:13:00.000+01:00
     changes:
       - type: added
@@ -176,7 +176,7 @@ Este proyecto es mi carta de presentación como **arquitecto Salesforce y especi
 - **SEO y contenido:** migración al dominio canónico **adrianmariscal.es**, actualización de metadatos y canonical; optimización de imágenes y autogeneración de enlaces en encabezados gracias a remark/rehype; reorganización de artículos y etiquetas.
 - **Arquitectura y DevOps:** refactor de Edge Functions para login protegido en staging, variables de entorno seguras y adopción de GitHub Actions como pipeline principal.
 
-## Resultados (v3.53.3)
+## Resultados (v3.53.4)
 
 - **Búsqueda instantánea**: se añade un buscador en `/search` que indexa posts, proyectos y páginas, facilitando el acceso a contenidos.
 - **Nuevas páginas**: se incorporan secciones de **Sobre mí** y **Servicios** que describen mi trayectoria y las soluciones que ofrezco.
