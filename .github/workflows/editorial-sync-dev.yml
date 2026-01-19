@@ -1,0 +1,155 @@
+# Syncs CMS content to dev when an entry moves to In Review.
+name: Editorial workflow sync to dev
+
+on:
+  pull_request:
+    types: [labeled, unlabeled, synchronize]
+
+permissions:
+  contents: write
+  pull-requests: read
+  issues: write
+
+jobs:
+  sync-dev:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Gate sync to dev
+        id: gate
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const action = context.payload.action;
+            const label = context.payload.label?.name;
+            if (!pr) {
+              core.setOutput("skip", "true");
+              return;
+            }
+
+            const cmsPrefixes = ["cms/", "cms_", "post/"];
+            const isCmsBranch = cmsPrefixes.some((prefix) => pr.head.ref.startsWith(prefix));
+            const isSameRepo = pr.head.repo?.full_name === `${context.repo.owner}/${context.repo.repo}`;
+            const hasPendingReview = pr.labels?.some((item) => item.name === "decap-cms/pending_review");
+            const shouldSync =
+              pr.base.ref === "dev" &&
+              isCmsBranch &&
+              isSameRepo &&
+              ((action === "labeled" && label === "decap-cms/pending_review") ||
+                (action === "unlabeled" && label === "decap-cms/draft") ||
+                (action === "synchronize" && hasPendingReview));
+
+            core.setOutput("skip", shouldSync ? "false" : "true");
+            core.setOutput("head_ref", pr.head.ref || "");
+            core.setOutput("pr_number", pr.number ? pr.number.toString() : "");
+
+      - name: Checkout
+        if: steps.gate.outputs.skip != 'true'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch branches
+        if: steps.gate.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          git fetch origin dev "${{ steps.gate.outputs.head_ref }}"
+
+      - name: Collect PR files
+        if: steps.gate.outputs.skip != 'true'
+        id: files
+        uses: actions/github-script@v7
+        env:
+          PR_NUMBER: ${{ steps.gate.outputs.pr_number }}
+        with:
+          script: |
+            const fs = require("fs");
+            const prNumber = Number(process.env.PR_NUMBER);
+            if (!prNumber) {
+              core.setOutput("allowed_count", "0");
+              core.setOutput("disallowed_count", "0");
+              return;
+            }
+
+            const allowedPrefixes = ["src/content/", "public/images/uploads/"];
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+              per_page: 100,
+            });
+
+            const allowed = [];
+            const disallowed = [];
+            for (const file of files) {
+              if (allowedPrefixes.some((prefix) => file.filename.startsWith(prefix))) {
+                allowed.push(file.filename);
+              } else {
+                disallowed.push(file.filename);
+              }
+            }
+
+            fs.writeFileSync("allowed-files.txt", allowed.join("\n"));
+            fs.writeFileSync("disallowed-files.txt", disallowed.join("\n"));
+            core.setOutput("allowed_count", allowed.length.toString());
+            core.setOutput("disallowed_count", disallowed.length.toString());
+
+      - name: Sync CMS entry to dev
+        if: steps.gate.outputs.skip != 'true' && steps.files.outputs.allowed_count != '0'
+        run: |
+          set -euo pipefail
+          BASE="dev"
+          SOURCE="${{ steps.gate.outputs.head_ref }}"
+
+          git checkout -B "$BASE" "origin/${BASE}"
+          xargs -d '\n' git checkout "origin/${SOURCE}" -- < allowed-files.txt
+
+          if git diff --quiet HEAD; then
+            echo "No changes to sync."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          xargs -d '\n' git add < allowed-files.txt
+          git commit -m "cms: sync content for review"
+          git push origin "$BASE"
+
+      - name: Comment on out-of-scope files
+        if: steps.gate.outputs.skip != 'true' && steps.files.outputs.disallowed_count != '0'
+        uses: actions/github-script@v7
+        env:
+          PR_NUMBER: ${{ steps.gate.outputs.pr_number }}
+        with:
+          script: |
+            const fs = require("fs");
+            const prNumber = Number(process.env.PR_NUMBER);
+            if (!prNumber) {
+              return;
+            }
+
+            let details = "";
+            try {
+              const disallowed = fs.readFileSync("disallowed-files.txt", "utf8").trim();
+              if (disallowed) {
+                const lines = disallowed
+                  .split(/\r?\n/)
+                  .slice(0, 20)
+                  .map((line) => `- ${line}`)
+                  .join("\n");
+                details = `\n\nArchivos fuera de scope (primeros 20):\n${lines}`;
+              }
+            } catch (error) {
+              core.warning(`Unable to read disallowed-files.txt: ${error.message}`);
+            }
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              body: [
+                "He sincronizado a `dev` solo el contenido permitido del CMS.",
+                "Los cambios fuera de scope se mantienen en la rama original.",
+                details,
+              ].join("\n"),
+            });
