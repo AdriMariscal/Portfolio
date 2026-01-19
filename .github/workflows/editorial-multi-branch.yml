@@ -25,7 +25,7 @@ jobs:
               return;
             }
 
-            const cmsPrefixes = ["cms/", "cms_", "post/"];
+            const cmsPrefixes = ["cms/", "cms_", "post/", "editorial/filtered/"];
             const isCmsBranch = cmsPrefixes.some((prefix) => pr.head.ref.startsWith(prefix));
             if (!isCmsBranch || pr.base.ref !== "dev") {
               return;
@@ -72,12 +72,12 @@ jobs:
                 return { headRef: `${owner}:${headRef}`, invalid };
               }
               const sanitized = headRef.replace(/\//g, "-");
-              const filteredBranch = headRef.startsWith("cms/filtered/")
+              const filteredBranch = headRef.startsWith("editorial/filtered/")
                 ? headRef
-                : `cms/filtered/${sanitized}`;
+                : `editorial/filtered/${sanitized}`;
 
               let filteredExists = false;
-              if (headRef.startsWith("cms/filtered/")) {
+              if (headRef.startsWith("editorial/filtered/")) {
                 filteredExists = true;
               } else {
                 try {
