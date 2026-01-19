@@ -192,6 +192,7 @@ jobs:
           xargs -d '\n' git checkout "origin/${SOURCE}" -- < allowed-files.txt
 
           if git diff --quiet; then
+            git push --force-with-lease origin "$FILTERED"
             exit 0
           fi
 
