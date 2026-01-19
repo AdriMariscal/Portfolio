@@ -10,6 +10,10 @@ permissions:
   pull-requests: write
   issues: write
 
+concurrency:
+  group: editorial-merge-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
 jobs:
   merge:
     runs-on: ubuntu-latest
@@ -18,13 +22,19 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const pr = context.payload.pull_request;
-            if (!pr) {
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const prNumber = context.payload.pull_request?.number;
+            if (!prNumber) {
               return;
             }
 
-            const owner = context.repo.owner;
-            const repo = context.repo.repo;
+            const { data: pr } = await github.rest.pulls.get({
+              owner,
+              repo,
+              pull_number: prNumber,
+            });
+
             const allowedBranchPrefixes = ["cms/", "cms_", "post/"];
             const allowedFilePrefixes = ["src/content/", "public/images/uploads/"];
             const action = context.payload.action;
@@ -106,22 +116,54 @@ jobs:
               });
             };
 
+            const commentMergeFailure = async (pullNumber, message) => {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: pullNumber,
+                body: message,
+              });
+            };
+
             const mergePr = async (pullNumber) => {
-              try {
+              const attemptMerge = async () => {
                 await github.rest.pulls.merge({
                   owner,
                   repo,
                   pull_number: pullNumber,
                   merge_method: "squash",
                 });
+              };
+
+              try {
+                await attemptMerge();
+                return;
               } catch (error) {
-                core.warning(`Merge failed: ${error.message}`);
-                await github.rest.issues.createComment({
-                  owner,
-                  repo,
-                  issue_number: pullNumber,
-                  body: "No pude hacer el merge automatico. Revisa conflictos o permisos.",
-                });
+                let mergeError = error;
+                if (error.message && error.message.includes("Merge already in progress")) {
+                  await new Promise((resolve) => setTimeout(resolve, 3000));
+                  const { data: refreshed } = await github.rest.pulls.get({
+                    owner,
+                    repo,
+                    pull_number: pullNumber,
+                  });
+                  if (refreshed.merged || refreshed.state !== "open") {
+                    return;
+                  }
+
+                  try {
+                    await attemptMerge();
+                    return;
+                  } catch (retryError) {
+                    mergeError = retryError;
+                  }
+                }
+
+                core.warning(`Merge failed: ${mergeError.message}`);
+                await commentMergeFailure(
+                  pullNumber,
+                  "No pude hacer el merge automatico. Revisa conflictos o permisos."
+                );
               }
             };
 
