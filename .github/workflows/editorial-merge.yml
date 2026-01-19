@@ -1,36 +1,25 @@
-# Auto-merges CMS pull requests after required CI workflows succeed.
+# Auto-merges CMS pull requests based on editorial workflow state.
 name: Editorial workflow auto-merge
 
 on:
-  workflow_run:
-    workflows:
-      - CI Lint
-      - CI Typecheck
-      - CI Unit Tests
-      - CI Audit
-      - CI E2E
-      - CI Lighthouse
-    types: [completed]
+  pull_request:
+    types: [opened, reopened, synchronize, labeled, unlabeled, closed]
 
 permissions:
-  actions: read
   contents: write
   pull-requests: write
   issues: write
-  checks: read
 
 jobs:
   merge:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
-      - name: Merge CMS PRs after CI
+      - name: Merge CMS PRs from editorial workflow
         uses: actions/github-script@v7
         with:
           script: |
-            const run = context.payload.workflow_run;
-            const prs = run.pull_requests || [];
-            if (prs.length === 0) {
+            const pr = context.payload.pull_request;
+            if (!pr) {
               return;
             }
 
@@ -38,14 +27,19 @@ jobs:
             const repo = context.repo.repo;
             const allowedBranchPrefixes = ["cms/", "post/"];
             const allowedFilePrefixes = ["src/content/", "public/images/uploads/"];
-            const requiredWorkflows = [
-              "CI Lint",
-              "CI Typecheck",
-              "CI Unit Tests",
-              "CI Audit",
-              "CI E2E",
-              "CI Lighthouse",
-            ];
+            const action = context.payload.action;
+            const label = context.payload.label?.name;
+            const base = pr.base.ref;
+            const isCmsBranch = allowedBranchPrefixes.some((prefix) => pr.head.ref.startsWith(prefix));
+            const isSameRepo = pr.head.repo?.full_name === `${owner}/${repo}`;
+
+            if (!isCmsBranch || !isSameRepo) {
+              return;
+            }
+
+            if (!["dev", "staging", "main"].includes(base)) {
+              return;
+            }
 
             const listFiles = async (pullNumber) => {
               return github.paginate(github.rest.pulls.listFiles, {
@@ -74,7 +68,7 @@ jobs:
                 repo,
                 issue_number: pullNumber,
                 body: [
-                  "Bloqueo el merge automático: hay archivos fuera del scope del CMS.",
+                  "Bloqueo el merge automatico: hay archivos fuera del scope del CMS.",
                   "Solo se permiten cambios en:",
                   "- `src/content/**`",
                   "- `public/images/uploads/**`",
@@ -86,15 +80,20 @@ jobs:
               return false;
             };
 
-            const isStagingMerged = async (headOwnerLogin, headRef) => {
-              const head = `${headOwnerLogin}:${headRef}`;
+            const listPrs = async (baseBranch, headRef) => {
               const { data } = await github.rest.pulls.list({
                 owner,
                 repo,
-                base: "staging",
-                head,
+                base: baseBranch,
+                head: headRef,
                 state: "all",
               });
+              return data;
+            };
+
+            const isStagingMerged = async (headOwnerLogin, headRef) => {
+              const head = `${headOwnerLogin}:${headRef}`;
+              const data = await listPrs("staging", head);
               return data.some((item) => item.merged_at);
             };
 
@@ -103,96 +102,16 @@ jobs:
                 owner,
                 repo,
                 issue_number: pullNumber,
-                body:
-                  "Espero a que la PR a `staging` esté mergeada antes de fusionar a `main`.",
+                body: "Espero a que la PR a `staging` este mergeada antes de fusionar a `main`.",
               });
             };
 
-            const listWorkflowRuns = async (headSha) => {
-              const { data } = await github.rest.actions.listWorkflowRunsForRepo({
-                owner,
-                repo,
-                head_sha: headSha,
-                event: "pull_request",
-                per_page: 100,
-              });
-              return data.workflow_runs || [];
-            };
-
-            const hasAllRequiredWorkflows = async (headSha, pullNumber) => {
-              const runs = await listWorkflowRuns(headSha);
-              const pending = [];
-
-              for (const workflowName of requiredWorkflows) {
-                const matches = runs
-                  .filter((item) => item.name === workflowName)
-                  .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-                if (matches.length === 0) {
-                  pending.push(`${workflowName}=missing`);
-                  continue;
-                }
-
-                const latest = matches[0];
-                if (latest.status !== "completed") {
-                  pending.push(`${workflowName}=in_progress`);
-                  continue;
-                }
-
-                if (latest.conclusion !== "success") {
-                  pending.push(`${workflowName}=${latest.conclusion || "failed"}`);
-                  continue;
-                }
-              }
-
-              if (pending.length > 0) {
-                core.info(`Skipping PR #${pullNumber}: CI not ready (${pending.join(", ")})`);
-                return false;
-              }
-
-              return true;
-            };
-
-            for (const prRef of prs) {
-              const { data: pr } = await github.rest.pulls.get({
-                owner,
-                repo,
-                pull_number: prRef.number,
-              });
-
-              if (pr.state !== "open") {
-                continue;
-              }
-
-              if (!["staging", "main"].includes(pr.base.ref)) {
-                continue;
-              }
-
-              if (!allowedBranchPrefixes.some((prefix) => pr.head.ref.startsWith(prefix))) {
-                continue;
-              }
-
-              if (!(await hasOnlyCmsFiles(pr.number))) {
-                continue;
-              }
-
-              if (!(await hasAllRequiredWorkflows(pr.head.sha, pr.number))) {
-                continue;
-              }
-
-              const headOwner = pr.head.repo?.owner?.login || owner;
-              if (pr.base.ref === "main") {
-                const stagingMerged = await isStagingMerged(headOwner, pr.head.ref);
-                if (!stagingMerged) {
-                  await commentWaitingForStaging(pr.number);
-                  continue;
-                }
-              }
-
+            const mergePr = async (pullNumber) => {
               try {
                 await github.rest.pulls.merge({
                   owner,
                   repo,
-                  pull_number: pr.number,
+                  pull_number: pullNumber,
                   merge_method: "squash",
                 });
               } catch (error) {
@@ -200,8 +119,54 @@ jobs:
                 await github.rest.issues.createComment({
                   owner,
                   repo,
-                  issue_number: pr.number,
-                  body: "No pude hacer el merge automático. Revisa conflictos o permisos.",
+                  issue_number: pullNumber,
+                  body: "No pude hacer el merge automatico. Revisa conflictos o permisos.",
                 });
               }
+            };
+
+            const headOwner = pr.head.repo?.owner?.login || owner;
+            const head = `${headOwner}:${pr.head.ref}`;
+
+            const isPublishSignal =
+              base === "dev" &&
+              ((action === "unlabeled" && label === "decap-cms/pending_publish") ||
+                (action === "closed" &&
+                  pr.merged &&
+                  pr.labels.some((item) => item.name === "decap-cms/pending_publish")));
+
+            if (isPublishSignal) {
+              const mainPrs = await listPrs("main", head);
+              const mainPr = mainPrs.find((item) => item.state === "open");
+              if (!mainPr) {
+                await github.rest.issues.createComment({
+                  owner,
+                  repo,
+                  issue_number: pr.number,
+                  body: "No encontre PR abierta a `main` para publicar este contenido.",
+                });
+              } else if (!(await hasOnlyCmsFiles(mainPr.number))) {
+                return;
+              } else {
+                const stagingMerged = await isStagingMerged(headOwner, pr.head.ref);
+                if (!stagingMerged) {
+                  await commentWaitingForStaging(mainPr.number);
+                } else {
+                  await mergePr(mainPr.number);
+                }
+              }
             }
+
+            if (pr.state !== "open") {
+              return;
+            }
+
+            if (!["dev", "staging"].includes(base)) {
+              return;
+            }
+
+            if (!(await hasOnlyCmsFiles(pr.number))) {
+              return;
+            }
+
+            await mergePr(pr.number);
