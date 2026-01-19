@@ -10,13 +10,6 @@ on:
       - "post/**"
       - "post_*/**"
       - "post_*"
-  create:
-  workflow_dispatch:
-    inputs:
-      branch:
-        description: "CMS branch to process (e.g., cms_123/projects/slug)"
-        required: false
-        type: string
 
 permissions:
   contents: write
@@ -34,35 +27,11 @@ jobs:
 
       - name: Prepare draft PR data
         id: prep
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-          CREATE_REF: ${{ github.event.ref }}
-          CREATE_REF_TYPE: ${{ github.event.ref_type }}
-          DISPATCH_BRANCH: ${{ github.event.inputs.branch }}
         run: |
           set -euo pipefail
 
           BRANCH="${GITHUB_REF_NAME}"
-          if [[ "$EVENT_NAME" == "create" ]]; then
-            if [[ "$CREATE_REF_TYPE" != "branch" ]]; then
-              echo "skip=true" >> "$GITHUB_OUTPUT"
-              exit 0
-            fi
-            BRANCH="${CREATE_REF}"
-          fi
-          if [[ "$EVENT_NAME" == "workflow_dispatch" && -n "$DISPATCH_BRANCH" ]]; then
-            BRANCH="${DISPATCH_BRANCH}"
-          fi
-
-          if [[ -z "$BRANCH" ]]; then
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
           if [[ "$BRANCH" == cms/filtered/* ]]; then
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          if [[ ! "$BRANCH" =~ ^(cms/|cms_|post/) ]]; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
@@ -94,15 +63,8 @@ jobs:
 
           git diff --name-only "origin/${BASE}...origin/${BRANCH}" > changed-files.txt
           if [[ ! -s changed-files.txt ]]; then
-            if [[ "$EVENT_NAME" == "create" ]]; then
-              sleep 10
-              git fetch origin "${BASE}" "${BRANCH}"
-              git diff --name-only "origin/${BASE}...origin/${BRANCH}" > changed-files.txt
-            fi
-            if [[ ! -s changed-files.txt ]]; then
-              echo "skip=true" >> "$GITHUB_OUTPUT"
-              exit 0
-            fi
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
 
           : > allowed-files.txt
@@ -136,20 +98,21 @@ jobs:
           fi
 
           if [[ -s disallowed-files.txt ]]; then
-            echo "has_disallowed=true" >> "$GITHUB_OUTPUT"
+            echo "needs_filtered=true" >> "$GITHUB_OUTPUT"
+            sanitized="${BRANCH//\//-}"
+            echo "pr_branch=cms/filtered/${sanitized}" >> "$GITHUB_OUTPUT"
           else
-            echo "has_disallowed=false" >> "$GITHUB_OUTPUT"
+            echo "needs_filtered=false" >> "$GITHUB_OUTPUT"
+            echo "pr_branch=${BRANCH}" >> "$GITHUB_OUTPUT"
           fi
-          sanitized="${BRANCH//\//-}"
-          echo "pr_branch=cms/filtered/${sanitized}" >> "$GITHUB_OUTPUT"
 
       - name: Create filtered branch
-        if: steps.prep.outputs.skip != 'true'
+        if: steps.prep.outputs.skip != 'true' && steps.prep.outputs.needs_filtered == 'true'
         run: |
           set -euo pipefail
 
           BASE="dev"
-          SOURCE="${{ steps.prep.outputs.source_branch }}"
+          SOURCE="${GITHUB_REF_NAME}"
           FILTERED="${{ steps.prep.outputs.pr_branch }}"
 
           git checkout -B "$FILTERED" "origin/${BASE}"
@@ -181,7 +144,7 @@ jobs:
           SOURCE_BRANCH: ${{ steps.prep.outputs.source_branch }}
           CMS_COLLECTION: ${{ steps.prep.outputs.collection }}
           CMS_SLUG: ${{ steps.prep.outputs.slug }}
-          HAS_DISALLOWED: ${{ steps.prep.outputs.has_disallowed }}
+          NEEDS_FILTERED: ${{ steps.prep.outputs.needs_filtered }}
         with:
           script: |
             const fs = require("fs");
@@ -228,7 +191,7 @@ jobs:
               labels: ["decap-cms/draft"],
             });
 
-            if (process.env.HAS_DISALLOWED === "true") {
+            if (process.env.NEEDS_FILTERED === "true") {
               let details = "";
               try {
                 const disallowed = fs.readFileSync("disallowed-files.txt", "utf8").trim();
