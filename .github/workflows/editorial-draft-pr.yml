@@ -120,6 +120,14 @@ jobs:
           collection="${CMS_COLLECTION}"
           slug="${CMS_SLUG}"
 
+          if [[ "$BRANCH" == cms_* && -n "$collection" && -n "$slug" ]]; then
+            git fetch origin "cms/${collection}/${slug}" || true
+            if git show-ref --verify --quiet "refs/remotes/origin/cms/${collection}/${slug}"; then
+              echo "skip=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          fi
+
           echo "collection=$collection" >> "$GITHUB_OUTPUT"
           echo "slug=$slug" >> "$GITHUB_OUTPUT"
           echo "source_branch=$SOURCE" >> "$GITHUB_OUTPUT"
@@ -215,7 +223,7 @@ jobs:
           git checkout -B "$BASE" "origin/${BASE}"
           xargs -d '\n' git checkout "origin/${SOURCE}" -- < allowed-files.txt
 
-          if git diff --quiet; then
+          if git diff --quiet HEAD; then
             echo "No changes to sync."
             exit 0
           fi
