@@ -12,7 +12,7 @@ backend:
     delete: "cms: delete {{collection}} \"{{slug}}\""
     uploadMedia: "cms: upload media \"{{path}}\""
     openAuthoring: "cms: open authoring {{collection}} \"{{slug}}\""
-publish_mode: simple
+publish_mode: editorial_workflow
 media_folder: "public/images/uploads"
 public_folder: "/images/uploads"
 collections:
