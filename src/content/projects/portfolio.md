@@ -21,6 +21,40 @@ projectUrl: https://adrianmariscal.es
 repoUrl: null
 demoUrl: null
 changelog:
+  - version: v3.53.0
+    date: 2026-01-18T21:13:00.000+01:00
+    changes:
+      - type: added
+        text: Buscador interno de alta velocidad con indexado de posts, proyectos y
+          páginas, disponible en la ruta /search.
+      - type: added
+        text: Nuevas páginas ‘Sobre mí’ y ‘Servicios’ que amplían la información
+          profesional y de consultoría.
+      - type: added
+        text: UI Kit accesible con componentes reutilizables (Botón, Tarjeta, Badge,
+          Input, Alert) y tokens de diseño (colores, spacing y tipografías).
+      - type: added
+        text: Panel de métricas RUM (/metrics/rum) para visualizar Core Web Vitals con
+          consentimiento de cookies y envío de datos a una función serverless.
+      - type: added
+        text: Funciones de Netlify para gestionar el formulario de contacto y la
+          recolección de métricas RUM, con autenticación de staging y variables
+          de entorno seguras.
+      - type: changed
+        text: Actualización a Astro 5 y Tailwind CSS 4; refactor de estilos globales y
+          tokens para mejorar rendimiento, responsive design y modo oscuro por
+          defecto.
+      - type: changed
+        text: Integración de MDX y publicación de más de 25 artículos técnicos con
+          optimización de imágenes, enlaces automáticos en encabezados y
+          slugificación coherente.
+      - type: devops
+        text: "Desglose de workflows en GitHub Actions: lint, typecheck, tests
+          unitarios, e2e con Playwright, Lighthouse CI y pipelines editoriales
+          para dev→staging→main."
+      - type: devops
+        text: Reconfiguración de netlify.toml con redirecciones, cabeceras de seguridad
+          y plugin Lighthouse adaptado a nuevas rutas.
   - version: v2.16.0
     date: 2025-12-10
     changes:
@@ -97,40 +131,6 @@ changelog:
         text: Contacto con Netlify Forms (honeypot + /thanks).
       - type: docs
         text: "Primera entrada del blog: lanzamiento v0.1.1."
-  - version: v3.53.0
-    date: 2026-01-18T21:13:00.000+01:00
-    changes:
-      - type: added
-        text: Buscador interno de alta velocidad con indexado de posts, proyectos y
-          páginas, disponible en la ruta /search.
-      - type: added
-        text: Nuevas páginas ‘Sobre mí’ y ‘Servicios’ que amplían la información
-          profesional y de consultoría.
-      - type: added
-        text: UI Kit accesible con componentes reutilizables (Botón, Tarjeta, Badge,
-          Input, Alert) y tokens de diseño (colores, spacing y tipografías).
-      - type: added
-        text: Panel de métricas RUM (/metrics/rum) para visualizar Core Web Vitals con
-          consentimiento de cookies y envío de datos a una función serverless.
-      - type: added
-        text: Funciones de Netlify para gestionar el formulario de contacto y la
-          recolección de métricas RUM, con autenticación de staging y variables
-          de entorno seguras.
-      - type: changed
-        text: Actualización a Astro 5 y Tailwind CSS 4; refactor de estilos globales y
-          tokens para mejorar rendimiento, responsive design y modo oscuro por
-          defecto.
-      - type: changed
-        text: Integración de MDX y publicación de más de 25 artículos técnicos con
-          optimización de imágenes, enlaces automáticos en encabezados y
-          slugificación coherente.
-      - type: devops
-        text: "Desglose de workflows en GitHub Actions: lint, typecheck, tests
-          unitarios, e2e con Playwright, Lighthouse CI y pipelines editoriales
-          para dev→staging→main."
-      - type: devops
-        text: Reconfiguración de netlify.toml con redirecciones, cabeceras de seguridad
-          y plugin Lighthouse adaptado a nuevas rutas.
 ---
 
 ## Resumen
