@@ -1,5 +1,5 @@
 ---
-title: Portfolio Personal
+title: Web/Portfolio Personal
 description: Sitio personal hecho con Astro. Blog, proyectos y contacto.
 tags:
   - portfolio
