@@ -19,7 +19,7 @@ featured: true
 date: ""
 projectUrl: https://adrianmariscal.es
 repoUrl: null
-demoUrl: null
+demoUrl: https://adrianmariscal.es
 changelog:
   - version: 3.53.4
     date: 2026-01-18T21:13:00.000+01:00
