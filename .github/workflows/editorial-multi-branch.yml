@@ -89,48 +89,44 @@ jobs:
                 }
               }
 
-              if (invalid.length === 0) {
-                if (filteredExists) {
-                  return { headRef: `${owner}:${filteredBranch}`, invalid: [] };
-                }
-                return { headRef: head, invalid: [] };
-              }
-
               const preview = invalid
                 .slice(0, 10)
                 .map((file) => `- ${file.filename}`)
                 .join("\n");
 
               if (!filteredExists) {
+                const lines = [
+                  "No encontre la rama filtrada para este entry.",
+                  "Guarda de nuevo en el CMS para regenerarla y reintenta.",
+                ];
+                if (invalid.length > 0) {
+                  lines.push("", "Archivos fuera de scope (primeros 10):", preview || "- (sin detalles)");
+                }
                 await github.rest.issues.createComment({
                   owner,
                   repo,
                   issue_number: pr.number,
-                  body: [
-                    "Detecte archivos fuera de scope del CMS y no encontre una rama filtrada.",
-                    "Guarda de nuevo en el CMS para regenerar la rama filtrada y reintenta.",
-                    "",
-                    "Archivos fuera de scope (primeros 10):",
-                    preview || "- (sin detalles)",
-                  ].join("\n"),
+                  body: lines.join("\n"),
                 });
                 core.setFailed("Missing filtered branch for CMS changes.");
                 return null;
               }
 
-              await github.rest.issues.createComment({
-                owner,
-                repo,
-                issue_number: pr.number,
-                body: [
-                  "Detecte archivos fuera de scope del CMS.",
-                  "Usare la rama filtrada para crear PRs a staging/main.",
-                  "Los cambios fuera de scope quedan en la rama original.",
-                  "",
-                  "Archivos fuera de scope (primeros 10):",
-                  preview || "- (sin detalles)",
-                ].join("\n"),
-              });
+              if (invalid.length > 0) {
+                await github.rest.issues.createComment({
+                  owner,
+                  repo,
+                  issue_number: pr.number,
+                  body: [
+                    "Detecte archivos fuera de scope del CMS.",
+                    "Usare la rama filtrada para crear PRs a staging/main.",
+                    "Los cambios fuera de scope quedan en la rama original.",
+                    "",
+                    "Archivos fuera de scope (primeros 10):",
+                    preview || "- (sin detalles)",
+                  ].join("\n"),
+                });
+              }
 
               return { headRef: `${owner}:${filteredBranch}`, invalid };
             };
