@@ -170,6 +170,10 @@ jobs:
 
             const headOwner = pr.head.repo?.owner?.login || owner;
             const head = `${headOwner}:${pr.head.ref}`;
+            const filteredRef = pr.head.ref.startsWith("cms/filtered/")
+              ? pr.head.ref
+              : `cms/filtered/${pr.head.ref.replace(/\//g, "-")}`;
+            const filteredHead = `${headOwner}:${filteredRef}`;
 
             const hasPendingPublish = pr.labels.some((item) => item.name === "decap-cms/pending_publish");
             const isPublishSignal =
@@ -178,8 +182,11 @@ jobs:
                 (action === "closed" && hasPendingPublish));
 
             if (isPublishSignal) {
-              const mainPrs = await listPrs("main", head);
-              const mainPr = mainPrs.find((item) => item.state === "open");
+              const findOpen = (prs) => prs.find((item) => item.state === "open");
+              let mainPr = findOpen(await listPrs("main", head));
+              if (!mainPr) {
+                mainPr = findOpen(await listPrs("main", filteredHead));
+              }
               if (!mainPr) {
                 await github.rest.issues.createComment({
                   owner,
@@ -190,7 +197,9 @@ jobs:
               } else if (!(await hasOnlyCmsFiles(mainPr.number))) {
                 return;
               } else {
-                const stagingMerged = await isStagingMerged(headOwner, pr.head.ref);
+                const publishHeadOwner = mainPr.head.repo?.owner?.login || owner;
+                const publishHeadRef = mainPr.head.ref;
+                const stagingMerged = await isStagingMerged(publishHeadOwner, publishHeadRef);
                 if (!stagingMerged) {
                   await commentWaitingForStaging(mainPr.number);
                 } else {
