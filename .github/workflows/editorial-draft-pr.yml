@@ -1,0 +1,220 @@
+# Creates draft PRs to dev for CMS branches and optionally filters changes to the entry + images.
+name: Editorial workflow draft PRs
+
+on:
+  push:
+    branches:
+      - "cms/**"
+      - "cms_*/**"
+      - "cms_*"
+      - "post/**"
+      - "post_*/**"
+      - "post_*"
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  draft-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Prepare draft PR data
+        id: prep
+        run: |
+          set -euo pipefail
+
+          BRANCH="${GITHUB_REF_NAME}"
+          if [[ "$BRANCH" == cms/filtered/* ]]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          BASE="dev"
+          git fetch origin "${BASE}" "${BRANCH}"
+
+          collection=""
+          slug=""
+          IFS='/' read -ra PARTS <<< "$BRANCH"
+          for ((i=0; i<${#PARTS[@]}; i++)); do
+            part="${PARTS[$i]}"
+            if [[ "$part" == "projects" || "$part" == "blog" ]]; then
+              if [[ $((i+1)) -lt ${#PARTS[@]} ]]; then
+                collection="$part"
+                slug="${PARTS[$i+1]}"
+                break
+              fi
+            fi
+          done
+          if [[ -z "$collection" && "$BRANCH" =~ ^post/([^/]+)$ ]]; then
+            collection="blog"
+            slug="${BASH_REMATCH[1]}"
+          fi
+
+          echo "collection=$collection" >> "$GITHUB_OUTPUT"
+          echo "slug=$slug" >> "$GITHUB_OUTPUT"
+          echo "source_branch=$BRANCH" >> "$GITHUB_OUTPUT"
+
+          git diff --name-only "origin/${BASE}...origin/${BRANCH}" > changed-files.txt
+          if [[ ! -s changed-files.txt ]]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          : > allowed-files.txt
+          : > disallowed-files.txt
+
+          while IFS= read -r file; do
+            if [[ "$file" == public/images/uploads/* ]]; then
+              echo "$file" >> allowed-files.txt
+              continue
+            fi
+
+            if [[ -n "$collection" && -n "$slug" ]]; then
+              if [[ "$file" == "src/content/${collection}/${slug}.md" || "$file" == "src/content/${collection}/${slug}.mdx" ]]; then
+                echo "$file" >> allowed-files.txt
+              else
+                echo "$file" >> disallowed-files.txt
+              fi
+              continue
+            fi
+
+            if [[ "$file" == src/content/* ]]; then
+              echo "$file" >> allowed-files.txt
+            else
+              echo "$file" >> disallowed-files.txt
+            fi
+          done < changed-files.txt
+
+          if [[ ! -s allowed-files.txt ]]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [[ -s disallowed-files.txt ]]; then
+            echo "needs_filtered=true" >> "$GITHUB_OUTPUT"
+            sanitized="${BRANCH//\//-}"
+            echo "pr_branch=cms/filtered/${sanitized}" >> "$GITHUB_OUTPUT"
+          else
+            echo "needs_filtered=false" >> "$GITHUB_OUTPUT"
+            echo "pr_branch=${BRANCH}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create filtered branch
+        if: steps.prep.outputs.skip != 'true' && steps.prep.outputs.needs_filtered == 'true'
+        run: |
+          set -euo pipefail
+
+          BASE="dev"
+          SOURCE="${GITHUB_REF_NAME}"
+          FILTERED="${{ steps.prep.outputs.pr_branch }}"
+
+          git checkout -B "$FILTERED" "origin/${BASE}"
+          xargs -d '\n' git checkout "origin/${SOURCE}" -- < allowed-files.txt
+
+          if git diff --quiet; then
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          xargs -d '\n' git add < allowed-files.txt
+
+          COLLECTION="${{ steps.prep.outputs.collection }}"
+          SLUG="${{ steps.prep.outputs.slug }}"
+          if [[ -n "$COLLECTION" && -n "$SLUG" ]]; then
+            git commit -m "cms: sync ${COLLECTION} \"${SLUG}\""
+          else
+            git commit -m "cms: sync content changes"
+          fi
+
+          git push --force-with-lease origin "$FILTERED"
+
+      - name: Create PR to dev
+        if: steps.prep.outputs.skip != 'true'
+        uses: actions/github-script@v7
+        env:
+          PR_BRANCH: ${{ steps.prep.outputs.pr_branch }}
+          SOURCE_BRANCH: ${{ steps.prep.outputs.source_branch }}
+          CMS_COLLECTION: ${{ steps.prep.outputs.collection }}
+          CMS_SLUG: ${{ steps.prep.outputs.slug }}
+          NEEDS_FILTERED: ${{ steps.prep.outputs.needs_filtered }}
+        with:
+          script: |
+            const fs = require("fs");
+
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const base = "dev";
+            const headRef = `${owner}:${process.env.PR_BRANCH}`;
+            const existing = await github.rest.pulls.list({
+              owner,
+              repo,
+              base,
+              head: headRef,
+              state: "open",
+            });
+            if (existing.data.length > 0) {
+              core.info(`PR already exists for ${headRef}`);
+              return;
+            }
+
+            const collection = process.env.CMS_COLLECTION;
+            const slug = process.env.CMS_SLUG;
+            const title = collection && slug
+              ? `cms: update ${collection} "${slug}"`
+              : `cms: update content (${process.env.PR_BRANCH})`;
+
+            const { data: pr } = await github.rest.pulls.create({
+              owner,
+              repo,
+              base,
+              head: headRef,
+              title,
+              body: [
+                "Automated from Decap CMS draft save.",
+                "",
+                `Source branch: \`${process.env.SOURCE_BRANCH}\``,
+              ].join("\n"),
+            });
+
+            await github.rest.issues.addLabels({
+              owner,
+              repo,
+              issue_number: pr.number,
+              labels: ["decap-cms/draft"],
+            });
+
+            if (process.env.NEEDS_FILTERED === "true") {
+              let details = "";
+              try {
+                const disallowed = fs.readFileSync("disallowed-files.txt", "utf8").trim();
+                if (disallowed) {
+                  const lines = disallowed
+                    .split(/\r?\n/)
+                    .slice(0, 20)
+                    .map((line) => `- ${line}`)
+                    .join("\n");
+                  details = `\n\nArchivos fuera de scope (primeros 20):\n${lines}`;
+                }
+              } catch (error) {
+                core.warning(`Unable to read disallowed-files.txt: ${error.message}`);
+              }
+
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: pr.number,
+                body: [
+                  "He creado esta PR con solo el contenido del entry y sus imagenes.",
+                  "Los cambios fuera de scope se mantienen en la rama original y no se han perdido.",
+                  details,
+                ].join("\n"),
+              });
+            }

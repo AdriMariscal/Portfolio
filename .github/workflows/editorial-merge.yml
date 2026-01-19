@@ -25,7 +25,7 @@ jobs:
 
             const owner = context.repo.owner;
             const repo = context.repo.repo;
-            const allowedBranchPrefixes = ["cms/", "post/"];
+            const allowedBranchPrefixes = ["cms/", "cms_", "post/"];
             const allowedFilePrefixes = ["src/content/", "public/images/uploads/"];
             const action = context.payload.action;
             const label = context.payload.label?.name;
