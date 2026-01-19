@@ -144,43 +144,15 @@ jobs:
               return data;
             };
 
-            const isDraftRemoved = action === "unlabeled" && label === "decap-cms/draft";
-            const isPendingReview = action === "labeled" && label === "decap-cms/pending_review";
-
-            if (isDraftRemoved || isPendingReview) {
-              const resolved = await resolveHead();
-              if (!resolved) {
-                return;
-              }
-
-              await ensurePr("staging", "In Review", resolved.headRef);
+            const isReady = action === "labeled" && label === "decap-cms/pending_publish";
+            if (!isReady) {
               return;
             }
 
-            if (action === "labeled" && label === "decap-cms/pending_publish") {
-              const resolved = await resolveHead();
-              if (!resolved) {
-                return;
-              }
-
-              const stagingPrs = await listPrs("staging", resolved.headRef);
-              const hasStaging = stagingPrs.some((item) => item.state === "open" || item.merged_at);
-              if (!hasStaging) {
-                await github.rest.issues.createComment({
-                  owner,
-                  repo,
-                  issue_number: pr.number,
-                  body: "No puedo crear la PR a `main` sin una PR previa a `staging`. Primero pasa el contenido a In Review.",
-                });
-                await github.rest.issues.removeLabel({
-                  owner,
-                  repo,
-                  issue_number: pr.number,
-                  name: "decap-cms/pending_publish",
-                });
-                core.setFailed("Missing staging PR for Ready → main.");
-                return;
-              }
-
-              await ensurePr("main", "Ready", resolved.headRef);
+            const resolved = await resolveHead();
+            if (!resolved) {
+              return;
             }
+
+            await ensurePr("staging", "Ready", resolved.headRef);
+            await ensurePr("main", "Publish", resolved.headRef);

@@ -207,41 +207,6 @@ jobs:
 
           git push --force-with-lease origin "$FILTERED"
 
-      - name: Sync CMS entry to dev
-        if: steps.prep.outputs.skip != 'true' && steps.cms_pr.outputs.exists == 'true'
-        run: |
-          set -euo pipefail
-
-          BASE="dev"
-          SOURCE="${{ steps.prep.outputs.source_branch }}"
-
-          if [[ ! -s allowed-files.txt ]]; then
-            echo "No allowed files to sync."
-            exit 0
-          fi
-
-          git checkout -B "$BASE" "origin/${BASE}"
-          xargs -d '\n' git checkout "origin/${SOURCE}" -- < allowed-files.txt
-
-          if git diff --quiet HEAD; then
-            echo "No changes to sync."
-            exit 0
-          fi
-
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          xargs -d '\n' git add < allowed-files.txt
-
-          COLLECTION="${{ steps.prep.outputs.collection }}"
-          SLUG="${{ steps.prep.outputs.slug }}"
-          if [[ -n "$COLLECTION" && -n "$SLUG" ]]; then
-            git commit -m "cms: sync ${COLLECTION} \"${SLUG}\""
-          else
-            git commit -m "cms: sync content changes"
-          fi
-
-          git push origin "$BASE"
-
       - name: Comment on CMS PR about filtered sync
         if: steps.cms_pr.outputs.exists == 'true' && steps.prep.outputs.needs_filtered == 'true'
         uses: actions/github-script@v7
@@ -278,7 +243,7 @@ jobs:
               repo,
               issue_number: prNumber,
               body: [
-                "He sincronizado a `dev` solo el contenido del entry y sus imagenes.",
+                "He preparado una rama filtrada con solo el contenido del entry y sus imagenes.",
                 "Los cambios fuera de scope se mantienen en la rama original y no se han perdido.",
                 details,
               ].join("\n"),
