@@ -14,6 +14,7 @@ jobs:
     if: >
       github.event.label.name == 'decap-cms/draft' &&
       (startsWith(github.event.pull_request.head.ref, 'cms/') ||
+      startsWith(github.event.pull_request.head.ref, 'cms_') ||
       startsWith(github.event.pull_request.head.ref, 'post/')) &&
       github.event.pull_request.base.ref == 'dev' &&
       github.event.pull_request.head.repo.full_name == github.repository
