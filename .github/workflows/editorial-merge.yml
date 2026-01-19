@@ -171,12 +171,11 @@ jobs:
             const headOwner = pr.head.repo?.owner?.login || owner;
             const head = `${headOwner}:${pr.head.ref}`;
 
+            const hasPendingPublish = pr.labels.some((item) => item.name === "decap-cms/pending_publish");
             const isPublishSignal =
               base === "dev" &&
               ((action === "unlabeled" && label === "decap-cms/pending_publish") ||
-                (action === "closed" &&
-                  pr.merged &&
-                  pr.labels.some((item) => item.name === "decap-cms/pending_publish")));
+                (action === "closed" && hasPendingPublish));
 
             if (isPublishSignal) {
               const mainPrs = await listPrs("main", head);

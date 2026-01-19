@@ -68,7 +68,31 @@ jobs:
               const invalid = files.filter(
                 (file) => !allowedPrefixes.some((prefix) => file.filename.startsWith(prefix))
               );
+              const sanitized = headRef.replace(/\//g, "-");
+              const filteredBranch = headRef.startsWith("cms/filtered/")
+                ? headRef
+                : `cms/filtered/${sanitized}`;
+
+              let filteredExists = false;
+              if (headRef.startsWith("cms/filtered/")) {
+                filteredExists = true;
+              } else {
+                try {
+                  await github.rest.git.getRef({
+                    owner,
+                    repo,
+                    ref: `heads/${filteredBranch}`,
+                  });
+                  filteredExists = true;
+                } catch (error) {
+                  filteredExists = false;
+                }
+              }
+
               if (invalid.length === 0) {
+                if (filteredExists) {
+                  return { headRef: `${owner}:${filteredBranch}`, invalid: [] };
+                }
                 return { headRef: head, invalid: [] };
               }
 
@@ -76,18 +100,8 @@ jobs:
                 .slice(0, 10)
                 .map((file) => `- ${file.filename}`)
                 .join("\n");
-              const sanitized = headRef.replace(/\//g, "-");
-              const filteredBranch = headRef.startsWith("cms/filtered/")
-                ? headRef
-                : `cms/filtered/${sanitized}`;
 
-              try {
-                await github.rest.git.getRef({
-                  owner,
-                  repo,
-                  ref: `heads/${filteredBranch}`,
-                });
-              } catch (error) {
+              if (!filteredExists) {
                 await github.rest.issues.createComment({
                   owner,
                   repo,

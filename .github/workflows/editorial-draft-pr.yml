@@ -168,9 +168,11 @@ jobs:
             exit 0
           fi
 
+          sanitized="${SOURCE//\//-}"
+          echo "filtered_branch=cms/filtered/${sanitized}" >> "$GITHUB_OUTPUT"
+
           if [[ -s disallowed-files.txt ]]; then
             echo "needs_filtered=true" >> "$GITHUB_OUTPUT"
-            sanitized="${SOURCE//\//-}"
             echo "pr_branch=cms/filtered/${sanitized}" >> "$GITHUB_OUTPUT"
           else
             echo "needs_filtered=false" >> "$GITHUB_OUTPUT"
@@ -178,13 +180,13 @@ jobs:
           fi
 
       - name: Create filtered branch
-        if: steps.prep.outputs.skip != 'true' && steps.prep.outputs.needs_filtered == 'true'
+        if: steps.prep.outputs.skip != 'true'
         run: |
           set -euo pipefail
 
           BASE="dev"
           SOURCE="${{ steps.prep.outputs.source_branch }}"
-          FILTERED="${{ steps.prep.outputs.pr_branch }}"
+          FILTERED="${{ steps.prep.outputs.filtered_branch }}"
 
           git checkout -B "$FILTERED" "origin/${BASE}"
           xargs -d '\n' git checkout "origin/${SOURCE}" -- < allowed-files.txt
