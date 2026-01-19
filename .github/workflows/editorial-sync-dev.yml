@@ -27,7 +27,7 @@ jobs:
               return;
             }
 
-            const cmsPrefixes = ["cms/", "cms_", "post/"];
+            const cmsPrefixes = ["cms/", "cms_", "post/", "editorial/filtered/"];
             const isCmsBranch = cmsPrefixes.some((prefix) => pr.head.ref.startsWith(prefix));
             const isSameRepo = pr.head.repo?.full_name === `${context.repo.owner}/${context.repo.repo}`;
             const hasPendingReview = pr.labels?.some((item) => item.name === "decap-cms/pending_review");
