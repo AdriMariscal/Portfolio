@@ -25,7 +25,7 @@ jobs:
               return;
             }
 
-            const cmsPrefixes = ["cms/", "post/"];
+            const cmsPrefixes = ["cms/", "cms_", "post/"];
             const isCmsBranch = cmsPrefixes.some((prefix) => pr.head.ref.startsWith(prefix));
             if (!isCmsBranch || pr.base.ref !== "dev") {
               return;
@@ -34,70 +34,95 @@ jobs:
             const owner = context.repo.owner;
             const repo = context.repo.repo;
             const headOwner = pr.head.repo?.owner?.login || owner;
-            const head = `${headOwner}:${pr.head.ref}`;
+            const headRef = pr.head.ref;
+            const isSameRepo = pr.head.repo?.full_name === `${owner}/${repo}`;
+            if (!isSameRepo) {
+              return;
+            }
+            const head = `${headOwner}:${headRef}`;
             const allowedPrefixes = ["src/content/", "public/images/uploads/"];
 
-            const listPrs = async (base) => {
+            const listPrs = async (base, headRefValue = head) => {
               const { data } = await github.rest.pulls.list({
                 owner,
                 repo,
                 base,
-                head,
+                head: headRefValue,
                 state: "all",
               });
               return data;
             };
 
-            const ensureCmsOnlyChanges = async () => {
+            const listFiles = async () => {
               const files = await github.paginate(github.rest.pulls.listFiles, {
                 owner,
                 repo,
                 pull_number: pr.number,
                 per_page: 100,
               });
+              return files;
+            };
+
+            const resolveHead = async () => {
+              const files = await listFiles();
               const invalid = files.filter(
                 (file) => !allowedPrefixes.some((prefix) => file.filename.startsWith(prefix))
               );
               if (invalid.length === 0) {
-                return true;
+                return { headRef: head, invalid: [] };
               }
 
               const preview = invalid
                 .slice(0, 10)
                 .map((file) => `- ${file.filename}`)
                 .join("\n");
+              const sanitized = headRef.replace(/\//g, "-");
+              const filteredBranch = headRef.startsWith("cms/filtered/")
+                ? headRef
+                : `cms/filtered/${sanitized}`;
+
+              try {
+                await github.rest.git.getRef({
+                  owner,
+                  repo,
+                  ref: `heads/${filteredBranch}`,
+                });
+              } catch (error) {
+                await github.rest.issues.createComment({
+                  owner,
+                  repo,
+                  issue_number: pr.number,
+                  body: [
+                    "Detecte archivos fuera de scope del CMS y no encontre una rama filtrada.",
+                    "Guarda de nuevo en el CMS para regenerar la rama filtrada y reintenta.",
+                    "",
+                    "Archivos fuera de scope (primeros 10):",
+                    preview || "- (sin detalles)",
+                  ].join("\n"),
+                });
+                core.setFailed("Missing filtered branch for CMS changes.");
+                return null;
+              }
+
               await github.rest.issues.createComment({
                 owner,
                 repo,
                 issue_number: pr.number,
                 body: [
-                  "He detectado archivos fuera del scope del CMS.",
-                  "Solo se permiten cambios en:",
-                  "- `src/content/**`",
-                  "- `public/images/uploads/**`",
+                  "Detecte archivos fuera de scope del CMS.",
+                  "Usare la rama filtrada para crear PRs a staging/main.",
+                  "Los cambios fuera de scope quedan en la rama original.",
                   "",
                   "Archivos fuera de scope (primeros 10):",
                   preview || "- (sin detalles)",
-                  "",
-                  "Por favor, deja la rama solo con cambios del CMS.",
                 ].join("\n"),
               });
 
-              if (context.payload.action === "labeled" && label === "decap-cms/pending_publish") {
-                await github.rest.issues.removeLabel({
-                  owner,
-                  repo,
-                  issue_number: pr.number,
-                  name: "decap-cms/pending_publish",
-                });
-              }
-
-              core.setFailed("PR contains files outside CMS scope.");
-              return false;
+              return { headRef: `${owner}:${filteredBranch}`, invalid };
             };
 
-            const ensurePr = async (base, titlePrefix) => {
-              const existing = await listPrs(base);
+            const ensurePr = async (base, titlePrefix, headRefValue) => {
+              const existing = await listPrs(base, headRefValue);
               const open = existing.find((item) => item.state === "open");
               const merged = existing.find((item) => item.merged_at);
               if (open || merged) {
@@ -108,7 +133,7 @@ jobs:
                 owner,
                 repo,
                 base,
-                head,
+                head: headRefValue,
                 title: `${titlePrefix}: ${pr.title}`,
                 body: [
                   "Automated from Decap CMS editorial workflow.",
@@ -123,20 +148,22 @@ jobs:
             const isPendingReview = action === "labeled" && label === "decap-cms/pending_review";
 
             if (isDraftRemoved || isPendingReview) {
-              if (!(await ensureCmsOnlyChanges())) {
+              const resolved = await resolveHead();
+              if (!resolved) {
                 return;
               }
 
-              await ensurePr("staging", "In Review");
+              await ensurePr("staging", "In Review", resolved.headRef);
               return;
             }
 
             if (action === "labeled" && label === "decap-cms/pending_publish") {
-              if (!(await ensureCmsOnlyChanges())) {
+              const resolved = await resolveHead();
+              if (!resolved) {
                 return;
               }
 
-              const stagingPrs = await listPrs("staging");
+              const stagingPrs = await listPrs("staging", resolved.headRef);
               const hasStaging = stagingPrs.some((item) => item.state === "open" || item.merged_at);
               if (!hasStaging) {
                 await github.rest.issues.createComment({
@@ -155,5 +182,5 @@ jobs:
                 return;
               }
 
-              await ensurePr("main", "Ready");
+              await ensurePr("main", "Ready", resolved.headRef);
             }
