@@ -113,7 +113,21 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           xargs -d '\n' git add < allowed-files.txt
           git commit -m "cms: sync content for review"
-          git push origin "$BASE"
+          attempts=0
+          max_attempts=3
+          while true; do
+            git fetch origin "$BASE"
+            git rebase "origin/$BASE"
+            if git push origin "$BASE"; then
+              break
+            fi
+            attempts=$((attempts + 1))
+            if [ "$attempts" -ge "$max_attempts" ]; then
+              echo "Failed to push to $BASE after ${max_attempts} attempts." >&2
+              exit 1
+            fi
+            echo "Push rejected, retrying ($attempts/$max_attempts)..."
+          done
 
       - name: Comment on out-of-scope files
         if: steps.gate.outputs.skip != 'true' && steps.files.outputs.disallowed_count != '0'
