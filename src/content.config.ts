@@ -3,6 +3,11 @@ import { defineCollection, z } from "astro:content";
 
 /** Schema auxiliar para URLs que pueden venir como string válido, "" o null */
 const urlField = z.union([z.string().url(), z.literal(""), z.null()]).optional();
+const optionalDate = z.preprocess(
+  (value) => (value === "" || value === null ? undefined : value),
+  z.coerce.date().optional()
+);
+const requiredDate = z.coerce.date();
 
 /** BLOG */
 const blog = defineCollection({
@@ -12,8 +17,8 @@ const blog = defineCollection({
     title: z.string(),
     description: z.string().optional(),
     tags: z.array(z.string()).default([]),
-      date: z.date(),
-      updated: z.date().optional(),
+      date: requiredDate,
+      updated: optionalDate,
       published: z.boolean().default(true),
     })
     .passthrough(),
@@ -39,8 +44,8 @@ const projects = defineCollection({
       demoUrl: urlField,
 
       // opcionales genéricos
-      date: z.date().optional(),
-      updated: z.date().optional(),
+      date: optionalDate,
+      updated: optionalDate,
 
       // changelog tipado
       changelog: z
