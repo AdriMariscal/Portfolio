@@ -22,7 +22,7 @@ repoUrl: null
 demoUrl: ""
 changelog:
   - version: 3.55.6
-    date: 2026-01-18T21:13:00.000+01:00
+    date: 2026-01-20T21:13:00.000+01:00
     changes:
       - type: added
         text: Buscador interno de alta velocidad con indexado de posts, proyectos y
