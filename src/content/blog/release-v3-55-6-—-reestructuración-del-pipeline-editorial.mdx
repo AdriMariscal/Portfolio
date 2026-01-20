@@ -1,0 +1,76 @@
+---
+title: Release v3.55.6 — Reestructuración del pipeline editorial
+description: Esta versión se centra en refactorizar por completo los workflows
+  editoriales utilizados para promocionar contenidos desde Decap CMS,
+  consolidando múltiples flujos en una única lógica de promoción y publicación y
+  asegurando la estabilidad de las ramas dev → staging → main.
+tags:
+  - release-notes
+  - portfolio
+  - ci‑cd
+  - github-actions
+date: 2026-01-20T13:12:00.000+01:00
+published: true
+draft: false
+---
+## Resumen
+
+La **versión v3.55.6** del portfolio no introduce cambios visibles en el diseño ni en las páginas públicas, pero es clave para la estabilidad a medio plazo del proyecto.  
+Se ha reescrito por completo el **pipeline editorial** que gestiona la integración de contenidos creados en **Decap CMS**, unificando y simplificando la lógica de promoción a través de las ramas `dev`, `staging` y `main`.  
+Gracias a este trabajo interno, la web en producción se actualiza de forma más fiable y coherente con el código fuente desplegado.
+
+Principales novedades:
+
+- **Simplificación de workflows**: se eliminan los antiguos flujos `editorial-force-sync.yml`, `editorial-merge.yml`, `editorial-multi-branch.yml` y `editorial-sync-dev.yml`, reemplazándolos por un par de workflows (`editorial-promote.yml` y `editorial-publish.yml`) más comprensibles y fáciles de mantener.
+- **Promoción unificada**: ahora los cambios de contenido se mueven automáticamente de `dev` a `staging` y de `staging` a `main` en función de las etiquetas del editorial (`decap‑cms/pending_review` y `decap‑cms/pending_publish`), evitando duplicidades y errores humanos.
+- **Soporte para ramas CMS**: el nuevo pipeline reconoce distintas convenciones de nombres (`cms/`, `cms_`, `post/`) y genera ramas *filtradas* que contienen únicamente los archivos permitidos (`src/content/**` y `public/images/uploads/**`).
+- **Sync de drafts**: los commits de borradores se permiten incluso cuando no hay cambios tangibles, asegurando que la sincronización de entradas no se quede bloqueada.
+- **Incremento de versión**: el número de versión del proyecto se actualiza a **v3.55.6**, garantizando trazabilidad y cumplimiento de SemVer en el repositorio.
+
+## Por qué este cambio
+
+En la entrega anterior (v3.55.3) se introdujo un buscador instantáneo, nuevas páginas y un **UI Kit** para mejorar la experiencia del usuario.  
+Durante las semanas posteriores, se detectaron problemas en la automatización editorial: ramas CMS que no se sincronizaban correctamente, merges conflictivos y workflows redundantes difíciles de mantener.  
+Al integrar **Decap CMS** como herramienta editorial, es fundamental que el contenido viaje sin fricciones hacia producción y que el equipo pueda confiar en que las versiones etiquetadas reflejan exactamente lo que está en línea.  
+Por ello se decidió refactorizar toda la pipeline editorial para reducir la complejidad, eliminar flujos obsoletos y garantizar una promoción estable y auditable de los cambios.
+
+## Qué hay de nuevo
+
+El núcleo de esta release es un **rediseño integral de los workflows de GitHub Actions** que soportan el proceso editorial:
+
+1. **Nuevo workflow `editorial-promote.yml`**: escucha los eventos de etiquetado y sincronización en las PRs generadas por Decap CMS y determina en qué fase se encuentra una entrada (revisión o lista para publicar).  
+   - Si la entrada está en revisión (`decap‑cms/pending_review`), fusiona de forma controlada la rama de contenido filtrado en `dev` y abre una PR `dev → staging` con un título estandarizado.  
+   - Si la entrada está lista para publicar (`decap‑cms/pending_publish`), fuerza el merge de `dev` en `staging` y crea una PR `staging → main` para su publicación.
+2. **Nuevo workflow `editorial-publish.yml`**: escucha la eliminación de ramas CMS y, tras borrar la rama filtrada, fuerza el merge de `staging` en `main`. Esto asegura que al publicar desde el CMS la web en producción reciba siempre la versión aprobada de `staging`.
+3. **Refactor de `editorial-draft-pr.yml`**: se simplifica la generación de ramas filtradas y PRs a `dev` reduciendo cientos de líneas de scripts personalizados a unos pocos pasos. Se filtran automáticamente los archivos fuera de scope y se genera un commit vacío cuando no hay cambios, evitando que se detenga la automatización.
+4. **Compatibilidad con distintas nomenclaturas**: los nuevos scripts detectan ramas que empiezan por `cms/`, `cms_`, `post/` o `post_` y transforman sus nombres en ramas filtradas seguras (`editorial/filtered/<sanitized>`), lo que permite que futuros flujos editoriales mantengan la consistencia.
+5. **Limpieza del repositorio**: se eliminan cuatro workflows obsoletos y se actualiza el archivo `src/content/projects/portfolio.md` para reflejar la nueva versión y los resultados de esta release.
+
+## Notas técnicas
+
+Esta iteración se enfoca en **DevOps y automatización**. Los cambios no alteran el stack principal (Astro 5, Tailwind CSS 4, MDX, Playwright, Netlify, etc.) detallado en la ficha del proyecto, pero sí mejoran el proceso de despliegue:
+
+- **Filtro estricto de archivos**: antes de fusionar contenido del CMS a `dev`, `staging` o `main` se genera un listado de ficheros cambiados y solo se aceptan los que pertenecen a `src/content/**` o `public/images/uploads/**`. Esto minimiza el riesgo de subir cambios accidentales en código fuente o configuración.
+- **Manejo de conflictos**: los nuevos workflows esperan de forma explícita a que GitHub calcule el estado mergeable de las PRs y, en caso de conflictos, aplican la estrategia `theirs` para priorizar el contenido aprobado sobre la rama base. También añaden comentarios automáticos cuando no es posible fusionar, facilitando la revisión manual.
+- **Unificación de reglas**: las acciones que antes se repartían en varios archivos YAML ahora se concentran, reduciendo la duplicidad de lógica y facilitando su mantenimiento. El resultado es una pipeline editorial más predecible y documentada.
+- **Versionado semántico**: cada iteración menor (`3.55.4`, `3.55.5` y ahora `3.55.6`) incrementa el `package.json` y el `package-lock.json`. Esto garantiza que las integraciones continuas reconozcan los cambios y desplieguen la versión correcta en producción.
+
+## Resultados / Impacto
+
+A pesar de que los usuarios finales no percibirán nuevas funcionalidades, la **calidad interna del proyecto** aumenta notablemente:
+
+- **Flujo editorial robusto**: las entradas del CMS se sincronizan de manera fiable, evitando que la web quede desfasada respecto al contenido aprobado.  
+- **Menor mantenimiento**: al reducir el número de workflows de ocho a tres, el equipo puede dedicar más tiempo a nuevas funcionalidades en lugar de corregir scripts complejos.  
+- **Prevención de errores**: la filtración de archivos y el manejo de conflictos disminuyen la probabilidad de que cambios fuera de scope lleguen a producción.  
+- **Visibilidad del estado**: las etiquetas de Decap CMS (`pending_review`, `pending_publish`) se convierten en acciones automatizadas que promueven o publican contenido, ofreciendo transparencia al equipo editorial.
+
+## Próximos pasos
+
+Con la base editorial consolidada, los esfuerzos se desplazarán a nuevas mejoras planeadas en el roadmap del proyecto:
+
+1. **PWA y capacidades offline**: habilitar cacheo de assets y navegación sin conexión para mejorar la resiliencia en dispositivos móviles.  
+2. **Analítica avanzada**: estudiar la integración de paneles FinOps y dashboards para monitorizar costes y rendimiento en tiempo real.  
+3. **Pruebas de accesibilidad**: ampliar la cobertura de tests de accesibilidad usando herramientas como Axe y automatizar los informes en la CI.  
+4. **UI y contenido**: seguir ampliando el UI Kit y publicar más artículos técnicos aprovechando la nueva pipeline editorial.
+
+Las etiquetas obligatorias de este post (`release‑notes` y `portfolio`) están presentes en el listado de etiquetas del blog, por lo que no es necesario crear nuevas taxonomías.
