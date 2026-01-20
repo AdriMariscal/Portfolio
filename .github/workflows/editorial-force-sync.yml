@@ -7,7 +7,7 @@ on:
 
 permissions:
   contents: write
-  pull-requests: read
+  pull-requests: write
   issues: write
 
 jobs:
@@ -48,16 +48,31 @@ jobs:
               return;
             }
 
-            const { data: prData } = await github.rest.pulls.get({
-              owner,
-              repo,
-              pull_number: pr.number,
-            });
+            const waitForMergeable = async () => {
+              let { data: prData } = await github.rest.pulls.get({
+                owner,
+                repo,
+                pull_number: pr.number,
+              });
 
-            if (prData.mergeable_state === "unknown") {
-              core.setOutput("skip", "true");
-              return;
-            }
+              for (let attempt = 0; attempt < 6; attempt += 1) {
+                if (prData.mergeable_state && prData.mergeable_state !== "unknown") {
+                  break;
+                }
+                await new Promise((resolve) => setTimeout(resolve, 2000));
+                prData = (
+                  await github.rest.pulls.get({
+                    owner,
+                    repo,
+                    pull_number: pr.number,
+                  })
+                ).data;
+              }
+
+              return prData;
+            };
+
+            const prData = await waitForMergeable();
 
             if (prData.mergeable_state !== "dirty") {
               core.setOutput("skip", "true");

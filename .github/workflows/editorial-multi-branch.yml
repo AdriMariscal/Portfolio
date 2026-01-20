@@ -68,9 +68,6 @@ jobs:
               const invalid = files.filter(
                 (file) => !allowedPrefixes.some((prefix) => file.filename.startsWith(prefix))
               );
-              if (invalid.length === 0) {
-                return { headRef: `${owner}:${headRef}`, invalid };
-              }
               const sanitized = headRef.replace(/\//g, "-");
               const filteredBranch = headRef.startsWith("editorial/filtered/")
                 ? headRef
