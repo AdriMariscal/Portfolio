@@ -41,7 +41,7 @@ Sirve para:
 - Priorizar: qué páginas/plantillas afectan más a negocio.
 - Validar si una mejora técnica se nota “fuera del laboratorio”.
 
-Importante: el informe de **Core Web Vitals en Search Console** se basa en datos de **CrUX** (campo).
+> Importante: el informe de **Core Web Vitals en Search Console** se basa en datos de **CrUX** (campo).
 
 ## 2) El flujo mínimo “sin drama” para datos reales
 
@@ -52,9 +52,9 @@ Piensa en tres capas, de menos a más específica:
 3. **RUM propio (`web-vitals`)**: diagnóstico fino en tus páginas clave (y solo lo que necesitas).
 
 Enlaces útiles del blog:
-- /blog/tags/core-web-vitals/
-- /blog/tags/lighthouse/
-- /blog/tags/performance/
+- [core-web-vitals]/blog/tags/core-web-vitals/)
+- [lighthouse]/blog/tags/lighthouse/)
+- [performance]/blog/tags/performance/)
 
 ## 3) Capa 1: Search Console (para priorizar, no para depurar)
 
@@ -68,7 +68,7 @@ Lo que NO haría:
 
 ## 4) Capa 2: CrUX (tendencia y decisiones por plantilla)
 
-CrUX (Chrome UX Report) es el dataset agregado de experiencia real. Con la **CrUX API** puedes consultar por origen o por URL (cuando hay suficiente volumen). citeturn13search7
+> CrUX (Chrome UX Report) es el dataset agregado de experiencia real. Con la **CrUX API** puedes consultar por origen o por URL (cuando hay suficiente volumen).
 
 Ventajas:
 - Te permite automatizar un “termómetro” diario/semanal.
@@ -81,7 +81,7 @@ Limitaciones prácticas:
 ### Un mínimo de automatización (sin infraestructura)
 Una opción barata es: **GitHub Actions diario** → consulta CrUX → guarda un CSV.
 
-- Si ya tienes pipelines, encaja bien con el enfoque de /blog/tags/github-actions/ (y luego decides si subes un “sistema” completo).
+- Si ya tienes pipelines, encaja bien con el enfoque de [github-action](/blog/tags/github-actions/) (y luego decides si subes un “sistema” completo).
 - Si no quieres tocar CI, puedes hacer lo mismo con un cron externo o un job programado en tu proveedor.
 
 ## 5) Capa 3: RUM ligero con `web-vitals` (producción)
@@ -158,12 +158,12 @@ export function initVitals() {
 }
 ```
 
-Si necesitas diagnóstico más fino, `web-vitals` tiene un build de **attribution** (más grande y con más datos). Úsalo solo cuando estés investigando un problema real. citeturn17search0turn17search2
+> Si necesitas diagnóstico más fino, `web-vitals` tiene un build de **attribution** (más grande y con más datos). Úsalo solo cuando estés investigando un problema real. 
 
 ## 6) Umbrales, alertas y “presupuesto” por plantilla
 
 Antes de alertar, define qué significa “malo” para ti. Como referencia, los umbrales “good” suelen ser:
-- **LCP ≤ 2.5s**, **INP ≤ 200ms**, **CLS ≤ 0.1** (habitualmente medidos en el 75º percentil). citeturn13search12turn13search4turn13search2
+> **LCP ≤ 2.5s**, **INP ≤ 200ms**, **CLS ≤ 0.1** (habitualmente medidos en el 75º percentil).
 
 ### Alertas por umbral (mínimo viable)
 Recomendación práctica:
@@ -291,4 +291,4 @@ En pymes, el flujo útil no es “perseguir 100/100”, sino:
 
 ---
 
-Si quieres que te deje este flujo montado (mínimo viable, con alertas y presupuesto por plantilla) en tu sitio Astro o en una landing de pyme, lo más directo es escribirme por /contact.
+Si quieres que te deje este flujo montado (mínimo viable, con alertas y presupuesto por plantilla) en tu sitio Astro o en una landing de pyme, lo más directo es escribirme por [contacto](/contact).
