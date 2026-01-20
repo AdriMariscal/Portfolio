@@ -3,7 +3,7 @@ name: Editorial workflow promote
 
 on:
   pull_request_target:
-    types: [labeled]
+    types: [labeled, synchronize]
 
 permissions:
   contents: write
@@ -20,17 +20,25 @@ jobs:
         with:
           script: |
             const pr = context.payload.pull_request;
-            const label = context.payload.label?.name;
-            if (!pr || !label) {
+            if (!pr) {
               core.setOutput("skip", "true");
               return;
             }
 
+            const action = context.payload.action;
+            const label = context.payload.label?.name;
+            const labels = pr.labels?.map((item) => item.name) ?? [];
             const owner = context.repo.owner;
             const repo = context.repo.repo;
+            const headRef = pr.head.ref;
             const isSameRepo = pr.head.repo?.full_name === `${owner}/${repo}`;
-            const isCmsPr = pr.base.ref === "dev" && pr.head.ref.startsWith("editorial/filtered/");
-            if (!isSameRepo || !isCmsPr) {
+            const isFiltered = headRef.startsWith("editorial/filtered/");
+            const isCmsBranch =
+              headRef.startsWith("cms/") ||
+              headRef.startsWith("cms_") ||
+              headRef.startsWith("post/") ||
+              headRef.startsWith("post_");
+            if (!isSameRepo || pr.base.ref !== "dev" || (!isFiltered && !isCmsBranch)) {
               core.setOutput("skip", "true");
               return;
             }
@@ -40,6 +48,12 @@ jobs:
               stage = "review";
             } else if (label === "decap-cms/pending_publish") {
               stage = "ready";
+            } else if (action === "synchronize") {
+              if (labels.includes("decap-cms/pending_review")) {
+                stage = "review";
+              } else if (labels.includes("decap-cms/pending_publish")) {
+                stage = "ready";
+              }
             }
 
             if (!stage) {
@@ -47,14 +61,23 @@ jobs:
               return;
             }
 
-            const body = pr.body || "";
-            const match = body.match(/CMS branch:\s*(.+)/i);
-            const cmsBranch = match ? match[1].trim() : pr.head.ref;
+            let cmsBranch = headRef;
+            if (isFiltered) {
+              const body = pr.body || "";
+              const match = body.match(/CMS branch:\s*(.+)/i);
+              if (match) {
+                cmsBranch = match[1].trim();
+              }
+            }
+
+            const filteredBranch = isFiltered
+              ? headRef
+              : `editorial/filtered/${cmsBranch.replace(/\//g, "-")}`;
 
             core.setOutput("skip", "false");
             core.setOutput("stage", stage);
             core.setOutput("cms_branch", cmsBranch);
-            core.setOutput("head_ref", pr.head.ref);
+            core.setOutput("filtered_branch", filteredBranch);
             core.setOutput("pr_number", pr.number.toString());
 
       - name: Checkout
@@ -63,12 +86,37 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Force merge CMS PR into dev
+      - name: Ensure filtered branch
+        if: steps.gate.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          BASE="dev"
+          CMS="${{ steps.gate.outputs.cms_branch }}"
+          FILTERED="${{ steps.gate.outputs.filtered_branch }}"
+
+          git fetch origin "$BASE" "$CMS"
+          git diff --name-only "origin/${BASE}...origin/${CMS}" > changed-files.txt
+          grep -E '^(src/content/|public/images/uploads/)' changed-files.txt > allowed-files.txt || true
+
+          git checkout -B "$FILTERED" "origin/${BASE}"
+          if [[ -s allowed-files.txt ]]; then
+            xargs -d '\n' git checkout "origin/${CMS}" -- < allowed-files.txt
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [[ -s allowed-files.txt ]]; then
+            xargs -d '\n' git add < allowed-files.txt
+          fi
+          git commit --allow-empty -m "cms: sync filtered content"
+          git push --force-with-lease origin "$FILTERED"
+
+      - name: Force merge filtered PR into dev
         if: steps.gate.outputs.stage == 'review'
         run: |
           set -euo pipefail
           BASE="dev"
-          HEAD="${{ steps.gate.outputs.head_ref }}"
+          HEAD="${{ steps.gate.outputs.filtered_branch }}"
 
           git fetch origin "$BASE" "$HEAD"
           git checkout -B "$BASE" "origin/$BASE"
