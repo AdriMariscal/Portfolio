@@ -33,7 +33,7 @@ jobs:
           SOURCE="${GITHUB_REF_NAME}"
 
           git fetch origin "$BASE" "$SOURCE"
-          git diff --name-only "origin/${BASE}...origin/${SOURCE}" > changed-files.txt
+          git -c core.quotepath=false diff --name-only "origin/${BASE}...origin/${SOURCE}" > changed-files.txt
           if [[ ! -s changed-files.txt ]]; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
             exit 0
