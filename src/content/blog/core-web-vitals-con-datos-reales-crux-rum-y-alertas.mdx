@@ -1,0 +1,294 @@
+---
+title: "Core Web Vitals con datos reales: CrUX, RUM y alertas"
+description: Diferencia entre laboratorio y campo, y un flujo mínimo para medir
+  Core Web Vitals con Search Console, CrUX y RUM ligero, convirtiendo métricas
+  en decisiones.
+tags:
+  - core-web-vitals
+  - performance
+  - astro
+  - netlify
+date: 2026-01-20T14:59:00.000+01:00
+published: true
+draft: false
+image: https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&fm=jpg&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&ixlib=rb-4.1.0&q=60&w=3000
+imageAlt: Panel de analítica de rendimiento en la pantalla de un portátil
+imageCaption: "Medir en campo, alertar y decidir: Core Web Vitals como sistema,
+  no como captura aislada."
+robots: max-snippet:-1, max-image-preview:large
+---
+# Core Web Vitals con datos reales: CrUX, RUM y alertas
+
+Cuando un cliente te dice “la web va lenta”, una captura de Lighthouse es útil… pero no es una respuesta. Lighthouse es laboratorio: condiciones controladas, reproducibles y perfectas para detectar regresiones. Core Web Vitals, en cambio, es campo: usuarios reales, dispositivos reales, redes reales.
+
+El objetivo de este post es montar un flujo mínimo (y barato) para medir **Core Web Vitals con datos reales** y convertir métricas en decisiones: **alertas**, **presupuestos por plantilla** y un **playbook** de diagnóstico para INP/LCP/CLS, con foco en **Astro + Netlify**.
+
+## 1) Laboratorio vs campo: qué es cada cosa (y cuándo usarla)
+
+### Laboratorio (Lighthouse, DevTools, WebPageTest)
+Sirve para:
+- Comparar cambios antes/después en un entorno estable.
+- Detectar regresiones en PRs (CI) antes de desplegar.
+- Investigar en profundidad con trazas y perfiles.
+
+Limitaciones:
+- No representa tu mezcla real de dispositivos, conexiones, extensiones, bloqueadores, etc.
+- Puede “salir bien” mientras tus usuarios van mal (o al revés).
+
+### Campo (Search Console, CrUX, RUM)
+Sirve para:
+- Saber cómo le va a la **experiencia real** de tu tráfico (el 75º percentil es el estándar habitual).
+- Priorizar: qué páginas/plantillas afectan más a negocio.
+- Validar si una mejora técnica se nota “fuera del laboratorio”.
+
+> Importante: el informe de **Core Web Vitals en Search Console** se basa en datos de **CrUX** (campo).
+
+## 2) El flujo mínimo “sin drama” para datos reales
+
+Piensa en tres capas, de menos a más específica:
+
+1. **Search Console (CWV)**: panorama general y señales “macro” por grupos de URLs.
+2. **CrUX API**: series temporales por *origen* o por *URL* (si hay datos suficientes) para ver tendencias.
+3. **RUM propio (`web-vitals`)**: diagnóstico fino en tus páginas clave (y solo lo que necesitas).
+
+Enlaces útiles del blog:
+- [core-web-vitals]/blog/tags/core-web-vitals/)
+- [lighthouse]/blog/tags/lighthouse/)
+- [performance]/blog/tags/performance/)
+
+## 3) Capa 1: Search Console (para priorizar, no para depurar)
+
+Uso recomendado:
+- **1 vez por semana** (o cada 2, si el sitio es pequeño): revisa **tendencias** y **qué grupos de URLs** están “No aptas” y por qué.
+- Alinea cada grupo con una **plantilla** (landing, listado, detalle, etc.). Si no puedes mapearlo, tu siguiente paso es mejorar la trazabilidad.
+
+Lo que NO haría:
+- Arreglar “a ciegas” solo con el listado de URLs.
+- Dar por válido un “verde” si tu RUM y tu negocio cuentan otra historia.
+
+## 4) Capa 2: CrUX (tendencia y decisiones por plantilla)
+
+> CrUX (Chrome UX Report) es el dataset agregado de experiencia real. Con la **CrUX API** puedes consultar por origen o por URL (cuando hay suficiente volumen).
+
+Ventajas:
+- Te permite automatizar un “termómetro” diario/semanal.
+- Es el puente razonable entre Search Console y tu RUM.
+
+Limitaciones prácticas:
+- Si tu sitio tiene poco tráfico, puede que no haya datos por URL (o ni siquiera por origen).
+- Es agregado: no te va a decir qué componente exacto rompe INP.
+
+### Un mínimo de automatización (sin infraestructura)
+Una opción barata es: **GitHub Actions diario** → consulta CrUX → guarda un CSV.
+
+- Si ya tienes pipelines, encaja bien con el enfoque de [github-action](/blog/tags/github-actions/) (y luego decides si subes un “sistema” completo).
+- Si no quieres tocar CI, puedes hacer lo mismo con un cron externo o un job programado en tu proveedor.
+
+## 5) Capa 3: RUM ligero con `web-vitals` (producción)
+
+Con RUM no se trata de medir “todo”, sino de medir **lo accionable**:
+- Páginas con intención comercial (home/landing, servicios, contacto/lead).
+- Plantillas que concentran tráfico (listados y detalles, si aplica).
+- Segmentación mínima: **ruta/plantilla**, **dispositivo** (mobile/desktop), y **entorno** (prod).
+
+### Implementación base (Astro)
+Ejemplo en TypeScript. La idea es: medir y enviar con `sendBeacon()` a un endpoint tuyo.
+
+```ts
+// src/scripts/vitals.ts
+import { onCLS, onINP, onLCP } from "web-vitals";
+
+type VitalPayload = {
+  name: "CLS" | "INP" | "LCP";
+  value: number;
+  id: string;
+  delta: number;
+  rating: "good" | "needs-improvement" | "poor";
+  navigationType?: string;
+  path: string;
+  template?: string;
+};
+
+function postVital(v: VitalPayload) {
+  // Ajusta la URL a tu endpoint (Netlify Function, etc.)
+  const url = "/api/vitals";
+  const body = JSON.stringify(v);
+
+  // sendBeacon es fiable en unload y barato.
+  if (navigator.sendBeacon) {
+    navigator.sendBeacon(url, body);
+    return;
+  }
+  fetch(url, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body,
+    keepalive: true,
+  }).catch(() => {});
+}
+
+function getTemplateHint(): string | undefined {
+  // Si puedes, inyecta un hint de plantilla desde tu layout (data-template="landing", etc.)
+  const el = document.documentElement;
+  return el.getAttribute("data-template") ?? undefined;
+}
+
+export function initVitals() {
+  if (!import.meta.env.PROD) return;
+
+  const path = location.pathname;
+  const template = getTemplateHint();
+
+  const send = (metric: any) => {
+    postVital({
+      name: metric.name,
+      value: metric.value,
+      id: metric.id,
+      delta: metric.delta,
+      rating: metric.rating,
+      navigationType: metric.navigationType,
+      path,
+      template,
+    });
+  };
+
+  onCLS(send);
+  onINP(send);
+  onLCP(send);
+}
+```
+
+> Si necesitas diagnóstico más fino, `web-vitals` tiene un build de **attribution** (más grande y con más datos). Úsalo solo cuando estés investigando un problema real. 
+
+## 6) Umbrales, alertas y “presupuesto” por plantilla
+
+Antes de alertar, define qué significa “malo” para ti. Como referencia, los umbrales “good” suelen ser:
+> **LCP ≤ 2.5s**, **INP ≤ 200ms**, **CLS ≤ 0.1** (habitualmente medidos en el 75º percentil).
+
+### Alertas por umbral (mínimo viable)
+Recomendación práctica:
+- No alertes por un pico aislado.
+- Alerta cuando un umbral se rompe **varios días seguidos** o tras un despliegue.
+
+Ejemplo de regla (campo):
+- “LCP p75 de plantilla `landing` empeora a `needs-improvement` durante 3 días consecutivos”.
+- “INP p75 de plantilla `contacto` empeora tras un release”.
+
+### Presupuesto por plantilla (lo que realmente evita regresiones)
+Un “presupuesto” útil no es solo un número de CWV. Es una combinación de:
+- CWV (p75).
+- Tamaño/impacto de JS (sobre todo si hay hidratación).
+- Peso de imágenes del above-the-fold.
+- Fuentes (número de familias/pesos y estrategia de carga).
+
+Enfoque que suele funcionar:
+- Define tu **baseline** por plantilla.
+- Permite variaciones pequeñas (por ejemplo, % de empeoramiento) y revisa “por qué” cuando se supera.
+
+## 7) Playbook de diagnóstico: qué tocar cuando falla cada métrica
+
+### INP (interactividad)
+Síntomas típicos en producción:
+- Demasiada hidratación (islands innecesarios).
+- Terceros pesados (chat, trackers, widgets).
+- Handlers grandes (formularios con validación compleja, sliders, etc.).
+
+Secuencia de trabajo:
+1. Confirma el problema en **campo** (CrUX/RUM). No optimices INP solo por laboratorio.
+2. Aísla por plantilla/ruta: ¿pasa en “todas” o solo en una?
+3. Reproduce en DevTools Performance: busca **long tasks** y scripting excesivo.
+4. En Astro, revisa:
+   - ¿Hay más componentes `client:*` de los necesarios?
+   - ¿Puedes pasar parte a HTML/CSS nativo?
+   - ¿Puedes retrasar o cargar bajo demanda terceros?
+
+### LCP (carga del contenido principal)
+Causas típicas:
+- Imagen hero sin optimizar (tamaño, formato, prioridad).
+- Fuentes bloqueantes (FOIT/FOUC mal gestionados).
+- CSS crítico grande o no cacheado.
+- TTFB elevado o caché mal configurada.
+
+Secuencia de trabajo:
+1. Identifica el elemento LCP en DevTools/Lighthouse.
+2. Optimiza lo que cae “en la foto”:
+   - Imagen hero responsive y con dimensiones correctas.
+   - Fuentes con estrategia defensiva (fallback decente y carga no bloqueante cuando proceda).
+3. Reduce dependencias arriba:
+   - Terceros que ejecutan JS antes de pintar.
+   - CSS que no afecta al above-the-fold.
+
+### CLS (estabilidad visual)
+Causas típicas:
+- Imágenes sin reservar espacio.
+- Fuentes que cambian métricas y empujan layout.
+- Componentes que aparecen “a destiempo” (banners, avisos, embeds).
+- Widgets de terceros que se inyectan sin contenedor estable.
+
+Secuencia de trabajo:
+1. Mide CLS en campo (porque depende mucho de contenido real).
+2. Localiza desplazamientos en DevTools (Layout Shift Regions).
+3. Soluciones casi siempre efectivas:
+   - Reservar dimensiones (img/video/embeds).
+   - Contenedores con alturas mínimas para bloques asíncronos.
+   - Evitar insertar UI arriba del contenido sin reservar espacio.
+
+## 8) Dónde guardar datos sin pagar una suite de RUM
+
+Tres opciones “baratas” que suelen funcionar:
+
+### A) Google Sheets (rápido para empezar)
+- Pros: cero infraestructura, dashboards rápidos, compartible.
+- Contras: límites de cuota; si envías cada visita, te lo comes en días.
+
+Uso recomendado: **solo agregados** (p.ej., resumen diario por plantilla) o muestreo en páginas clave.
+
+### B) CSV (barato y transparente)
+- Guardas un CSV diario (CrUX) en un bucket o incluso en el repo.
+- Fácil de versionar, fácil de auditar.
+- Ideal si quieres un tablero sencillo y control total.
+
+### C) SQLite (cuando ya te importa queryar)
+- Un SQLite pequeño para series temporales por plantilla.
+- Te permite consultas y filtros sin montar un data warehouse.
+- Decide primero dónde vive (un servicio pequeño o un storage durable). Si no lo tienes claro, empieza por CSV.
+
+## 9) Ejemplo para una pyme local: landing + formulario
+
+Contexto típico:
+- Home/landing con propuesta y prueba social.
+- Página de servicios.
+- Contacto con formulario (lead).
+
+Traducción de rendimiento a impacto:
+- Define un KPI simple: **envíos de formulario** o **clic en WhatsApp/llamada**.
+- Cruza (aunque sea manualmente al inicio) con:
+  - Dispositivo (mobile suele ser donde duele).
+  - Plantilla.
+  - Releases (fechas de despliegue).
+
+En pymes, el flujo útil no es “perseguir 100/100”, sino:
+- Evitar regresiones.
+- Mejorar lo que afecta al embudo (landing → contacto).
+
+## 10) Checklist de mantenimiento (para no volver al modo “apagafuegos”)
+
+**En cada despliegue**
+- Lighthouse (laboratorio) en CI con budgets básicos.
+- Si falla el budget, hay una decisión explícita: arreglar o aceptar trade-off.
+
+**Diario o semanal**
+- Snapshot CrUX (si hay datos) por plantilla.
+- Alertas por umbral con histéresis (no por un día suelto).
+
+**Semanal**
+- Search Console: revisar grupos “No aptas” y confirmar si coinciden con tus plantillas clave.
+
+**Mensual**
+- Revisión de terceros (scripts que se han colado).
+- Revisión de rutas más visitadas y su salud CWV.
+- Ajuste de presupuestos si el producto cambia (nuevas secciones, campañas, etc.).
+
+---
+
+Si quieres que te deje este flujo montado (mínimo viable, con alertas y presupuesto por plantilla) en tu sitio Astro o en una landing de pyme, lo más directo es escribirme por [contacto](/contact).
