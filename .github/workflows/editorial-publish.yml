@@ -1,0 +1,91 @@
+# Forces staging -> main on CMS publish (branch delete) and removes filtered branch.
+name: Editorial workflow publish
+
+on:
+  delete:
+    branches:
+      - "cms/**"
+      - "cms_*/**"
+      - "cms_*"
+      - "post/**"
+      - "post_*/**"
+      - "post_*"
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Gate delete event
+        id: gate
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const refType = context.payload.ref_type;
+            if (refType !== "branch") {
+              core.setOutput("skip", "true");
+              return;
+            }
+
+            const cmsBranch = context.payload.ref;
+            const sanitized = cmsBranch.replace(/\//g, "-");
+            const filtered = `editorial/filtered/${sanitized}`;
+
+            core.setOutput("skip", "false");
+            core.setOutput("cms_branch", cmsBranch);
+            core.setOutput("filtered_branch", filtered);
+
+      - name: Checkout
+        if: steps.gate.outputs.skip != 'true'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Force merge staging into main
+        if: steps.gate.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          BASE="main"
+          HEAD="staging"
+
+          git fetch origin "$BASE" "$HEAD"
+          git checkout -B "$BASE" "origin/$BASE"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if ! git merge --no-ff -X theirs "origin/$HEAD"; then
+            git checkout --theirs .
+            git add -A
+            git commit -m "cms: force merge ${HEAD} into ${BASE}"
+          fi
+
+          git push origin "$BASE"
+
+      - name: Delete filtered branch
+        if: steps.gate.outputs.skip != 'true'
+        uses: actions/github-script@v7
+        env:
+          FILTERED_BRANCH: ${{ steps.gate.outputs.filtered_branch }}
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const filtered = process.env.FILTERED_BRANCH;
+            if (!filtered) {
+              return;
+            }
+
+            try {
+              await github.rest.git.deleteRef({
+                owner,
+                repo,
+                ref: `heads/${filtered}`,
+              });
+            } catch (error) {
+              core.warning(`Unable to delete ${filtered}: ${error.message}`);
+            }
