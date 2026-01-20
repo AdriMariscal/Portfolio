@@ -61,15 +61,10 @@ jobs:
           git checkout -B "$FILTERED" "origin/${BASE}"
           xargs -d '\n' git checkout "origin/${SOURCE}" -- < allowed-files.txt
 
-          if git diff --quiet; then
-            git push --force-with-lease origin "$FILTERED"
-            exit 0
-          fi
-
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           xargs -d '\n' git add < allowed-files.txt
-          git commit -m "cms: sync filtered content"
+          git commit --allow-empty -m "cms: sync filtered content"
           git push --force-with-lease origin "$FILTERED"
 
       - name: Create PR to dev
