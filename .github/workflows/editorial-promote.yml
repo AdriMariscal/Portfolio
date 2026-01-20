@@ -95,7 +95,7 @@ jobs:
           FILTERED="${{ steps.gate.outputs.filtered_branch }}"
 
           git fetch origin "$BASE" "$CMS"
-          git diff --name-only "origin/${BASE}...origin/${CMS}" > changed-files.txt
+          git -c core.quotepath=false diff --name-only "origin/${BASE}...origin/${CMS}" > changed-files.txt
           grep -E '^(src/content/|public/images/uploads/)' changed-files.txt > allowed-files.txt || true
 
           git checkout -B "$FILTERED" "origin/${BASE}"
