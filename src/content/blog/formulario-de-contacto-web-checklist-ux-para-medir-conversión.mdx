@@ -1,0 +1,327 @@
+---
+title: "Formulario de contacto web: checklist UX para medir conversión"
+description: "Checklist UX P0/P1 para formularios de contacto: campos mínimos,
+  autocompletado, errores útiles, RGPD y accesibilidad, más eventos para medir
+  abandono."
+tags:
+  - ux
+  - conversion
+  - cro
+  - formularios
+  - accesibilidad
+  - rgpd
+  - astro
+  - netlify
+date: 2026-01-22T14:11:00.000+01:00
+published: true
+draft: false
+image: /images/uploads/screen-with-grafics.jpg
+imageAlt: Panel de analítica en la pantalla de un portátil, con gráficas y
+  métricas de rendimiento.
+imageCaption: Medir abandono y éxito es parte del diseño del formulario.
+robots: max-snippet:-1, max-image-preview:large
+---
+# Formulario de contacto web: checklist UX para medir conversión
+
+Un formulario de contacto no “falla” solo por diseño: falla por fricción, por dudas (privacidad/confianza) y por errores que no ayudan. Si además no mides qué pasa dentro del formulario, mejoras a ciegas.
+
+En este post tienes un checklist práctico (P0/P1) para auditar y mejorar conversión: campos mínimos, autocompletado, validación y mensajes útiles, microcopy RGPD, accesibilidad, anti-spam sin CAPTCHA intrusivo y una guía de instrumentación para medir abandono. Cierro con un ejemplo aplicable en Astro + Netlify Forms/Functions.
+
+Lo que te llevas al terminar:
+- Un checklist P0 (imprescindible) y P1 (mejoras) para pasar de “funciona” a “convierte”.
+- Un enfoque de spam controlado sin romper UX ni accesibilidad.
+- Un mapa de eventos para medir abandono y priorizar mejoras con datos.
+
+* * *
+
+## 1. Antes de tocar campos: define “conversión” y qué cuenta como lead
+
+Define en una frase el objetivo del formulario. Ejemplos:
+- “Que me pidan presupuesto”.
+- “Que reserven una llamada”.
+- “Que me escriban una consulta”.
+
+A partir de ahí, fija:
+- **Evento de éxito**: “submit_success”.
+- **Evento de intento**: “submit_attempt”.
+- **Evento de abandono**: “form_abandon” (más abajo te doy cómo medirlo).
+- **Métrica base**: envíos / visitas a la página (y, si puedes, envíos / formularios iniciados).
+
+Sin esto, el checklist se convierte en una lista de “buenas prácticas” sin impacto medible.
+
+* * *
+
+## 2. Checklist P0 (imprescindible): lo mínimo que debe estar bien
+
+### 2.1 Campos mínimos y orden (menos es más)
+- [ ] Solo pides lo necesario para **responder**: nombre (opcional), email (casi siempre), mensaje u objetivo.
+- [ ] Teléfono **solo** si hay una razón clara (y explícita) para pedirlo.
+- [ ] Si añades campos opcionales, están marcados como **(opcional)**.
+- [ ] El orden es natural: datos de contacto → contexto → mensaje → consentimiento.
+
+Regla útil: cada campo debe justificar su existencia con una pregunta.  
+“¿Qué haría yo si no tuviera este dato?”
+
+### 2.2 Etiquetas claras (labels) y ayudas (no placeholders como label)
+- [ ] Cada campo tiene **label visible**.
+- [ ] Si hay ejemplo, va como texto de ayuda (debajo), no como placeholder.
+- [ ] Si agrupas opciones, usas `fieldset` + `legend`.
+
+### 2.3 Autocompletado y teclado móvil
+- [ ] `autocomplete` correcto (reduce fricción y errores).
+- [ ] Tipos e input modes correctos (`type="email"`, `inputmode="email"`, etc.).
+
+Ejemplos de `autocomplete` frecuentes:
+- `name`, `email`, `tel`, `organization`, `street-address`, `postal-code`, `country`, `language`.
+
+### 2.4 Validación: inmediata, humana y sin castigar
+- [ ] Validas **lo mínimo** en cliente (formato) y **todo** en servidor (seguridad).
+- [ ] No bloqueas al usuario con errores genéricos tipo “campo inválido”.
+- [ ] Los mensajes dicen **qué pasó y cómo arreglarlo**.
+- [ ] No borras lo escrito tras un error.
+- [ ] Hay estado “enviando…” y confirmación de éxito (sin duda).
+
+Microcopy de error (mejor que “inválido”):
+- “Escribe un email válido (ej.: nombre@dominio.com).”
+- “Este campo es obligatorio para poder responderte.”
+
+### 2.5 Accesibilidad P0 (sin esto, pierdes leads reales)
+- [ ] El formulario se completa solo con teclado (Tab/Shift+Tab/Enter).
+- [ ] El foco es visible siempre (no lo “elimines” por estética).
+- [ ] Los errores se anuncian de forma accesible:
+  - el campo tiene `aria-invalid="true"` cuando aplica,
+  - el mensaje de error está asociado (ej.: `aria-describedby`),
+  - si hay resumen de errores, el foco va a ese resumen.
+- [ ] Contraste suficiente en texto, bordes y estados de error.
+
+Si quieres una referencia interna de patrones de UX + accesibilidad, esta guía complementa bien el enfoque:  
+[Infinite scroll con URLs de verdad: atrás, estado y SEO en Astro](/blog/infinite-scroll-urls-verdad-astro/)
+
+* * *
+
+## 3. Checklist P1 (mejoras): conversiones extra con poco coste
+
+### 3.1 Señales de confianza (sin “marketing”, con claridad)
+- [ ] Dices **cuándo respondes** (“Respondo en 24–48h laborables”).
+- [ ] Aclaras qué pasa tras enviar (“Te escribiré al email indicado”).
+- [ ] Si aplica, indicas canal alternativo (solo si es real y mantenible).
+
+### 3.2 RGPD: microcopy mínimo y defendible
+No es asesoría legal, pero a nivel UX hay un mínimo que reduce dudas:
+- [ ] Enlace visible a la política de privacidad.
+- [ ] Frase breve de finalidad (“Usaré tus datos solo para responder a tu mensaje.”).
+- [ ] Consentimiento claro si lo necesitas (evita “checkbox por defecto” si no aporta).
+
+En el propio sitio, tu política de privacidad es un buen ejemplo de estructura y transparencia:  
+[Política de privacidad](/legal/privacidad/)
+
+Y si estás integrando formularios con proveedores/servicios (BaaS, hosting, etc.), este post te ayuda a aterrizar criterios sin humo:  
+[Cumplimiento RGPD en BaaS: guía práctica para pymes y desarrolladores](/blog/cumplimiento-rgpd-baas-guia-practica/)
+
+### 3.3 Prevención de errores (antes de que ocurran)
+- [ ] Formato esperado (ej.: “+34 6XX XXX XXX”) si pides teléfono.
+- [ ] Límites visibles (ej.: “Máx. 1.000 caracteres”).
+- [ ] Campos largos con tamaño suficiente (textarea que no parezca “una línea”).
+
+### 3.4 Confirmación útil (reduce “¿llegó?” y reintentos)
+- [ ] Mensaje de éxito con **siguiente paso** (“Te responderé al email…”).
+- [ ] Si puedes, das **ID** o resumen (sin datos sensibles).
+
+### 3.5 Anti-spam sin CAPTCHA intrusivo (cuando el volumen lo permite)
+- [ ] Honeypot (campo trampa) + validación en servidor.
+- [ ] Rate limit por IP/tiempo (suave: “N envíos / 10 min”).
+- [ ] Bloqueo por patrón si hay abuso (mismo dominio, mismo texto repetido, etc.).
+- [ ] Opción de escalado: si hay ataque real, añade un reto adicional **solo entonces**.
+
+* * *
+
+## 4. Anti-spam sin romper UX: patrón recomendado (honeypot + rate limit)
+
+### 4.1 Honeypot (P0)
+El honeypot filtra bots simples sin impactar al usuario:
+- Campo oculto para humanos (con CSS) y visible para bots.
+- Si llega relleno, descartas.
+
+### 4.2 Rate limiting (P1)
+No necesitas “seguridad enterprise” para la mayoría de webs:
+- Límite por IP + ventana de tiempo.
+- Respuesta suave (HTTP 429) con mensaje claro: “Demasiados intentos. Prueba en unos minutos.”
+
+Importante: **no confíes** en que el frontend te proteja. Lo que filtra es el servidor.
+
+* * *
+
+## 5. Instrumentación: qué eventos medir para saber dónde se pierden leads
+
+Si solo mides “submit_success”, no sabes qué mejorar. Mínimo viable:
+
+### 5.1 Eventos recomendados
+- `form_view` (la página carga con el formulario visible)
+- `form_start` (primer input: focus/typing)
+- `field_error` (campo + tipo de error)
+- `submit_attempt`
+- `submit_success`
+- `submit_error` (timeout, error servidor, validación servidor)
+- `form_abandon` (inició pero no envió)
+
+### 5.2 Propiedades mínimas (para segmentar sin invadir privacidad)
+- `form_name`
+- `field_name` (en `field_error`)
+- `error_type` (required, format, server, rate_limit)
+- `device` (si tu analítica lo ofrece)
+- `time_to_submit_ms` (si puedes)
+
+Regla práctica: registra **fricción**, no contenido. Evita capturar el mensaje del usuario.
+
+* * *
+
+## 6. Ejemplo en Astro + Netlify Forms (con honeypot y validación básica)
+
+Este ejemplo prioriza:
+- HTML semántico,
+- autocompletado,
+- honeypot,
+- mensajes de error defendibles,
+- y base para instrumentación.
+
+~~~astro
+---
+const FORM_NAME = "contacto";
+---
+
+<form
+  name={FORM_NAME}
+  method="POST"
+  data-netlify="true"
+  data-netlify-honeypot="bot-field"
+>
+  {/* Netlify identifica el formulario por este campo */}
+  <input type="hidden" name="form-name" value={FORM_NAME} />
+
+  {/* Honeypot: oculto para humanos, útil para bots simples */}
+  <p class="sr-only">
+    <label>
+      No rellenes este campo:
+      <input name="bot-field" autocomplete="off" tabindex="-1" />
+    </label>
+  </p>
+
+  <div>
+    <label for="name">Nombre <span aria-hidden="true">(opcional)</span></label>
+    <input
+      id="name"
+      name="name"
+      type="text"
+      autocomplete="name"
+    />
+  </div>
+
+  <div>
+    <label for="email">Email</label>
+    <input
+      id="email"
+      name="email"
+      type="email"
+      inputmode="email"
+      autocomplete="email"
+      required
+    />
+    <small id="email-help">Te responderé a este email.</small>
+  </div>
+
+  <div>
+    <label for="message">Mensaje</label>
+    <textarea
+      id="message"
+      name="message"
+      rows="6"
+      required
+    ></textarea>
+  </div>
+
+  <p>
+    Al enviar aceptas la <a href="/legal/privacidad/">política de privacidad</a>.
+  </p>
+
+  <button type="submit">Enviar</button>
+</form>
+~~~
+
+### 6.1 Instrumentación (progresiva) sin romper el HTML
+Puedes añadir un script que dispare eventos (a tu analítica) cuando:
+- el usuario hace el primer input (form_start),
+- hay errores (field_error),
+- intenta enviar (submit_attempt),
+- y si abandona (form_abandon).
+
+~~~js
+const form = document.querySelector('form[name="contacto"]');
+if (!form) return;
+
+let started = false;
+let submitted = false;
+
+function track(event, props = {}) {
+  // Sustituye por tu analítica (Plausible/GA4/endpoint propio)
+  // window.plausible?.(event, { props });
+  console.log("[track]", event, props);
+}
+
+form.addEventListener("input", () => {
+  if (started) return;
+  started = true;
+  track("form_start", { form_name: "contacto" });
+}, { passive: true });
+
+form.addEventListener("invalid", (e) => {
+  const field = e.target;
+  if (!(field instanceof HTMLElement)) return;
+  track("field_error", { form_name: "contacto", field_name: field.getAttribute("name") || "unknown" });
+}, true);
+
+form.addEventListener("submit", () => {
+  submitted = true;
+  track("submit_attempt", { form_name: "contacto" });
+});
+
+window.addEventListener("beforeunload", () => {
+  if (started && !submitted) track("form_abandon", { form_name: "contacto" });
+});
+~~~
+
+Nota: `beforeunload` no es perfecto, pero como señal 80/20 suele ser suficiente. Si quieres más precisión, puedes medir tiempo inactivo o visibilidad (`visibilitychange`) según tu caso.
+
+* * *
+
+## 7. Mini-caso (local): “Pedir presupuesto” sin matar la conversión
+
+Ejemplo típico: negocio local que quiere leads de calidad, no “formularios eternos”.
+
+P0 recomendado:
+- Email (obligatorio)
+- Mensaje (obligatorio)
+- Servicio (select corto: 4–8 opciones)
+- Localidad (texto corto)
+
+P1 (solo si aporta):
+- Presupuesto estimado (rangos)
+- Teléfono (opcional, con microcopy “si prefieres que te llame”)
+
+Métricas a mirar:
+- % de `form_start` → `submit_success`
+- Campos con más `field_error`
+- Tiempo medio a envío
+- Ratio de abandono por móvil vs escritorio
+
+* * *
+
+## 8. Cierre: el formulario es UX + datos (no solo HTML)
+
+Un formulario que convierte bien:
+- pide poco,
+- explica mucho (cuando hace falta),
+- guía sin castigar,
+- y se mide para mejorar con criterio.
+
+Si quieres, puedo auditar tu formulario con este checklist P0/P1 y devolverte un plan priorizado (qué cambiar, por qué y cómo medir si mejora).  
+[Contacto](/contact/)
