@@ -1,0 +1,340 @@
+---
+title: "CRO práctico: medir el embudo de contacto y priorizar mejoras"
+description: Instrumenta el embudo CTA→formulario→envío con eventos mínimos y
+  nombres consistentes. Detecta cuellos de botella y prioriza P0/P1 cumpliendo
+  RGPD.
+tags:
+  - cro
+  - conversion
+  - ux
+  - formularios
+  - analytics
+  - ga4
+  - rgpd
+date: 2026-01-27T13:01:00.000+01:00
+published: true
+draft: false
+image: https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&fm=jpg&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&ixlib=rb-4.1.0&q=60&w=3000
+imageAlt: Panel de analítica en la pantalla de un portátil, útil para medir el
+  embudo de contacto
+robots: max-snippet:-1, max-image-preview:large
+---
+# CRO práctico: medir el embudo de contacto y priorizar mejoras
+
+Si no mides el embudo de contacto, acabas mejorando “a ojo”: cambias el copy, mueves el botón, tocas el formulario… y cruzas los dedos.  
+En CRO (optimización de conversión), lo mínimo viable es **instrumentar el recorrido CTA → formulario → envío** para saber *dónde* se rompe y *por qué*.
+
+En este post te dejo un enfoque práctico:
+- Un **modelo de eventos mínimo** (start, errores, abandono, envío, clic a WhatsApp/llamada).
+- Un **esquema de nombres consistente** (para no montar un Frankenstein).
+- Cómo convertir datos en un **plan P0/P1** sin perderte en dashboards.
+- Snippets para **GA4** y una alternativa **cookieless** (más fácil de encajar con RGPD).
+
+## 1. Define el embudo (y qué significa “convertir”)
+
+Antes de instrumentar nada, cierra esto en 5 minutos:
+
+1) **Conversión principal (macro)**  
+- `contact_form_submit_success` (envío correcto del formulario)
+
+2) **Micro-conversiones (mueven la aguja si hay fricción)**  
+- Click en CTA de contacto (header, hero, footer, sticky…)
+- Inicio del formulario (primer input)
+- Intento de envío (submit)
+- Error (validación / red / servidor)
+- Abandono (empieza pero no envía)
+- Click a WhatsApp / llamada (rutas alternativas)
+
+3) **Qué páginas entran en el embudo**  
+- Home, servicios, proyecto, post, contacto… (no mezcles todo sin segmentar)
+
+> Regla simple: si no puedes explicar el embudo en una frase, aún no estás listo para medirlo.
+
+## 2. Eventos mínimos y nomenclatura consistente (sin inventos)
+
+La consistencia manda. Si hoy llamas a un evento `cta_click` y mañana `click_cta`, en dos semanas no podrás comparar nada.
+
+### Propuesta de nombres (GA4-friendly)
+- Eventos en `lower_snake_case`
+- Prefijo por área (`contact_`)
+- Verbo al final cuando tenga sentido (`_click`, `_start`, `_error`, `_success`)
+
+**Set mínimo recomendado:**
+
+| Paso | Evento | Cuándo dispara | Parámetros recomendados (mínimos) |
+|---|---|---|---|
+| CTA | `contact_cta_click` | Click en “Contactar / Auditoría / WhatsApp / Llamar” | `cta_id`, `cta_location`, `page_path` |
+| Inicio | `contact_form_start` | Primer foco/tecleo en el formulario | `form_id`, `page_path` |
+| Intento | `contact_form_submit_attempt` | Click en submit / intento de envío | `form_id`, `page_path` |
+| Error | `contact_form_error` | Validación, red o servidor | `form_id`, `error_type`, `field_name` (si aplica), `page_path` |
+| Éxito | `contact_form_submit_success` | Confirmación real de envío | `form_id`, `page_path` |
+| Abandono | `contact_form_abandon` | Empieza pero no envía | `form_id`, `time_on_form_ms`, `page_path` |
+| WhatsApp | `contact_whatsapp_click` | Click a WhatsApp | `cta_location`, `page_path` |
+| Llamada | `contact_call_click` | Click tel: | `cta_location`, `page_path` |
+
+**Parámetros clave (para segmentar sin volverte loco):**
+- `cta_location`: `header | hero | footer | sticky | inline`
+- `cta_id`: `audit_free | contact | whatsapp | call`
+- `form_id`: `contact_main` (y punto; si tienes variantes, las nombras bien)
+- `error_type`: `validation | network | server | timeout`
+- `page_path`: ruta (sin query sensible)
+
+> Importante: **nunca metas PII** (email, teléfono, contenido del mensaje) en eventos.
+
+## 3. Implementación rápida en GA4 (con un wrapper decente)
+
+La implementación más robusta suele ser: **un wrapper `track()` + data-attributes**.
+
+### 3.1. Wrapper mínimo
+
+~~~js
+// track.js
+export function track(eventName, params = {}) {
+  if (typeof window === "undefined") return;
+  if (typeof window.gtag !== "function") return; // GA4 via gtag
+
+  window.gtag("event", eventName, {
+    ...params,
+    // si quieres, normaliza aquí (p.ej. page_path)
+  });
+}
+~~~
+
+### 3.2. CTA clicks (sin acoplarte al HTML)
+
+~~~html
+<a
+  href="/contact/"
+  data-track="contact_cta_click"
+  data-cta-id="audit_free"
+  data-cta-location="hero"
+>
+  Solicitar auditoría gratuita
+</a>
+~~~
+
+~~~js
+import { track } from "./track.js";
+
+function getPagePath() {
+  return window.location?.pathname || "/";
+}
+
+document.addEventListener("click", (e) => {
+  const el = e.target.closest("[data-track]");
+  if (!el) return;
+
+  const eventName = el.getAttribute("data-track");
+  track(eventName, {
+    cta_id: el.getAttribute("data-cta-id") || "unknown",
+    cta_location: el.getAttribute("data-cta-location") || "unknown",
+    page_path: getPagePath(),
+  });
+});
+~~~
+
+### 3.3. Form start, submit, error y success (el orden importa)
+
+Aquí está el fallo típico: medir “submit” como éxito. **No**.  
+Mide `submit_attempt` y, solo cuando el backend confirma, `submit_success`.
+
+~~~js
+import { track } from "./track.js";
+
+const form = document.querySelector('form[data-form-id="contact_main"]');
+if (form) {
+  const formId = form.getAttribute("data-form-id");
+  const pagePath = window.location.pathname;
+
+  let started = false;
+
+  form.addEventListener("focusin", () => {
+    if (started) return;
+    started = true;
+    track("contact_form_start", { form_id: formId, page_path: pagePath });
+  });
+
+  form.addEventListener("submit", async (e) => {
+    // Si haces submit normal (HTML), aquí solo tendrás attempt.
+    track("contact_form_submit_attempt", { form_id: formId, page_path: pagePath });
+
+    // Ejemplo si tú controlas el envío por fetch:
+    e.preventDefault();
+
+    try {
+      const fd = new FormData(form);
+      const res = await fetch(form.action, { method: "POST", body: fd });
+
+      if (!res.ok) {
+        track("contact_form_error", {
+          form_id: formId,
+          error_type: "server",
+          page_path: pagePath,
+        });
+        return;
+      }
+
+      track("contact_form_submit_success", { form_id: formId, page_path: pagePath });
+      form.reset();
+    } catch (err) {
+      track("contact_form_error", {
+        form_id: formId,
+        error_type: "network",
+        page_path: pagePath,
+      });
+    }
+  });
+}
+~~~
+
+**Abandono**: no hace falta ser perfecto. Con un baseline vale:
+- si `form_start` ocurrió y **no** hubo `submit_success`, considera abandono
+- opcional: emite `contact_form_abandon` al `visibilitychange` (si te apetece afinar)
+
+## 4. Alternativa cookieless (cuando quieres medir “sin complicarte”)
+
+Si tu objetivo es **decidir** (no perfilar usuarios), una vía muy práctica es medir **agregado**:
+
+- Sin cookies
+- Sin IDs
+- Sin PII
+- Contadores por día / evento / página / ubicación
+
+### 4.1. En el cliente: manda solo lo mínimo
+
+~~~js
+export async function trackCookieless(eventName, props = {}) {
+  try {
+    await fetch("/api/track", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        event: eventName,
+        props: {
+          ...props,
+          page_path: window.location.pathname,
+        },
+      }),
+    });
+  } catch {
+    // Silencioso: es analítica, no debe romper UX
+  }
+}
+~~~
+
+### 4.2. En el servidor: allowlist + sanitización
+
+~~~js
+// /api/track (Node/Edge/Serverless)
+const ALLOWED_EVENTS = new Set([
+  "contact_cta_click",
+  "contact_form_start",
+  "contact_form_submit_attempt",
+  "contact_form_error",
+  "contact_form_submit_success",
+  "contact_whatsapp_click",
+  "contact_call_click",
+]);
+
+export async function POST(req) {
+  const { event, props } = await req.json();
+
+  if (!ALLOWED_EVENTS.has(event)) return new Response(null, { status: 204 });
+
+  // 1) elimina cualquier clave sospechosa (PII)
+  const safeProps = pick(props, ["page_path", "cta_id", "cta_location", "form_id", "error_type", "field_name"]);
+
+  // 2) registra agregado (DB, KV, logs JSON…)
+  // incrementa contador por (event + day + page_path + cta_location)
+  await incrementCounter({ event, props: safeProps });
+
+  return new Response(null, { status: 204 });
+}
+
+function pick(obj, keys) {
+  const out = {};
+  for (const k of keys) if (obj && obj[k] != null) out[k] = String(obj[k]).slice(0, 120);
+  return out;
+}
+~~~
+
+Esto no sustituye a una analítica completa, pero **sí** te permite responder:
+- ¿Qué CTA funciona mejor?
+- ¿En qué paso cae la gente?
+- ¿Qué errores están bloqueando envíos?
+
+## 5. Cómo leer los datos: localiza el cuello de botella en 10 minutos
+
+No necesitas 40 métricas. Con **3 ratios** puedes priorizar:
+
+1) **CTR de CTA (por ubicación)**
+- `contact_cta_click` / (impresiones, si las mides)
+- Si no mides impresiones: compara clicks entre ubicaciones (baseline)
+
+2) **Paso CTA → Form start**
+- `contact_form_start / contact_cta_click`
+- Si esto es bajo, el problema suele ser: fricción al llegar, scroll, carga lenta, CTA engañosa o el formulario “intimida”.
+
+3) **Paso Form start → Success**
+- `contact_form_submit_success / contact_form_start`
+- Si esto es bajo, el problema suele ser: campos, errores, confianza (RGPD/privacidad), o UX de errores.
+
+### Diagnóstico rápido por patrones
+- **Muchos CTA clicks, pocos form_start** → landing/contacto no cumple expectativa, o el formulario está “lejos” / oculto.
+- **Muchos submit_attempt, pocos success** → fallos técnicos, validación agresiva, errores de servidor.
+- **Muchos form_error con el mismo field_name** → campo mal explicado o formato demasiado estricto.
+- **Muchos whatsapp/call clicks y pocos submits** → el formulario no compite: quizá es demasiado largo o genera desconfianza.
+
+Segmenta (siempre):
+- `cta_location`
+- `device` (si lo tienes fácil)
+- `page_path` (home vs servicios vs contacto)
+
+## 6. De datos a hipótesis: plan P0/P1 (sin postureo)
+
+La salida útil de la analítica es un backlog. Un formato simple:
+
+**Observación → Hipótesis → Cambio → Métrica de éxito → Prioridad**
+
+### P0 (impacto alto, riesgo bajo)
+- **Arreglar errores reales** (`error_type=server|network` con volumen)
+- Reducir campos a lo esencial (nombre + email + mensaje, por ejemplo)
+- Mejorar microcopy de errores (qué pasó + cómo arreglarlo)
+- Autocompletado correcto (`autocomplete`) y teclado adecuado en móvil
+- CTA claro y consistente (mismo verbo, misma promesa)
+
+### P1 (mejoras con más incertidumbre)
+- Reordenar campos (primero lo fácil, luego lo “comprometido”)
+- “Asistir” el formulario: ejemplos, placeholders útiles, hints
+- Alternativas visibles (WhatsApp/llamada) sin canibalizar el objetivo
+- Test de layout (1 columna vs 2, sticky CTA, etc.)
+
+> Regla práctica: no pases a P1 si tu P0 no está resuelto (sobre todo errores y fricción obvia).
+
+## 7. Checklist RGPD para medir sin pasarte
+
+Esto es lo que suele romper proyectos pequeños: medir demasiado (o mal). Checklist corto:
+
+- [ ] **Minimización**: no envíes a analítica email/teléfono/mensaje ni IDs internos que identifiquen a una persona.
+- [ ] **Consentimiento**: si usas cookies/analítica no esencial, no dispares hasta tener consentimiento.
+- [ ] **Transparencia**: política de privacidad clara (qué herramienta, para qué, retención).
+- [ ] **DPA / encargo de tratamiento**: firmado con el proveedor si aplica.
+- [ ] **Transferencias**: revisa dónde se procesan datos (y documenta).
+- [ ] **Retención**: limita el tiempo (no guardes logs “para siempre”).
+- [ ] **Seguridad**: acceso mínimo, y si guardas algo, que sea agregado/anonimizado.
+- [ ] **Auditoría interna**: revisa periódicamente que nadie metió PII en params.
+
+Si dudas, la alternativa cookieless (agregada) es muchas veces el camino más simple para **medir y decidir** sin meterte en un jardín.
+
+## Enlaces útiles
+- #cro: /blog/tags/cro/
+- #formularios: /blog/tags/formularios/
+- #conversion: /blog/tags/conversion/
+- #rgpd: /blog/tags/rgpd/
+- Servicios: /services/
+- Contacto: /contact/
+
+---
+
+Si quieres, puedo revisar tu embudo de contacto y devolverte un **plan P0/P1** con métricas y cambios concretos.  
+**Solicitar auditoría gratuita:** /contact/
