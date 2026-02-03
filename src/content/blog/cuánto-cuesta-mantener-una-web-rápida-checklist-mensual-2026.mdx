@@ -1,0 +1,223 @@
+---
+title: "Cuánto cuesta mantener una web rápida: checklist mensual (2026)"
+description: Checklist mensual para calcular el coste real de una web rápida
+  (dominio, hosting, herramientas y terceros) y decidir qué recortar sin perder
+  SEO ni leads.
+tags:
+  - costes
+  - finops
+  - performance
+  - seo
+  - pymes
+  - analytics
+date: 2026-02-03T19:11:00.000+01:00
+published: true
+draft: false
+image: /images/uploads/screen-with-grafics.jpg
+imageAlt: Panel de analítica y rendimiento en la pantalla de un portátil.
+robots: max-snippet:-1, max-image-preview:large
+---
+# Cuánto cuesta mantener una web rápida: checklist mensual (2026)
+
+“Mi web va rápida” no es un estado: es un **mantenimiento**. Y el coste real no es solo “hosting + dominio”, sino **todo lo que se conecta a tu web** (CDN, email, analítica, chat, mapas, píxeles, consent, reservas…), más el **impacto que eso tiene en rendimiento, SEO y leads**.
+
+En esta guía te dejo un método simple (en 5 pasos), una plantilla de hoja de cálculo y una checklist mensual de 30 minutos para que el coste sea **predecible** y las métricas no se degraden sin darte cuenta.
+
+> Contexto: este post encaja con la etiqueta [#costes](/blog/tags/costes/) y, cuando hablamos de “rápida”, está muy conectado con [#performance](/blog/tags/performance/).
+
+---
+
+## 1. Qué estás pagando realmente cuando pagas “una web”
+
+Piensa en tu web como un **sistema de piezas**. Algunas son imprescindibles. Otras son opcionales. Y unas cuantas, si se acumulan, se convierten en “muerte por mil scripts”.
+
+Un inventario típico (según el caso) suele incluir:
+
+- **Base**: dominio, DNS, hosting, CDN/caché, certificados.
+- **Operación**: backups, monitorización (uptime), logs/errores, seguridad/WAF.
+- **Medición**: analítica, eventos, etiquetas, mapas de calor, A/B testing.
+- **Conversión**: chat, formularios, reservas/citas, WhatsApp, call tracking.
+- **Terceros**: mapas, vídeos embebidos, widgets, píxeles, fuentes externas.
+- **Legal**: consentimiento, banners, bloqueo por categorías, auditoría de cookies.
+
+El error común es solo controlar el coste “base” y olvidar el resto. El resultado: **sube la factura** y (peor) **sube el peso y el JS**, bajan los Core Web Vitals y cae el rendimiento comercial.
+
+---
+
+## 2. Método en 5 pasos para calcular tu coste mensual real
+
+### Paso 1 — Inventario “sin vergüenza” (todo lo que carga o se factura)
+Haz una lista de **todo**:
+- Lo que te llega por factura (mensual/anual).
+- Lo que “no pagas” pero afecta (scripts de terceros).
+- Lo que no está en la web, pero **es necesario para que funcione** (correo, DNS, backups).
+
+Regla práctica: si afecta a **carga**, **tracking**, **captación** o **operación**, entra.
+
+### Paso 2 — Separar coste fijo vs variable (y convertirlo a €/mes)
+Para comparar manzanas con manzanas:
+- Convierte anual a mensual: `€/año ÷ 12`.
+- Separa:
+  - **Fijo**: pagas igual aunque no haya tráfico.
+  - **Variable**: depende de visitas, envíos, llamadas, reservas, etc.
+
+> Importante: lo variable suele ser donde aparecen sorpresas. No por “malicia”, sino por **escala**.
+
+### Paso 3 — Mapear impacto en rendimiento (LCP / INP / CLS) y en negocio
+No necesitas una auditoría perfecta: necesitas **señales útiles**.
+
+Etiqueta cada servicio con:
+- **Impacto probable en rendimiento**
+  - LCP: imágenes pesadas, fuentes, CSS/JS bloqueante, TTFB.
+  - INP: JS de terceros, listeners, frameworks en páginas simples, chat.
+  - CLS: banners que aparecen tarde, embeds que cambian tamaño, anuncios.
+- **Impacto en negocio**
+  - ¿Afecta a leads/ventas? ¿Afecta a SEO? ¿Afecta a soporte?
+
+Si un servicio cuesta poco pero mete 200KB de JS y empeora INP, su “coste real” no es solo euros: es **oportunidad**.
+
+### Paso 4 — Presupuesto por categorías (para decidir con criterio)
+En vez de “pagar lo que venga”, define un **presupuesto mensual** por categoría.
+
+Ejemplo de categorías (ajústalo a tu caso):
+- Base (dominio/hosting/CDN)
+- Operación (backups/uptime/seguridad)
+- Medición (analítica/eventos)
+- Conversión (forms/chat/reservas)
+- Legal (consent/cookies)
+
+Tu objetivo: que si sube una categoría, lo notes rápido y decidas si compensa.
+
+### Paso 5 — Alertas y revisión mensual (coste + rendimiento)
+Pon dos tipos de alertas:
+- **Coste/uso**: umbrales simples (50/80/100%) para servicios variables o planes que cambian.
+- **Rendimiento**: budgets mínimos (ej. “no empeorar LCP/INP/CLS en páginas clave”) y una comprobación mensual.
+
+Esto evita el patrón típico: “añadimos una cosa pequeña” × 12 y, de repente, tu web pesa el doble.
+
+---
+
+## 3. Plantilla de hoja de cálculo (lista para copiar)
+
+La idea es que en 10–15 minutos tengas el mapa completo y puedas mantenerlo mes a mes.
+
+### Columnas recomendadas (Inventario)
+Copia esta tabla a Google Sheets/Excel y rellena filas:
+
+| Servicio | Categoría | Proveedor | Tipo (fijo/variable) | Coste (€/mes) | Renovación | Impacto rendimiento (LCP/INP/CLS) | Impacto negocio (SEO/leads/ops) | Prioridad (P0/P1/P2) | Alternativas / notas |
+|---|---|---|---|---:|---|---|---|---|---|
+| Dominio | Base |  | Fijo |  |  |  |  | P0 |  |
+| Hosting | Base |  | Fijo |  |  |  |  | P0 |  |
+| CDN / caché | Base |  | Fijo |  |  |  |  | P0 |  |
+| Email (MX / buzón) | Operación |  | Fijo |  |  |  |  | P0 |  |
+| Backups | Operación |  | Fijo |  |  |  |  | P0 |  |
+| Uptime / alertas | Operación |  | Fijo |  |  |  |  | P1 |  |
+| Analítica | Medición |  | Fijo |  |  |  |  | P0/P1 |  |
+| Chat | Conversión |  | Fijo/Variable |  |  |  |  | P1/P2 |  |
+| Mapas | Terceros |  | Variable |  |  |  |  | P1 |  |
+| Consent (cookies) | Legal |  | Fijo |  |  |  |  | P0 |  |
+
+### Fórmulas útiles (opcional)
+Si tienes costes anuales, crea una columna “Coste (€/año)” y calcula €/mes:
+
+~~~excel
+=SI([@[Coste (€/año)]]<>""; [@[Coste (€/año)]]/12; "")
+~~~
+
+Y para sumar por categoría:
+
+~~~excel
+=SUMAR.SI.CONJUNTO([Coste (€/mes)]; [Categoría]; "Base")
+~~~
+
+---
+
+## 4. P0 / P1 / P2 para recortar sin cargarte SEO ni leads
+
+El objetivo no es “pagar menos”. Es **pagar por lo que aporta** y quitar lo que añade riesgo (coste o rendimiento) sin retorno claro.
+
+### P0 — Imprescindible (si falla, tu web deja de ser fiable)
+- Dominio/DNS
+- Hosting + caché/CDN (si aplica)
+- Certificados (normalmente incluidos, pero conviene controlarlo)
+- Backups (y saber restaurar)
+- Formulario/contacto que llegue (y se pueda auditar)
+- Consentimiento/cookies si estás midiendo o usando terceros
+
+### P1 — Importante (aporta, pero debe justificarse)
+- Uptime/alertas (según criticidad)
+- Analítica bien configurada (mínima y útil)
+- Reservas/citas si es tu canal principal
+- Call tracking si el teléfono es tu conversión principal
+
+### P2 — Prescindible (frecuente fuente de coste + degradación)
+- Multipíxeles “por si acaso”
+- Widgets que duplican funcionalidad (dos chats, dos trackers)
+- Popups pesados, embebidos que cambian layout, scripts de marketing sin uso real
+- Fuentes externas innecesarias o excesivas
+
+**Regla operativa**: antes de recortar, mide **dos cosas**:
+1) ¿Afecta a conversiones? (envíos, llamadas, reservas)  
+2) ¿Afecta a rendimiento? (LCP/INP/CLS en páginas clave)
+
+Si no puedes defenderlo con una respuesta clara, probablemente sea P2.
+
+---
+
+## 5. Checklist mensual (30 minutos) para mantener coste y rendimiento bajo control
+
+1) **Revisa facturas y renovaciones**
+- ¿Qué ha subido? ¿Por qué?
+- ¿Hay servicios duplicados o “olvidados”?
+
+2) **Comprueba servicios variables**
+- ¿Hay picos de uso? ¿Coinciden con campañas o bots?
+- Si aplica, ajusta umbrales de alertas.
+
+3) **Audita terceros (lo que carga en el navegador)**
+- ¿Ha aparecido algún script nuevo?
+- ¿Alguno está cargando en páginas donde no aporta?
+
+4) **Mide páginas clave**
+- Home / servicio / contacto (o landing principal)
+- Apunta LCP/INP/CLS (o, mínimo, si “mejoró / igual / empeoró”).
+
+5) **Revisa el canal de lead**
+- ¿El formulario funciona? ¿Los emails llegan?
+- ¿Tienes logs o señales suficientes para saberlo?
+
+6) **Decisión P0/P1/P2**
+- Elige 1 acción: recortar, sustituir o dejar documentado por qué se mantiene.
+
+> Si quieres profundizar, en el [blog](/blog/) hay más guías prácticas en formato checklist.
+
+---
+
+## 6. Ejemplos típicos en pymes (y qué mirar antes/después)
+
+### Restaurante
+Suele acumular: mapas, reservas, Instagram, cartas digitales, widgets de delivery.
+- Antes/después: **LCP en móvil** (imágenes + fuentes) y **clics a reservar/llamar**.
+- Riesgo típico: embeds y scripts en todas las páginas aunque solo aporten en “Contacto”.
+
+### Clínica
+Suele sumar: formulario, citas, consent, analítica, a veces campañas.
+- Antes/después: **envíos de formulario** y **abandono**; vigila **CLS** (banners/cookies).
+- Riesgo típico: medición mal planteada (muchas herramientas, pocos datos accionables).
+
+### Taller
+Suele depender de: llamada/WhatsApp, ubicación, confianza.
+- Antes/después: **clics a llamar/WhatsApp** y **visitas a “Cómo llegar”**.
+- Riesgo típico: meter “marketing” pesado cuando el canal real es teléfono.
+
+---
+
+## 7. Cierre: coste predecible + métricas estables
+
+Una web rápida no se mantiene “con suerte”. Se mantiene con:
+- **Inventario**.  
+- **Presupuesto**.
+- **Alertas**.
+- **Decisiones P0/P1/P2** basadas en métricas.
+
+Si quieres, puedo ayudarte a convertir tu inventario en un plan recortable (sin perder leads) y con prioridades claras: [Solicitar auditoría gratuita](/contact/).
