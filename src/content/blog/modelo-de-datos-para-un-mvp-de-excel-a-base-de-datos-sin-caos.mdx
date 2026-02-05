@@ -1,0 +1,281 @@
+---
+title: "Modelo de datos para un MVP: de Excel a base de datos sin caos"
+description: "Convierte un Excel real en un modelo de datos mínimo para tu MVP:
+  entidades, claves, relaciones, validaciones, diccionario de datos y plan de
+  migración."
+tags:
+  - desarrollo
+  - mvp
+  - datos
+  - backend
+  - pymes
+date: 2026-02-05T19:40:00.000+01:00
+published: true
+draft: false
+image: https://images.pexels.com/photos/34639577/pexels-photo-34639577.jpeg?auto=compress&cs=tinysrgb&w=3000
+imageAlt: Persona revisando una hoja de cálculo en un portátil, representando el
+  paso de Excel a un modelo de datos para un MVP
+robots: max-snippet:-1, max-image-preview:large
+---
+# Modelo de datos para un MVP: de Excel a base de datos sin caos
+
+Hay un punto en casi todos los MVP donde el Excel deja de ser “práctico” y empieza a ser **caro**: duplicados, estados inconsistentes, búsquedas lentas, “¿cuál es el dato bueno?”, y cambios que obligan a rehacerlo todo.
+
+Este post es una forma pragmática de pasar de un Excel real (clientes, pedidos, incidencias…) a un **modelo de datos mínimo** que:
+- Aguanta el MVP sin volverte loco.
+- Evita el caos típico (duplicados, estados imposibles, “campos que significan cosas distintas”).
+- Te deja iterar sin re-trabajo innecesario.
+
+> Contexto: este post encaja con la etiqueta [#desarrollo](/blog/tags/desarrollo/) y toca backend desde un ángulo muy práctico (si te interesa esa parte, hay más en [#backend](/blog/tags/backend/)).
+
+* * *
+
+## 1. Antes de dibujar tablas: define el MVP en “preguntas P0”
+
+Un modelo de datos no se diseña para “ser bonito”. Se diseña para responder **preguntas** (consultas) que importan en tu MVP.
+
+Haz este ejercicio antes de normalizar nada:
+
+### 1.1 Lista de preguntas P0 (las que sí o sí deben funcionar)
+Ejemplos típicos:
+- “¿Qué pedidos tiene este cliente y en qué estado están?”
+- “¿Qué incidencias están abiertas y quién las lleva?”
+- “¿Cuánto tardamos de media en resolver una incidencia?”
+- “¿Cuántos pedidos entraron esta semana y cuál fue su importe?”
+- “¿Cuántas veces un cliente repite compra?”
+
+Si no hay una pregunta P0 detrás, ese dato/relación es sospechoso de *scope creep*.
+
+### 1.2 Traduce preguntas P0 a pantallas/acciones del MVP
+Esto te fuerza a concretar:
+- **Crear** (alta pedido / alta incidencia)
+- **Leer** (listados + detalle)
+- **Actualizar** (cambio de estado + comentarios)
+- **Auditar** (quién cambió qué y cuándo)
+
+Ese “CRUD real” es el mapa de tu modelo mínimo.
+
+* * *
+
+## 2. Del Excel a entidades: detecta “cosas” y repeticiones
+
+Un Excel suele mezclar varias entidades en una sola fila. Tu trabajo es **separarlas sin perder trazabilidad**.
+
+### 2.1 Regla rápida: “si se repite, probablemente es una entidad”
+Si ves algo así:
+- Columnas `ClienteNombre`, `ClienteEmail`, `ClienteTeléfono` repetidas en muchas filas → **Cliente**
+- Columnas `PedidoFecha`, `PedidoEstado`, `PedidoTotal` → **Pedido**
+- Columnas `IncidenciaTipo`, `IncidenciaEstado`, `IncidenciaPrioridad` → **Incidencia**
+- “Producto” dentro del pedido (varios por pedido) → **Línea de pedido** (order_item)
+
+### 2.2 Entidades mínimas típicas para este caso
+Una versión “MVP-friendly” suele ser:
+- `customer` (cliente)
+- `order` (pedido)
+- `order_item` (líneas del pedido, si aplica)
+- `ticket` (incidencia)
+- `user` (agente interno, si hay asignación)
+
+No metas “más” por anticipación. Mete lo justo para tus preguntas P0.
+
+* * *
+
+## 3. Claves sin drama: IDs, unicidad y trazabilidad
+
+Aquí se decide si el modelo te va a ahorrar tiempo… o te va a explotar en la cara.
+
+### 3.1 Usa un ID técnico estable para cada entidad
+En MVP suele ser lo más práctico:
+- `id` (UUID o similar) como clave primaria.
+- Y luego claves “naturales” como **constraints**, no como PK.
+
+Ejemplos de claves naturales razonables:
+- `customer.email` (si tu negocio lo garantiza)
+- `order.external_ref` (si viene de otro sistema)
+- `ticket.external_ref` (si existe)
+
+### 3.2 Define unicidad explícita (para cortar duplicados pronto)
+Decisiones típicas:
+- Email de cliente: ¿único o no?
+- Pedido: ¿puede haber dos pedidos con el mismo número?
+- Incidencia: ¿se permite duplicar “misma incidencia” o hay dedupe?
+
+Si no decides esto, acabarás con:
+- “Juan” duplicado 6 veces.
+- Métricas que mienten.
+- Y migraciones dolorosas.
+
+* * *
+
+## 4. Relaciones: lo mínimo que evita inconsistencias
+
+Piensa en relaciones como “bloques anti-caos”.
+
+### 4.1 Relaciones típicas
+- Un cliente tiene muchos pedidos: `customer (1) → (N) order`
+- Un pedido tiene muchas líneas: `order (1) → (N) order_item`
+- Un cliente tiene muchas incidencias: `customer (1) → (N) ticket`
+- Una incidencia puede estar asignada a un usuario: `ticket (N) → (1) user` (opcional)
+
+### 4.2 Decide qué se borra y qué se archiva
+En MVP, **borrar** suele ser mala idea. Mejor:
+- `deleted_at` (soft delete) o
+- estados tipo `archived`
+
+¿Por qué? Porque si borras, rompes:
+- integridad (FKs),
+- auditoría,
+- y análisis.
+
+* * *
+
+## 5. Estados y reglas: donde se rompe el 80% de los MVP
+
+La mayor fuente de caos en datos no son los “números”. Son los **estados**.
+
+### 5.1 Define estados como enumeraciones pequeñas
+Ejemplos:
+- `order.status`: `draft`, `paid`, `shipped`, `cancelled`
+- `ticket.status`: `open`, `in_progress`, `waiting_customer`, `resolved`, `closed`
+
+### 5.2 Define transiciones válidas (aunque sea en texto)
+No necesitas una máquina de estados perfecta, pero sí evitar imposibles:
+- `resolved` → `open` ¿se permite?
+- `cancelled` → `paid` ¿nunca?
+
+Esto reduce bugs de UX y discusiones internas.
+
+### 5.3 Auditoría mínima en todas las tablas “de negocio”
+Como base:
+- `created_at`, `updated_at`
+- `created_by`, `updated_by` (si hay usuarios)
+- para entidades con estados: `status_changed_at`
+
+* * *
+
+## 6. Validaciones: separa UX (cliente) de seguridad (servidor)
+
+Dos reglas simples:
+- Validar en cliente mejora UX.
+- Validar en servidor evita basura y riesgos.
+
+### 6.1 Validaciones mínimas típicas
+- Requeridos: email, fecha, estado, cantidades > 0
+- Formatos: email, teléfono (si aplica), códigos
+- Rangos: importes, unidades
+- Integridad: que existan los IDs referenciados (FK)
+
+Si manejas datos personales, conecta esta parte con cumplimiento y retención desde el principio (aunque sea “mínimo”): [Cumplimiento RGPD en BaaS: guía práctica para pymes y desarrolladores](/blog/cumplimiento-rgpd-baas-guia-practica/).
+
+* * *
+
+## 7. Plantilla de diccionario de datos (la pieza que más re-trabajo evita)
+
+Si solo haces una cosa de este post, que sea esta.
+
+El diccionario de datos evita:
+- Campos ambiguos (“importe” ¿con IVA? ¿en qué moneda?).
+- Duplicidades (“phone” vs “mobile”).
+- Reglas invisibles (“estado solo lo cambia soporte”).
+
+Copia/pega y rellena:
+
+| Entidad/tabla | Campo | Tipo | Obligatorio | Origen (quién lo rellena) | Significado | Validación | Ejemplo | Notas |
+|---|---|---|---|---|---|---|---|---|
+| customer | email | text | sí | usuario / import | Identificador principal de contacto | formato email + unique | ana@empresa.com | decide si es único |
+| order | status | enum | sí | sistema / agente | Estado del pedido | set {draft, paid, shipped, cancelled} | paid | transiciones definidas |
+| ticket | priority | enum | no | agente | Prioridad operativa | set {low, medium, high} | high | si no, default medium |
+
+### 7.1 Bonus: añade “preguntas P0 que toca este campo”
+Si quieres llevarlo a “nivel pro”, añade una columna:
+- “¿En qué pantalla/consulta P0 se usa?”
+
+Eso fuerza foco.
+
+* * *
+
+## 8. Trade-offs: ¿cuándo normalizar “de verdad” y cuándo vale algo simple?
+
+No hay medallas por normalizar demasiado pronto. Hay facturas.
+
+### 8.1 Una tabla simple puede valer si…
+- Eres tú solo (o 1 persona) editando.
+- No hay estado complejo (o hay 1 estado simple).
+- No hay relaciones reales 1:N o N:M.
+- El volumen es bajo y no hay reporting serio.
+
+Ejemplo típico: un “registro de leads” con 10–15 columnas, sin relaciones.
+
+### 8.2 Normaliza (al menos lo básico) si aparece alguno de estos síntomas
+- **Duplicados** recurrentes (clientes, pedidos, incidencias).
+- **Estados** que se contradicen (“cerrado” con “fecha de cierre vacía”).
+- **Relaciones** reales (un pedido con varios productos, una incidencia con varios eventos).
+- **Auditoría** empieza a importar (“¿quién cambió esto?”).
+- **Permisos** (no todo el mundo debería ver/modificar todo).
+- **Integración** con otros sistemas (CRM, email, pagos…).
+
+### 8.3 Cómo detectar futuros puntos de dolor (check rápido)
+- ¿Hay más de 1 “fuente de verdad” para el mismo dato?
+- ¿Hay campos que se rellenan “a ojo” sin regla?
+- ¿El estado depende de “lo que diga un comentario”?
+- ¿Las filas “hacen de historial” (añades filas para cambios) porque no hay auditoría?
+Si respondes “sí” a 2+, el Excel ya está pidiendo modelo.
+
+* * *
+
+## 9. Mini plan de migración: import inicial + cambios sin romper nada
+
+Migrar “sin caos” es más proceso que SQL.
+
+### 9.1 Import inicial (primera carga)
+1) Congela una versión del Excel (export “definitivo” de arranque).  
+2) Limpieza mínima: tipos, fechas, espacios, emails.  
+3) Importa a una tabla staging (raw) para trazar errores.  
+4) Pasa de staging a tablas finales con reglas (dedupe + validación).  
+5) Genera un reporte: filas OK vs rechazadas, y por qué.
+
+### 9.2 Cambios (delta) sin duplicar todo
+En MVP, lo más simple suele ser:
+- Un “import batch” con `batch_id` y timestamp.
+- Reglas idempotentes: si ya existe (por unique key), actualiza; si no, crea.
+- Log de conflictos (misma clave, datos diferentes).
+
+### 9.3 Si usas BaaS o backend gestionado
+El patrón no cambia, pero sí el coste y los límites (lecturas, escrituras, logs, retención). Si estás eligiendo stack, aquí tienes una guía para tomar decisiones con criterio: [Backend as a Service (BaaS) en 2025: cómo elegirlo y conectarlo con Astro o Next.js](/blog/backend-as-a-service-2025-astro-nextjs/).
+
+* * *
+
+## 10. Métricas/logs mínimos para saber si el modelo aguanta (o hay que iterar)
+
+No necesitas un observability stack perfecto. Necesitas señales.
+
+### 10.1 Métricas mínimas (MVP)
+- % de registros rechazados en import (y top 3 motivos).
+- nº de duplicados detectados por entidad (clientes/pedidos/incidencias).
+- distribución de estados (¿hay estados “zombie”?).
+- tiempo medio en cada estado (tickets/pedidos).
+- ratio de “ediciones manuales” vs “creación automática” (si aplica).
+
+### 10.2 Logs útiles (no verbosos)
+- `entity`, `entity_id`, `action`
+- `batch_id` (si viene de import)
+- `actor` (usuario/sistema)
+- `error_code` + mensaje corto
+
+Si tus logs no responden “qué pasó” en 60 segundos, no sirven.
+
+* * *
+
+## Checklist final (para usar como cierre de alcance)
+
+- [ ] Preguntas P0 definidas (y mapeadas a pantallas).
+- [ ] Entidades mínimas identificadas (sin futuro-ficción).
+- [ ] Claves primarias + unicidad decididas (corta duplicados).
+- [ ] Relaciones mínimas con integridad (FK o equivalente).
+- [ ] Estados y transiciones definidos (aunque sea simple).
+- [ ] Validaciones servidor (tipos, requeridos, rangos).
+- [ ] Diccionario de datos rellenado (origen + significado + validación).
+- [ ] Plan de import inicial + delta.
+- [ ] Métricas/logs mínimos para iterar con señales.
+
+Si haces esto antes de escribir “la primera tabla”, tu MVP no solo llega antes: llega con menos deuda invisible.
