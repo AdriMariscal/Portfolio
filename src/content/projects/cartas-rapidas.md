@@ -24,6 +24,57 @@ projectUrl: https://cartasrapidas.es
 repoUrl: null
 demoUrl: ""
 changelog:
+  - version: v2.35.0
+    date: 2026-02-05T16:58:00.000+01:00
+    changes:
+      - type: added
+        text: "Monetización con Google AdSense y Ezoic: integración de espacios
+          publicitarios con banner de consentimiento CMP (Gatekeeper), ads.txt
+          gestionado vía redirect y CSP ampliado para permitir scripts de ambas
+          plataformas."
+      - text: added
+        type: Google Analytics 4 (G-QZ87TJZKM1) activado en producción a través de
+          variable de entorno en netlify.toml, con web-vitals añadido como
+          dependencia de producción para envío de métricas Core Web Vitals.
+      - type: added
+        text: "Suite de testing completa: tests unitarios con Vitest (jsdom), E2E con
+          Playwright (Chromium en local; Chromium + Firefox + WebKit en CI) y
+          script ci-playwright.sh que omite gracefully si no hay tests."
+      - type: added
+        text: "Lighthouse CI integrado en dos capas: GitHub Actions (lhci autorun,
+          artefacto lhci-report) y plugin @netlify/plugin-lighthouse en Netlify
+          con umbrales de performance ≥0.85, a11y ≥0.90 y SEO ≥0.90."
+      - type: added
+        text: "Sección de recursos ampliada con páginas independientes: derechos del
+          consumidor, cambios legislativos, consejos de envío, protección de
+          datos, ficheros de morosidad y cómo escalar una reclamación."
+      - type: added
+        text: "Páginas informativas: FAQ con datos estructurados FAQPage (Schema.org),
+          página 'Sobre' con secciones y lista de enlaces legales, y brand-spec
+          con paleta de colores, escala tipográfica, tokens de espaciado,
+          radios, sombras y motion."
+      - type: changed
+        text: "Rutas i18n (ca/eu) redirigidas a / en netlify.toml: la infraestructura
+          multilingüe permanece en código pero las rutas /ca y /eu no están
+          activas en producción en esta versión."
+      - type: changed
+        text: jsPDF actualizado a ^4.1.0 (major bump desde v2.x).
+      - type: changed
+        text: Políticas legales (privacidad, cookies, aviso) actualizadas en enero de
+          2026 para incluir Ezoic como tercero, transferencias internacionales
+          de datos y base jurídica de publicidad personalizada.
+      - type: devops
+        text: "CI refactorizado en jobs independientes: lint, i18n:check, unit tests
+          (Vitest), E2E (Playwright) y Lighthouse; workflow netlify-deploy.yml
+          se dispara solo tras CI verde en staging/main."
+      - type: devops
+        text: "Headers de seguridad completos en netlify.toml: CSP granular con
+          allowlist para AdSense, GTM, Ezoic y GA4; HSTS preload;
+          X-Frame-Options DENY; Permissions-Policy restrictiva; política
+          diferenciada para /ads/*."
+      - type: refactor
+        text: Script verify-ci.sh unifica el flujo completo (install, lint, unit, e2e,
+          lhci) con NODE_ENV=development y HUSKY=0 para entornos CI.
   - version: v1.4.0
     date: 2025-12-31
     changes:
@@ -80,57 +131,6 @@ changelog:
       - type: devops
         text: "GitHub Actions para auto-etiquetado: tags vX.Y.Z en main y vX.Y.Z-rc en
           staging a partir de package.json."
-  - version: v2.35.0
-    date: 2026-02-05T16:58:00.000+01:00
-    changes:
-      - type: added
-        text: "Monetización con Google AdSense y Ezoic: integración de espacios
-          publicitarios con banner de consentimiento CMP (Gatekeeper), ads.txt
-          gestionado vía redirect y CSP ampliado para permitir scripts de ambas
-          plataformas."
-      - text: added
-        type: Google Analytics 4 (G-QZ87TJZKM1) activado en producción a través de
-          variable de entorno en netlify.toml, con web-vitals añadido como
-          dependencia de producción para envío de métricas Core Web Vitals.
-      - type: added
-        text: "Suite de testing completa: tests unitarios con Vitest (jsdom), E2E con
-          Playwright (Chromium en local; Chromium + Firefox + WebKit en CI) y
-          script ci-playwright.sh que omite gracefully si no hay tests."
-      - type: added
-        text: "Lighthouse CI integrado en dos capas: GitHub Actions (lhci autorun,
-          artefacto lhci-report) y plugin @netlify/plugin-lighthouse en Netlify
-          con umbrales de performance ≥0.85, a11y ≥0.90 y SEO ≥0.90."
-      - type: added
-        text: "Sección de recursos ampliada con páginas independientes: derechos del
-          consumidor, cambios legislativos, consejos de envío, protección de
-          datos, ficheros de morosidad y cómo escalar una reclamación."
-      - type: added
-        text: "Páginas informativas: FAQ con datos estructurados FAQPage (Schema.org),
-          página 'Sobre' con secciones y lista de enlaces legales, y brand-spec
-          con paleta de colores, escala tipográfica, tokens de espaciado,
-          radios, sombras y motion."
-      - type: changed
-        text: "Rutas i18n (ca/eu) redirigidas a / en netlify.toml: la infraestructura
-          multilingüe permanece en código pero las rutas /ca y /eu no están
-          activas en producción en esta versión."
-      - type: changed
-        text: jsPDF actualizado a ^4.1.0 (major bump desde v2.x).
-      - type: changed
-        text: Políticas legales (privacidad, cookies, aviso) actualizadas en enero de
-          2026 para incluir Ezoic como tercero, transferencias internacionales
-          de datos y base jurídica de publicidad personalizada.
-      - type: devops
-        text: "CI refactorizado en jobs independientes: lint, i18n:check, unit tests
-          (Vitest), E2E (Playwright) y Lighthouse; workflow netlify-deploy.yml
-          se dispara solo tras CI verde en staging/main."
-      - type: devops
-        text: "Headers de seguridad completos en netlify.toml: CSP granular con
-          allowlist para AdSense, GTM, Ezoic y GA4; HSTS preload;
-          X-Frame-Options DENY; Permissions-Policy restrictiva; política
-          diferenciada para /ads/*."
-      - type: refactor
-        text: Script verify-ci.sh unifica el flujo completo (install, lint, unit, e2e,
-          lhci) con NODE_ENV=development y HUSKY=0 para entornos CI.
 ---
 ## Resumen
 Cartas Rápidas es una herramienta web para generar cartas legales claras y listas para enviar, orientada a casos frecuentes en España (baja de gimnasio, desistimiento, reclamaciones, devoluciones SEPA y solicitudes relacionadas con ASNEF). En la versión 2.x el proyecto evoluciona hacia un portal de información legal con sección de recursos extensa, monetización mediante Google AdSense y Ezoic, analítica GA4, y una suite de calidad completa (Vitest + Playwright + Lighthouse CI en Netlify y GitHub Actions).
