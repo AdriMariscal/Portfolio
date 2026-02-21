@@ -183,8 +183,8 @@ Copia/pega y rellena:
 | Entidad/tabla | Campo | Tipo | Obligatorio | Origen (quién lo rellena) | Significado | Validación | Ejemplo | Notas |
 |---|---|---|---|---|---|---|---|---|
 | customer | email | text | sí | usuario / import | Identificador principal de contacto | formato email + unique | ana@empresa.com | decide si es único |
-| order | status | enum | sí | sistema / agente | Estado del pedido | set {draft, paid, shipped, cancelled} | paid | transiciones definidas |
-| ticket | priority | enum | no | agente | Prioridad operativa | set {low, medium, high} | high | si no, default medium |
+| order | status | enum | sí | sistema / agente | Estado del pedido | set {'{'}draft, paid, shipped, cancelled{'}'} | paid | transiciones definidas |
+| ticket | priority | enum | no | agente | Prioridad operativa | set {'{'}low, medium, high{'}'} | high | si no, default medium |
 
 ### 7.1 Bonus: añade “preguntas P0 que toca este campo”
 Si quieres llevarlo a “nivel pro”, añade una columna:
