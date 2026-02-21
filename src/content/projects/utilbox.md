@@ -23,29 +23,6 @@ projectUrl: https://utilibox.app/
 repoUrl: ""
 demoUrl: ""
 changelog:
-  - version: v0.22.0
-    date: 2026-01-10
-    changes:
-      - type: added
-        text: Lanzamiento inicial del sitio con base Astro 5.x y generación estática en
-          Netlify.
-      - type: added
-        text: "Tres utilidades disponibles: generador de QR, generador de contraseñas
-          con aleatoriedad criptográfica y contador de palabras (beta),
-          accesibles sin enviar datos a servidores."
-      - type: added
-        text: Página de descargas con categorías (VPNs gratuitas, visores, editores y
-          plantillas) y enlaces verificados desde fuentes oficiales.
-      - type: added
-        text: Buscador instantáneo y filtros por categoría que permiten encontrar
-          herramientas rápidamente.
-      - type: added
-        text: "Sistema de monetización basado en red Monetag: formatos Pop-under y Push
-          activados tras interacción del usuario, con formato banner en
-          preparación."
-      - type: added
-        text: Gestor de consentimiento de cookies que carga publicidad solo tras la
-          aceptación del usuario.
   - version: v1.25.0
     date: 2026-02-17T18:04:00.000+01:00
     changes:
@@ -119,6 +96,29 @@ changelog:
           (Netlify), ARCHITECTURE.md con diagrama Mermaid y estructura /src/,
           BRAND.md, CONTRIBUTING.md, analytics.md, compliance.md,
           lighthouse-cwv.md, ads.md y devlog-v1.md."
+  - version: v0.22.0
+    date: 2026-01-10
+    changes:
+      - type: added
+        text: Lanzamiento inicial del sitio con base Astro 5.x y generación estática en
+          Netlify.
+      - type: added
+        text: "Tres utilidades disponibles: generador de QR, generador de contraseñas
+          con aleatoriedad criptográfica y contador de palabras (beta),
+          accesibles sin enviar datos a servidores."
+      - type: added
+        text: Página de descargas con categorías (VPNs gratuitas, visores, editores y
+          plantillas) y enlaces verificados desde fuentes oficiales.
+      - type: added
+        text: Buscador instantáneo y filtros por categoría que permiten encontrar
+          herramientas rápidamente.
+      - type: added
+        text: "Sistema de monetización basado en red Monetag: formatos Pop-under y Push
+          activados tras interacción del usuario, con formato banner en
+          preparación."
+      - type: added
+        text: Gestor de consentimiento de cookies que carga publicidad solo tras la
+          aceptación del usuario.
 ---
 ## Resumen
 
