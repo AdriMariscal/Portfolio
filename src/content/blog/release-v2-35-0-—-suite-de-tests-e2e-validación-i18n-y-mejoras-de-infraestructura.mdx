@@ -1,0 +1,109 @@
+---
+title: Release v2.35.0 — Suite de tests E2E, validación i18n y mejoras de
+  infraestructura
+description: La versión 2.35.0 de Cartas Rápidas consolida la calidad técnica
+  del proyecto con una suite completa de tests Playwright, verificación
+  automatizada de traducciones, presupuestos Lighthouse, integración con Google
+  Analytics 4 y un sistema de publicidad actualizado vía Ezoic.
+tags:
+  - release-notes
+  - cartas-rapidas
+  - astro
+  - netlify
+  - ci‑cd
+  - playwright
+  - seo
+date: 2026-02-05T17:51:00.000+01:00
+published: true
+draft: false
+---
+## Resumen
+
+La **v2.35.0** de **Cartas Rápidas** es una release de consolidación técnica que refuerza la calidad y la observabilidad del proyecto sin añadir nuevas plantillas visibles de forma inmediata para el usuario.  Se estrena una **suite de tests end-to-end con Playwright** que cubre el flujo principal de generación de cartas, el soporte multilingüe y el manejo de errores 404.  Se incorpora también un **script de verificación de traducciones i18n** que detecta claves faltantes o vacías en los locales `ca` y `eu` en tiempo de compilación, y se afina el pipeline de CI/CD con **presupuestos de Lighthouse** alineados con Core Web Vitals.
+
+**Highlights de la release:**
+
+- **Playwright E2E**: tres suites de tests que cubren flujo principal, multilingüe (es/ca/eu) y manejo de errores 404 con validaciones de status HTTP.
+- **i18n:check**: script TypeScript que detecta claves de traducción faltantes, extra u obsoletas y falla en CI si hay discrepancias.
+- **Lighthouse CI con presupuestos**: LCP < 3 s, INP < 200 ms, TBT < 300 ms y CLS < 0,1 verificados automáticamente en cada deploy.
+- **Google Analytics 4**: medición de producción con `PUBLIC_GA_MEASUREMENT_ID` inyectado en el contexto de Netlify.
+- **Ezoic**: actualización del sistema de publicidad desde Monetag a la red Ezoic, con CSP, redirección de `ads.txt` y cabeceras de seguridad revisadas.
+- **web-vitals**: integración de la librería oficial de métricas CWV como dependencia de producción.
+
+## Por qué este cambio
+
+Desde la publicación de la **v1.4.0** (cuenta local cifrada, soporte multilingüe y primer pipeline de CI), el proyecto sumó decenas de iteraciones menores.  Al alcanzar la serie v2.x, la prioridad ha sido asegurar que las funcionalidades existentes son estables, testeables y observables antes de añadir nuevas.
+
+Tres motivaciones concretas guían esta release:
+
+1. **Cobertura de tests**: el generador de cartas, las firmas, la cuenta local y las rutas multilingüe carecían de tests automatizados de integración.  Sin ellos, cualquier refactor arriesgaba romper la experiencia sin detectarlo.
+2. **Integridad de las traducciones**: con tres locales activos (`es`, `ca`, `eu`), mantener las claves i18n sincronizadas de forma manual es propenso a errores.  El script `i18n:check` lo automatiza y bloquea el deploy si hay inconsistencias.
+3. **Calidad de publicidad y analítica**: la migración a Ezoic y la activación de GA4 responden a necesidades de monetización y medición responsable, alineadas con las cabeceras CSP ya presentes.
+
+## Qué hay de nuevo
+
+### Suite de tests Playwright (E2E)
+
+Se incorporan tres archivos de tests end-to-end bajo `tests/e2e/`:
+
+- **`basic-flow.spec.ts`**: verifica que la página principal carga el generador, el selector de plantillas muestra opciones, el formulario se actualiza al cambiar de modelo, la vista previa refleja el texto introducido y los botones de PDF, copia y firma están presentes.  También prueba la página de carta individual (`/cartas/baja-gimnasio`).
+- **`multilingual.spec.ts`**: itera sobre los tres locales para confirmar que las páginas de inicio, cartas, FAQ, contacto, sobre nosotros, recursos y legales se sirven con status 200 y con el atributo `lang` correcto en el HTML.
+- **`404.spec.ts`**: prueba rutas inexistentes, recursos no encontrados y combinaciones de locales para garantizar que las respuestas 404 son coherentes y que las rutas válidas no las devuelven.
+
+Los tests se ejecutan contra Chromium en local y añaden Firefox y WebKit en CI, con reintentos automáticos y captura de pantalla en fallos.  El artefacto `playwright-report` queda disponible en GitHub Actions.
+
+### Script de verificación i18n (`npm run i18n:check`)
+
+El nuevo script `scripts/i18n-check.ts` compara las claves de traducción de `es` (base) con las de `ca` y `eu`, detecta claves faltantes, claves extra/obsoletas y valores vacíos, y devuelve exit code 1 si hay algún problema.  Esto permite que el job `i18n` del CI falle antes del deploy en caso de regresión de traducciones.
+
+El script también maneja arrays y objetos anidados, evitando falsos positivos en estructuras como `toneOptions` o `faq`, donde el número de elementos puede variar legítimamente entre locales.
+
+### Presupuestos Lighthouse en CI y Netlify
+
+El archivo `.lighthouserc.json` establece umbrales estrictos medidos sobre `http://localhost:4321/` con tres ejecuciones:
+
+| Métrica | Umbral | Nivel |
+|---|---|---|
+| LCP | < 3.000 ms | error |
+| INP | < 200 ms | warning |
+| TBT | < 300 ms | error |
+| CLS | < 0,1 | error |
+
+Adicionalmente, el plugin de Lighthouse en `netlify.toml` audita `/` y `/cartas/baja-gimnasio` post-deploy, con umbrales de rendimiento (≥ 0,85), accesibilidad (≥ 0,90), best practices (≥ 0,85) y SEO (≥ 0,90).  Si no se alcanzan, el deploy falla.
+
+### Google Analytics 4 y web-vitals
+
+Se activa `PUBLIC_GA_MEASUREMENT_ID` en el contexto de producción de Netlify.  La dependencia `web-vitals ^5.1.0` se añade al proyecto para permitir el envío de métricas CWV al endpoint de GA4 sin cookies de terceros adicionales.
+
+### Actualización publicitaria: Ezoic
+
+El sistema de publicidad migra de Monetag a **Ezoic**.  La CSP de `netlify.toml` se actualiza para permitir los dominios de Ezoic (`www.ezoic.com`, `www.ezojs.com`) y los scripts de Google Ads asociados.  El archivo `ads.txt` se gestiona vía redirección a `srv.adstxtmanager.com` en lugar de servirlo estático, facilitando la actualización automática desde Ezoic.
+
+Los locales `ca` y `eu` actualmente redirigen a `/` mediante reglas en `netlify.toml`, mientras los tests E2E validan que las rutas con prefijo de locale responden correctamente.
+
+## Notas técnicas
+
+- **Stack**: Astro 5.17.1, Tailwind CSS 4.1.17, Preact 10.28.3, jsPDF 4.1.0, TypeScript 5.9.3, Vitest 4.0.18, Playwright 1.58.1, Node 20.18.0.
+- **CI pipeline**: los jobs `lint`, `i18n`, `unit`, `e2e` y `lighthouse` se ejecutan en paralelo sobre PR y push a `dev`, `staging` y `main`.  El deploy a Netlify solo se lanza si el workflow CI completa con éxito.
+- **Selectores de test**: los tests E2E usan atributos `data-cr-*` (`data-cr-generator`, `data-cr-template`, `data-cr-form`, `data-cr-preview`, `data-cr-pdf`, `data-cr-copy`, `data-cr-signatures-container`) para desacoplar tests de clases CSS.
+- **Cabeceras de seguridad**: las cabeceras `Content-Security-Policy`, `Strict-Transport-Security`, `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy` y `Permissions-Policy` se definen por contexto en `netlify.toml` (assets, páginas generales, sección `/ads/*`), con la CSP más permisiva reservada para el path de anuncios.
+- **Breaking changes**: ninguno conocido para el usuario final.  Los cambios son internos de CI, tests y publicidad.
+
+## Resultados / Impacto
+
+- **Calidad técnica**: la suite Playwright y el script `i18n:check` convierten en detectables automáticamente errores que antes solo aparecían en producción.
+- **Confianza en deploys**: los presupuestos Lighthouse bloquean regresiones de rendimiento antes de llegar a producción.
+- **Monetización**: la integración con Ezoic amplía las opciones publicitarias respetando la experiencia de usuario y la privacidad.
+- **Observabilidad**: GA4 permite medir el uso real de las plantillas sin depender de cookies de terceros y complementando las métricas CWV ya capturadas.
+
+## Próximos pasos
+
+1. **Ampliar el catálogo de plantillas** con nuevos modelos (reclamaciones a administraciones, cartas de impago, bajas de servicios de suscripción SaaS) y actualizar las guías asociadas.
+2. **Accesibilidad avanzada**: incluir tests de accesibilidad automatizados con Axe o similar e integrarlos en el pipeline de CI junto con los existentes.
+3. **Sincronización en la nube**: explorar almacenamiento en la nube opcional para la cuenta local, manteniendo el cifrado AES-GCM y sin comprometer el principio de privacidad.
+4. **Analítica responsable**: activar un dashboard de uso por plantilla a partir de los eventos GA4 para priorizar el roadmap de contenidos.
+5. **Revisar locales ca/eu**: las redirecciones actuales de `/ca/*` y `/eu/*` a `/` coexisten con los tests E2E que esperan contenido localizado; alinear ambas partes en una próxima iteración.
+
+---
+
+Cartas Rápidas sigue creciendo como herramienta legal autoservicio.  Si encuentras algún problema o tienes ideas para nuevas plantillas, abre un issue en [GitHub](https://github.com/AdriMariscal/CartasRapidas) o escríbenos desde el formulario de [contacto](https://cartasrapidas.es/contacto).
