@@ -12,8 +12,8 @@ tags:
   - ux
   - a11y
   - ci‑cd
-  - '"cartas-rapidas"'
-  - '"web"'
+  - cartas-rapidas
+  - web
 published: true
 active: true
 status: active
