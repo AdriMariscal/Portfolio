@@ -1,0 +1,83 @@
+---
+title: Release v1.25.0 — Ezoic como proveedor de monetización
+description: "La versión 1.25.0 de Utilibox integra Ezoic como proveedor de
+  publicidad: anuncios display con Consent Mode v2, slots en Home y
+  herramientas, CSP actualizada y política de cookies revisada."
+tags:
+  - release-notes
+  - utilibox
+  - netlify
+  - astro
+date: 2026-02-17T19:14:00.000+01:00
+published: true
+draft: false
+---
+## Resumen
+
+La **v1.25.0** de **Utilibox** cierra el ciclo de monetización iniciado en la v1.6.0 (cuando se eliminó el proveedor anterior) e incorpora **Ezoic** como nueva red publicitaria. La integración es técnicamente limpia: los anuncios solo se cargan tras el consentimiento explícito del usuario gracias a la implementación de **Google Consent Mode v2**, y el componente `Banner.astro` ya no muestra el texto provisional *"Formato display pendiente de habilitación"* cuando no hay placement configurado.
+
+Los cambios principales de esta versión son:
+
+- **Integración Ezoic** con script cargado condicionalmente: ningún recurso de Ezoic se solicita antes de que el usuario acepte las cookies.
+- **Banner.astro refactorizado**: placementId configurable desde variable de entorno; ausencia de placement = componente invisible, sin texto de relleno.
+- **Slots publicitarios** en dos posiciones: Home (banner principal + sidebar opcional) y páginas de herramientas (entre el área de input y el resultado).
+- **CSP actualizada** en `netlify.toml` con los dominios de Ezoic (`www.ezojs.com`, `the.gatekeeperconsent.com`, `cmp.gatekeeperconsent.com`).
+- **Política de cookies revisada** para reflejar la presencia de Ezoic y sus categorías de datos.
+- **Runbook** de configuración disponible con los pasos exactos a realizar en la plataforma Ezoic.
+
+## Por qué este cambio
+
+Desde la v1.6.0 el espacio publicitario estaba sin proveedor activo y el sitio no generaba ingresos. La elección de Ezoic responde a su compatibilidad nativa con Consent Mode v2 (obligatorio en la UE desde 2024) y a que el CMP propio de la plataforma (`cmp.gatekeeperconsent.com`) facilita el cumplimiento del RGPD sin necesidad de un gestor de consentimiento adicional. La integración se diseñó para respetar la privacidad: ningún script de Ezoic llega al navegador hasta que el usuario acepta en el banner de cookies propio de Utilibox.
+
+## Qué hay de nuevo
+
+### Integración Ezoic con Consent Mode v2
+
+El script principal de Ezoic (`www.ezojs.com/ezoic/sa.min.js`) se inyecta dinámicamente en `BaseLayout.astro` solo cuando se verifica que `document.documentElement.dataset.adsConsent === "true"`. Adicionalmente, se escucha el evento `ads:consent-granted` para activar los anuncios en tiempo real tras la aceptación, sin recargar la página. Si el usuario rechaza las cookies, el script de Ezoic nunca se solicita.
+
+La integración también incluye soporte para el CMP de Ezoic (`the.gatekeeperconsent.com`), permitiendo que la plataforma gestione la granularidad del consentimiento publicitario según la normativa vigente.
+
+### Banner.astro actualizado
+
+El componente `src/components/Ads/Banner.astro` recibe un `placementId` opcional procedente de la variable de entorno `PUBLIC_EZOIC_PLACEMENT_BANNER`. Cuando el placement no está definido, el componente no renderiza nada, eliminando el antiguo texto de marcador de posición que resultaba antiestético en producción. Cada slot está asociado al contenedor `ezoic-pub-ad-placeholder-{placementId}` que Ezoic detecta automáticamente.
+
+### Posicionamiento de slots
+
+Se han definido dos posiciones publicitarias iniciales alineadas con la guía de buenas prácticas de colocación:
+
+- **Home**: un banner principal debajo del hero/herramientas destacadas y un sidebar opcional (`PUBLIC_EZOIC_PLACEMENT_SIDEBAR`).
+- **Páginas de herramientas**: un banner entre el área de entrada y el resultado generado (`PUBLIC_EZOIC_PLACEMENT_TOOL`), posición de alta visibilidad sin interferir con el flujo de uso.
+
+### CSP y seguridad
+
+La cabecera `Content-Security-Policy` en `netlify.toml` se amplía con los dominios necesarios para que Ezoic funcione sin errores de CSP: `script-src` incluye ahora `https://www.ezojs.com`, `https://the.gatekeeperconsent.com` y `https://cmp.gatekeeperconsent.com`. El resto de directivas de seguridad (`X-Frame-Options`, `HSTS`, `X-Content-Type-Options`, etc.) permanecen inalteradas.
+
+### Política de cookies actualizada
+
+La página `/cookies` se actualiza para reflejar la presencia de Ezoic, sus categorías de datos (publicidad, personalización) y el mecanismo de revocación del consentimiento. El runbook completo de configuración en la plataforma Ezoic está documentado.
+
+## Notas técnicas
+
+- **Variables de entorno requeridas** (Netlify → Site settings → Environment variables): `PUBLIC_EZOIC_PLACEMENT_BANNER`, `PUBLIC_EZOIC_PLACEMENT_SIDEBAR` (opcional) y `PUBLIC_EZOIC_PLACEMENT_TOOL`. Sin ellas, los componentes `Banner.astro` no renderizan contenido, evitando errores en producción mientras se realiza la configuración en Ezoic.
+- **Consent Mode v2**: la activación de Ezoic es condicional al dataset `data-ads-consent="true"` del `<html>`, establecido por el banner de cookies. Esto es compatible con la implementación GA4 existente (los cuatro parámetros de consent se actualizan de forma independiente).
+- **Sin ruptura de herramientas**: los slots de herramientas están posicionados entre input y resultado, no antes del H1 ni dentro del flujo principal de interacción, siguiendo las recomendaciones de Google AdSense para evitar CLS y penalizaciones de Core Web Vitals.
+- **Configuración externa pendiente**: la cuenta Ezoic debe verificarse y configurarse en la plataforma. Los anuncios no aparecerán hasta completar dicho proceso incluso con las variables de entorno presentes.
+
+## Resultados / Impacto
+
+Esta versión reactiva el modelo de ingresos de Utilibox tras el periodo sin proveedor activo. El impacto esperado a corto plazo es:
+
+- **Monetización activa**: los slots publicitarios comenzarán a generar impresiones en cuanto se complete la verificación en Ezoic.
+- **Privacidad preservada**: ningún dato publicitario se envía antes del consentimiento; la experiencia de usuario sin cookies permanece inalterada.
+- **Cumplimiento normativo**: la integración con Consent Mode v2 y el CMP de Ezoic satisface los requisitos del RGPD y la política de Google para la UE.
+- **Código más limpio**: el componente `Banner.astro` ya no introduce ruido visual en entornos sin placement configurado.
+
+## Próximos pasos
+
+Con la monetización reactivada, el roadmap próximo se centra en maximizar el rendimiento del sitio y ampliar la propuesta de valor:
+
+1. **Completar la configuración Ezoic** siguiendo el runbook: verificación de dominio, habilitación de formatos y revisión de la política en la plataforma.
+2. **Analítica de ingresos**: conectar GA4 con el panel de Ezoic para correlacionar uso de herramientas con impresiones y RPM.
+3. **Evaluar formatos adicionales**: una vez estabilizado el display, valorar In-Page Push o Vignette según su impacto en Core Web Vitals y retención.
+4. **Ampliar el catálogo de herramientas**: incorporar nuevas utilidades (convertidores, herramientas de texto avanzadas) para aumentar el tráfico indexado y la superficie publicitaria.
+5. **Auditoría Lighthouse post-Ezoic**: verificar que la carga del script de Ezoic no degrada LCP, INP ni CLS por debajo de los umbrales documentados en `docs/lighthouse-cwv.md`.
