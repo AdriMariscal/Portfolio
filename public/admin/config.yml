@@ -1,3 +1,5 @@
+site_url: "https://adrianmariscal.es"
+display_url: "https://adrianmariscal.es"
 backend:
   name: github
   repo: "AdriMariscal/portfolio"

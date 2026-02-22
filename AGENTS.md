@@ -171,6 +171,7 @@ Usa el detectado en todos los comandos subsiguientes.
    git commit -m "feat: <resumen> (refs #<ID>)"
    git push origin dev
    ```
+9. Mueve la issue en Project a **"In Review"** (best effort).
 
 #### A.8 — Entrega tras push a dev
 - Incluye batería de pruebas manuales (3–7, ver §7).
@@ -193,7 +194,8 @@ Usa el detectado en todos los comandos subsiguientes.
    git commit -m "fix: <resumen ajuste> (refs #<ID>)"
    git push origin dev
    ```
-6. **DETENTE. Espera nuevo OK del usuario.**
+6. Mueve la issue en Project a **"In Review"** (best effort).
+7. **DETENTE. Espera nuevo OK del usuario.**
 
 ---
 
@@ -207,9 +209,6 @@ gh pr create --base staging --head dev \
   --title "<título>" \
   --body "<descripción>\n\nResuelve #<ID>"
 ```
-
-Inmediatamente tras crear la PR:
-- Mueve la issue en Project a **"In Review"** (best effort).
 
 #### C.2 — Conflictos
 Si hay conflictos, resuélvelos de forma segura (preferencia: rebase de `dev` sobre `staging`). Re-ejecuta verificación mínima y actualiza el PR.
