@@ -104,10 +104,10 @@ html[data-theme="light"]{
   --shadow-color:rgba(31,36,38,0.18);
   --shadow-color-soft:rgba(31,36,38,0.12);
 
-  --color-bg:var(--palette-sand-200);
-  --color-surface:var(--palette-sand-500);
-  --color-surface-alt:var(--palette-sand-500);
-  --color-canvas:var(--palette-sand-500);
+  --color-bg:var(--palette-sand-100);
+  --color-surface:#FFFFFF;
+  --color-surface-alt:var(--palette-sand-100);
+  --color-canvas:var(--palette-sand-100);
 
   --color-heading:var(--palette-charcoal-950);
   --color-text:var(--palette-charcoal-900);

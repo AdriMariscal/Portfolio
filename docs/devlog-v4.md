@@ -13,6 +13,12 @@ Regla: todas las versiones MINOR se registran; PATCH solo cuando aporte.
 - Comentario del archivo de tokens actualizado de v1.6 a v2.0.
 - Refs: #577 / https://github.com/AdriMariscal/Portfolio/issues/577
 
+## v4.3.0 — 2026-03-13
+- T-003 [BRAND]: light mode 'Neutral funcional' aplicado end-to-end — fondo `#F0ECE4` (Sand 100), cards blanco (`#FFFFFF`), texto Charcoal 900.
+- Corregidos `--color-bg`, `--color-surface`, `--color-surface-alt` y `--color-canvas` en `[data-theme="light"]`; eliminado el uso residual de Sand 200 y Sand 500 como fondos en modo claro.
+- Resultado: ninguna sección muestra fondo perceptiblemente amarillo en light mode; el toggle de tema ya no produce regresión visual.
+- Refs: #579 / https://github.com/AdriMariscal/Portfolio/issues/579
+
 ## v4.2.0 — 2026-03-13
 - T-002 [BRAND]: verificados con fórmula WCAG 2.1 todos los ratios de contraste de §10.1 de la guía de marca.
 - Las 4 combinaciones Sand nuevas pasan su nivel esperado: Sand 500/Charcoal 900 → 7.98:1 AAA; Teal 700/Sand 100 → 4.65:1 AA; Charcoal 900/Sand 100 → 10.69:1 AAA; Charcoal 950/Sand 500 → 9.94:1 AAA.
