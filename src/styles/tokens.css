@@ -1,5 +1,5 @@
 /* ========================================================================== */
-/*   Design tokens (Guía de Marca v1.6)                                       */
+/*   Design tokens (Guía de Marca v2.0)                                       */
 /* ========================================================================== */
 
 :root{
@@ -36,9 +36,9 @@
   --palette-charcoal-600:#4B555B;
   --palette-neutral-300:#CCCCCC;
 
-  --palette-sand-100:#FBE7B5;
-  --palette-sand-200:#E8D3A3;
-  --palette-sand-500:#FBE7B5;
+  --palette-sand-100:#F0ECE4;
+  --palette-sand-200:#C9B07A;
+  --palette-sand-500:#E2CC96;
 
   --palette-teal-600:#0F766E;
   --palette-teal-500:#2DD4BF;
@@ -141,9 +141,9 @@ html[data-theme="light"]{
   --color-info-border:rgba(56,189,248,0.35);
   --color-info-soft:rgba(56,189,248,0.08);
 
-  --color-overlay:rgba(251,231,181,0.95);
-  --color-header-bg:rgba(251,231,181,0.86);
-  --color-menu-bg:rgba(251,231,181,0.98);
+  --color-overlay:rgba(240,236,228,0.95);
+  --color-header-bg:rgba(240,236,228,0.86);
+  --color-menu-bg:rgba(240,236,228,0.98);
   --color-nav-active-bg:rgba(45,212,191,0.14);
   --color-skip-link-bg:var(--palette-charcoal-950);
   --color-skip-link-text:var(--palette-sand-100);
