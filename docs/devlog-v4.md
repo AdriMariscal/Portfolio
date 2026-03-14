@@ -19,6 +19,16 @@ Regla: todas las versiones MINOR se registran; PATCH solo cuando aporte.
 - Resultado: ninguna sección muestra fondo perceptiblemente amarillo en light mode; el toggle de tema ya no produce regresión visual.
 - Refs: #579 / https://github.com/AdriMariscal/Portfolio/issues/579
 
+## v4.4.0 — 2026-03-14
+- T-004 [BRAND]: auditada y corregida la regla de contención de color (máx. 2 marcas por sección) en Home, /services y /projects.
+- Botón primario cambiado de gradiente Teal a Sand 500 (corrección fundamental: el CTA principal es el acento de marca Sand, no el color interactivo Teal).
+- Barras decorativas de `.section__title` (barra vertical + subrayado) convertidas de Teal a gradiente Sand 500→Sand 200.
+- Icono del theme-toggle, bandas de tarjetas de proyecto/gracias y punto decorativo de About: Teal reemplazado por Sand.
+- Tags/chips: fondo y borde cambiados de teal-soft (`rgba(45,212,191,0.18)`) a sand-soft (`rgba(226,204,150,0.12)`).
+- Glow del hero en dark mode: teal `rgba(45,212,191,0.24)` → sand cálido `rgba(226,204,150,0.10)`.
+- Resultado: ninguna sección muestra Charcoal + Sand + Teal simultáneamente en reposo; Teal queda exclusivamente en estados hover/focus/activo.
+- Refs: #580 / https://github.com/AdriMariscal/Portfolio/issues/580
+
 ## v4.2.0 — 2026-03-13
 - T-002 [BRAND]: verificados con fórmula WCAG 2.1 todos los ratios de contraste de §10.1 de la guía de marca.
 - Las 4 combinaciones Sand nuevas pasan su nivel esperado: Sand 500/Charcoal 900 → 7.98:1 AAA; Teal 700/Sand 100 → 4.65:1 AA; Charcoal 900/Sand 100 → 10.69:1 AAA; Charcoal 950/Sand 500 → 9.94:1 AAA.
