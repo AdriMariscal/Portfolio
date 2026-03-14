@@ -52,6 +52,12 @@ Regla: todas las versiones MINOR se registran; PATCH solo cuando aporte.
 - Test unitario añadido en `tests/unit/seo.test.ts` verificando los dos criterios de aceptación.
 - Refs: #586 / https://github.com/AdriMariscal/Portfolio/issues/586
 
+## v4.9.0 — 2026-03-14
+- T-012 [SEO]: schema.org `BreadcrumbList` verificado en ambas páginas de detalle; añadido breadcrumb visual (UI) que refleja la jerarquía Inicio › Blog/Proyectos › Título en `/blog/[slug]` y `/projects/[slug]`.
+- El JSON-LD `BreadcrumbList` ya existía y es correcto (3 ítems, `item` con URL absoluta); esta versión añade el `<nav aria-label="Ruta de navegación">` visible para que la UI coincida con el schema, cumpliendo el criterio de Rich Results Test.
+- CSS `.breadcrumb` añadido en `global.css` con tokens de texto muted, truncado de título largo y hover en `--color-accent`.
+- Refs: #588 / https://github.com/AdriMariscal/Portfolio/issues/588
+
 ## v4.8.0 — 2026-03-14
 - T-011 [SEO]: schema.org `Person` ampliado con `sameAs` (LinkedIn + GitHub) y `jobTitle` corregido a "Diseñador Web" (alineado con guía de marca v2.0).
 - Nodo `Organization` en BaseLayout elevado a `["ProfessionalService", "LocalBusiness"]` con `areaServed: "España"` y `priceRange: "€€"` para Google Knowledge Graph y featured snippets de marca.

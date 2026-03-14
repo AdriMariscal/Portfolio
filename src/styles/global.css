@@ -1141,6 +1141,13 @@ strong{color:var(--color-heading)}
 /* margen cómodo para el botón volver */
 .post__back{margin:4px 0 16px}
 
+.breadcrumb{margin:0 0 .75rem}
+.breadcrumb__list{display:flex;flex-wrap:wrap;align-items:center;gap:.25rem .1rem;list-style:none;margin:0;padding:0;font-size:13px;color:var(--color-text-muted)}
+.breadcrumb__item a{color:var(--color-text-muted);text-decoration:none}
+.breadcrumb__item a:hover{color:var(--color-accent);text-decoration:underline;text-underline-offset:.12em}
+.breadcrumb__sep{color:var(--color-text-muted);opacity:.6;padding:0 .15rem;user-select:none}
+.breadcrumb__item--current{color:var(--color-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:32ch}
+
 .post__desc{margin:.15rem 0 1rem}
 
 /* Meta (fecha + tags) */
