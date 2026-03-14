@@ -20,6 +20,16 @@ export const SERVICES_META_TITLE = "Auditoría web y packs de mejora SEO · Adri
 export const PROJECTS_META_TITLE = "Proyectos web: rendimiento y SEO técnico · Adrián Mariscal";
 export const AUDITORIA_META_TITLE = "Auditoría Web Gratuita: rendimiento y SEO · Adrián Mariscal";
 
+/** Meta title para fichas de proyecto: "{título} · rendimiento web y SEO · Adrián Mariscal" (50-60 chars) */
+export const buildProjectMetaTitle = (title: string): string => {
+  const suffix = " · rendimiento web y SEO · Adrián Mariscal";
+  const clean = normalizeText(title);
+  const full = `${clean}${suffix}`;
+  if (full.length <= 60) return full;
+  const available = 60 - suffix.length;
+  return `${truncateAtWord(clean, available)}${suffix}`;
+};
+
 export const buildMetaTitle = (keyword: string, title: string, max = 60) => {
   const cleanTitle = normalizeText(title);
   const prefix = `${keyword} · `;

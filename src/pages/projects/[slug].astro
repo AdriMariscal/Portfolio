@@ -11,8 +11,7 @@ import { SITE } from "@/lib/config";
 import {
   buildHeadingTitle,
   buildMetaDescription,
-  buildMetaTitle,
-  SEO_KEYWORD
+  buildProjectMetaTitle,
 } from "@/lib/seo";
 
 export async function getStaticPaths() {
@@ -21,7 +20,7 @@ export async function getStaticPaths() {
     params: { slug: entry.slug },
     props: {
       project: entry,
-      metaTitle: buildMetaTitle(SEO_KEYWORD, entry.data.title ?? SITE.title),
+      metaTitle: buildProjectMetaTitle(entry.data.title ?? SITE.title),
       metaDescription: buildMetaDescription(
         entry.data.description ?? SITE.description,
         "Descubre el proyecto y pide una auditoría."
