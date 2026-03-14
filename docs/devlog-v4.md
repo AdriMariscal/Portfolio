@@ -29,6 +29,14 @@ Regla: todas las versiones MINOR se registran; PATCH solo cuando aporte.
 - Resultado: ninguna sección muestra Charcoal + Sand + Teal simultáneamente en reposo; Teal queda exclusivamente en estados hover/focus/activo.
 - Refs: #580 / https://github.com/AdriMariscal/Portfolio/issues/580
 
+## v4.5.0 — 2026-03-14
+- T-005 [BRAND]: auditoría y corrección del uso de Teal — solo interacción y estado, nunca decorativo.
+- `--color-success` corregido de `teal-500` a `--palette-success-500` (`#22C55E`); sus derivados `--color-success-border` y `--color-success-soft` actualizados a RGBA de verde (#22C55E).
+- Light mode: `--color-accent`, `--color-accent-strong` y `--color-focus` cambiados de `teal-500` a `teal-600` (`#0F766E`) para cumplir la guía (mejor contraste en fondo Sand 100) y coherencia con la regla de Teal por modo.
+- Todos los RGBA derivados de teal-500 en light mode actualizados a RGBA de teal-600.
+- Resultado: `--color-success` ya no es Teal (era incorrecto semánticamente); en light mode el foco y las interacciones usan el teal con contraste adecuado (4.65:1 AA sobre Sand 100 según §10.1).
+- Refs: #581 / https://github.com/AdriMariscal/Portfolio/issues/581
+
 ## v4.2.0 — 2026-03-13
 - T-002 [BRAND]: verificados con fórmula WCAG 2.1 todos los ratios de contraste de §10.1 de la guía de marca.
 - Las 4 combinaciones Sand nuevas pasan su nivel esperado: Sand 500/Charcoal 900 → 7.98:1 AAA; Teal 700/Sand 100 → 4.65:1 AA; Charcoal 900/Sand 100 → 10.69:1 AAA; Charcoal 950/Sand 500 → 9.94:1 AAA.
