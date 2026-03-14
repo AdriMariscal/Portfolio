@@ -144,6 +144,9 @@ Regla: todas las versiones MINOR se registran; PATCH solo cuando aporte.
 - Redeploy de producción forzado vía Netlify CLI; sitio live en `https://adrianmariscal.es` con las nuevas variables activas.
 - Refs: #604
 
+## v4.21.4 — 2026-03-14
+- Patch v4.21.4 — CTA añadido al template de OG images en todas las páginas (blog, proyectos, estáticas).
+
 ## v4.21.0 — 2026-03-14
 - T-014 [SEO]: OG images dinámicas por página generadas en build time con `satori` + `sharp`.
 - Endpoint `src/pages/og/[...slug].png.ts` cubre 41 posts, 3 proyectos y 5 páginas estáticas (home, about, services, auditoria-web, contact).

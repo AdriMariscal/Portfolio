@@ -9,6 +9,7 @@ interface OGProps {
   title: string;
   description: string;
   type: string;
+  cta: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -49,8 +50,9 @@ function truncate(text: string, max: number): string {
 // Palette: Charcoal 900 bg, Sand 500 accent, Teal 500 domain
 // ---------------------------------------------------------------------------
 function buildElement(props: OGProps): object {
-  const { title, description, type } = props;
-  const desc = truncate(description, 120);
+  const { title, description, type, cta } = props;
+  // Reduce description length slightly to leave room for the CTA line
+  const desc = truncate(description, 100);
   const titleFontSize = title.length > 65 ? '42px' : title.length > 45 ? '50px' : '58px';
 
   return {
@@ -80,7 +82,7 @@ function buildElement(props: OGProps): object {
             {
               type: 'div',
               props: {
-                style: { display: 'flex', marginBottom: '36px' },
+                style: { display: 'flex', marginBottom: '28px' },
                 children: {
                   type: 'div',
                   props: {
@@ -110,7 +112,7 @@ function buildElement(props: OGProps): object {
                   fontSize: titleFontSize,
                   fontWeight: 700,
                   lineHeight: 1.2,
-                  marginBottom: '28px',
+                  marginBottom: '20px',
                   flexGrow: 1,
                   alignItems: 'flex-start',
                 },
@@ -124,11 +126,25 @@ function buildElement(props: OGProps): object {
                 style: {
                   display: 'flex',
                   color: '#9CA3AF',
-                  fontSize: '26px',
+                  fontSize: '24px',
                   lineHeight: 1.5,
-                  marginBottom: '40px',
+                  marginBottom: '18px',
                 },
                 children: desc,
+              },
+            },
+            // ── CTA ────────────────────────────────────────────────────────
+            {
+              type: 'div',
+              props: {
+                style: {
+                  display: 'flex',
+                  color: '#2DD4BF',
+                  fontSize: '24px',
+                  fontWeight: 700,
+                  marginBottom: '20px',
+                },
+                children: `${cta} →`,
               },
             },
             // ── Footer ─────────────────────────────────────────────────────
@@ -140,7 +156,7 @@ function buildElement(props: OGProps): object {
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   borderTop: '1px solid #4B555B',
-                  paddingTop: '24px',
+                  paddingTop: '20px',
                 },
                 children: [
                   {
@@ -149,7 +165,7 @@ function buildElement(props: OGProps): object {
                       style: {
                         display: 'flex',
                         color: '#F9FAFB',
-                        fontSize: '28px',
+                        fontSize: '26px',
                         fontWeight: 700,
                       },
                       children: 'Adrián Mariscal',
@@ -161,7 +177,7 @@ function buildElement(props: OGProps): object {
                       style: {
                         display: 'flex',
                         color: '#2DD4BF',
-                        fontSize: '26px',
+                        fontSize: '24px',
                         fontWeight: 700,
                       },
                       children: 'adrianmariscal.es',
@@ -192,30 +208,35 @@ export const getStaticPaths: GetStaticPaths = async () => {
       title: 'Diseñador Web Performance y SEO Técnico · Adrián Mariscal',
       description: SITE.description ?? '',
       type: 'Portfolio',
+      cta: 'Solicita tu auditoría gratuita',
     },
     {
       slug: 'about',
       title: 'Adrián Mariscal: diseñador web, rendimiento y SEO técnico',
       description: 'Historia, metodología y valores de Adrián Mariscal, diseñador web especializado en rendimiento.',
       type: 'About',
+      cta: 'Contacta conmigo',
     },
     {
       slug: 'services',
       title: 'Auditoría web y packs de mejora · Adrián Mariscal',
       description: 'Auditoría gratuita + informe base en 48-72 h + packs de mejora cerrados.',
       type: 'Servicios',
+      cta: 'Ver los packs de mejora',
     },
     {
       slug: 'auditoria-web',
       title: 'Auditoría Web Gratuita: rendimiento y SEO',
       description: 'Solicita tu auditoría de rendimiento y SEO técnico. Informe en 48-72 h.',
       type: 'Auditoría',
+      cta: 'Solicita tu auditoría',
     },
     {
       slug: 'contact',
       title: 'Contacto · Adrián Mariscal',
       description: 'Hablemos de tu proyecto web. Rendimiento, SEO técnico y UX con Astro.',
       type: 'Contacto',
+      cta: 'Escríbeme',
     },
   ];
 
@@ -226,6 +247,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
         title: String(post.data.title ?? SITE.title),
         description: String(post.data.description ?? SITE.description ?? ''),
         type: 'Blog',
+        cta: 'Leer el artículo',
       } satisfies OGProps,
     })),
     ...projects.map((project) => ({
@@ -236,11 +258,12 @@ export const getStaticPaths: GetStaticPaths = async () => {
           (project.data as Record<string, unknown>).description ?? SITE.description ?? ''
         ),
         type: 'Proyecto',
+        cta: 'Ver el proyecto',
       } satisfies OGProps,
     })),
-    ...staticPages.map(({ slug, title, description, type }) => ({
+    ...staticPages.map(({ slug, title, description, type, cta }) => ({
       params: { slug },
-      props: { title, description, type } satisfies OGProps,
+      props: { title, description, type, cta } satisfies OGProps,
     })),
   ];
 };
@@ -249,10 +272,10 @@ export const getStaticPaths: GetStaticPaths = async () => {
 // Request handler — generates PNG from satori SVG
 // ---------------------------------------------------------------------------
 export async function GET({ props }: APIContext) {
-  const { title, description, type } = props as OGProps;
+  const { title, description, type, cta } = props as OGProps;
 
   const font = await getSoraFont();
-  const element = buildElement({ title, description, type });
+  const element = buildElement({ title, description, type, cta });
 
   const svg = await satori(element as Parameters<typeof satori>[0], {
     width: 1200,
