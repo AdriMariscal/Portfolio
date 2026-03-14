@@ -111,6 +111,11 @@ Regla: todas las versiones MINOR se registran; PATCH solo cuando aporte.
 - Objetivo: Mozilla Observatory ≥ B+ (A esperada).
 - Refs: #603 / https://github.com/AdriMariscal/Portfolio/issues/603
 
+## v4.17.0 — 2026-03-14
+- T-006 [BRAND]: corregido microcopy del CTA secundario del hero de "Ver metodología de performance" a "Ver mi metodología de performance", alineando con la guía de marca §6.
+- Cambio mínimo de 1 carácter ("mi") que refuerza la voz personal de marca en el primer impacto visual del Home.
+- Refs: #582 / https://github.com/AdriMariscal/Portfolio/issues/582
+
 ## v4.16.0 — 2026-03-14
 - T-028 [DX]: variables de entorno `CMS_SITE_URL` y `CMS_DISPLAY_URL` actualizadas en Netlify para contexto `production` → valor `https://adrianmariscal.es`.
 - Valores de `branch-deploy` (staging) confirmados intactos: `https://staging.adrianmariscal.es`.
