@@ -19,6 +19,18 @@ const legalLinks = [
   aria-label="Información del sitio"
 >
   <div class="wrap footer__inner">
+    <a class="footer__brand" href="/" aria-label="Adrián Mariscal — Inicio">
+      <img
+        class="footer__logo"
+        src="/logos/logo_cuadrado_transparente.svg"
+        width="800"
+        height="800"
+        alt="Logo de Adrián Mariscal"
+        decoding="async"
+        loading="lazy"
+      />
+    </a>
+
     <nav class="footer__nav" aria-label="Información legal">
       {legalLinks.map((l) => (
         <a class="footer__link" href={l.href}>{l.label}</a>

@@ -3,6 +3,13 @@
 Notas rápidas de cambios durante el desarrollo de la línea major v4.
 Regla: todas las versiones MINOR se registran; PATCH solo cuando aporte.
 
+## v4.19.0 — 2026-03-14
+- T-009 [BRAND]: logo del navbar reemplazado de PNG a SVG (`logo_cuadrado_transparente.svg`).
+- Añadido logo SVG al footer (no existía previamente) con `loading="lazy"` y clase `footer__logo` a 60px de alto.
+- SVG creado con PNG embebido en base64 (solución transitoria equivalente a `favicon.svg`); sustituir por vector real cuando se exporte desde archivos fuente.
+- Verificado: `width/height="800"` + CSS `height:auto/60px` garantizan mínimo 160px y no deforma la imagen; `filter:invert()` en light mode aplicado a ambos logos.
+- Refs: #585 / https://github.com/AdriMariscal/Portfolio/issues/585
+
 ## v4.18.0 — 2026-03-14
 - T-008 [BRAND]: auditoría de componentes Button/CTA contra especificación de diseño v2.0.
 - Corregido `.btn--secondary`: `border-color` ahora usa `var(--palette-sand-500)` (#E2CC96) en lugar del token genérico `--color-border`; cumple "outline Sand 500" de §12.
