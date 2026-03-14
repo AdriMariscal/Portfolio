@@ -13,8 +13,9 @@ const truncateAtWord = (value: string, max: number) => {
 
 export const SEO_KEYWORD = "Rendimiento web";
 
-/** Meta title del Home: keyword en los primeros ~30 caracteres, 50-60 caracteres totales */
+/** Meta titles estáticos: keyword en los primeros ~30 caracteres, 50-60 caracteres totales */
 export const HOME_META_TITLE = "Diseñador Web Performance y SEO Técnico · Adrián Mariscal";
+export const ABOUT_META_TITLE = "Adrián Mariscal: diseñador web, rendimiento y SEO técnico";
 export const SERVICES_META_TITLE = "Auditoría web y packs de mejora · Adrián Mariscal";
 export const AUDITORIA_META_TITLE = "Auditoría Web Gratuita: rendimiento y SEO · Adrián Mariscal";
 

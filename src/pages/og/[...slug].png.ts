@@ -195,8 +195,8 @@ export const getStaticPaths: GetStaticPaths = async () => {
     },
     {
       slug: 'about',
-      title: 'About · Adrián Mariscal',
-      description: 'Diseñador web especializado en rendimiento, SEO técnico y UX.',
+      title: 'Adrián Mariscal: diseñador web, rendimiento y SEO técnico',
+      description: 'Historia, metodología y valores de Adrián Mariscal, diseñador web especializado en rendimiento.',
       type: 'About',
     },
     {
