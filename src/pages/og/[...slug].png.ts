@@ -189,7 +189,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
   const staticPages: Array<OGProps & { slug: string }> = [
     {
       slug: 'home',
-      title: 'Diseñador Web Performance · Adrián Mariscal',
+      title: 'Diseñador Web Performance y SEO Técnico · Adrián Mariscal',
       description: SITE.description ?? '',
       type: 'Portfolio',
     },
