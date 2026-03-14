@@ -1,6 +1,0 @@
-feat: verificar y confirmar notificacion email de Netlify Forms (refs #602)
-
-- Hook submission_created tipo email ya presente y activo (amariscalcantudo@gmail.com)
-- Netlify CLI v24.2.0 instalado y autenticado; .netlify anadido a .gitignore
-- Test de envio real confirmado: submission registrada en Netlify en tiempo real
-- bump v4.13.0 a v4.14.0
