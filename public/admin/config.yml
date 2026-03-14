@@ -3,7 +3,7 @@ display_url: "https://adrianmariscal.es"
 backend:
   name: github
   repo: "AdriMariscal/portfolio"
-  branch: dev
+  branch: main
   base_url: "https://api.netlify.com"
   auth_endpoint: "auth"
   auth_type: "pkce"
@@ -14,7 +14,7 @@ backend:
     delete: "cms: delete {{collection}} \"{{slug}}\""
     uploadMedia: "cms: upload media \"{{path}}\""
     openAuthoring: "cms: open authoring {{collection}} \"{{slug}}\""
-publish_mode: editorial_workflow
+publish_mode: simple
 media_folder: "public/images/uploads"
 public_folder: "/images/uploads"
 collections:

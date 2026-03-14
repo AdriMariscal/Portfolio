@@ -52,6 +52,13 @@ Regla: todas las versiones MINOR se registran; PATCH solo cuando aporte.
 - Test unitario añadido en `tests/unit/seo.test.ts` verificando los dos criterios de aceptación.
 - Refs: #586 / https://github.com/AdriMariscal/Portfolio/issues/586
 
+## v4.10.0 — 2026-03-14
+- T-015 [FEAT]: Decap CMS simplificado a modo editorial `simple` — `publish_mode` cambiado de `editorial_workflow` a `simple`.
+- `branch` cambiado de `dev` a `main`: los commits del CMS van directamente a `main` y Netlify auto-despliega en producción sin pasar por staging.
+- `site_url` y `display_url` ya apuntaban a `https://adrianmariscal.es` (configuración previa correcta).
+- Pendiente (configuración externa): verificar variables de entorno `CMS_SITE_URL` y `CMS_DISPLAY_URL` en contexto `production` de Netlify.
+- Refs: #591 / https://github.com/AdriMariscal/Portfolio/issues/591
+
 ## v4.9.0 — 2026-03-14
 - T-012 [SEO]: schema.org `BreadcrumbList` verificado en ambas páginas de detalle; añadido breadcrumb visual (UI) que refleja la jerarquía Inicio › Blog/Proyectos › Título en `/blog/[slug]` y `/projects/[slug]`.
 - El JSON-LD `BreadcrumbList` ya existía y es correcto (3 ítems, `item` con URL absoluta); esta versión añade el `<nav aria-label="Ruta de navegación">` visible para que la UI coincida con el schema, cumpliendo el criterio de Rich Results Test.
