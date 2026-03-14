@@ -58,6 +58,7 @@ Regla: todas las versiones MINOR se registran; PATCH solo cuando aporte.
 - `site_url` y `display_url` ya apuntaban a `https://adrianmariscal.es` (configuración previa correcta).
 - Pendiente (configuración externa): verificar variables de entorno `CMS_SITE_URL` y `CMS_DISPLAY_URL` en contexto `production` de Netlify.
 - Refs: #591 / https://github.com/AdriMariscal/Portfolio/issues/591
+  - Patch v4.10.1 — añadido workflow `editorial-localize-images-simple.yml` para localizar imágenes remotas en commits directos a `main`
 
 ## v4.9.0 — 2026-03-14
 - T-012 [SEO]: schema.org `BreadcrumbList` verificado en ambas páginas de detalle; añadido breadcrumb visual (UI) que refleja la jerarquía Inicio › Blog/Proyectos › Título en `/blog/[slug]` y `/projects/[slug]`.
