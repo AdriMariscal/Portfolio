@@ -5,6 +5,8 @@ import { getCollection } from "astro:content";
 import Badge from "@/components/ui/Badge.astro";
 import Button from "@/components/ui/Button.astro";
 import Card from "@/components/ui/Card.astro";
+import BeforeAfter from "@/components/BeforeAfter.astro";
+import type { Metric } from "@/components/BeforeAfter.astro";
 import { SITE } from "@/lib/config";
 import {
   buildHeadingTitle,
@@ -67,6 +69,9 @@ const isActive: boolean =
     : typeof data.status === "string"
       ? ["active", "activo", "activa"].includes(String(data.status).toLowerCase())
       : data.published !== false;
+
+// before/after metrics
+const beforeAfter: Metric[] = Array.isArray(data.beforeAfter) ? data.beforeAfter : [];
 
 // changelog
 type Change = { type?: string; text?: string };
@@ -202,6 +207,15 @@ const projectJsonLd = {
       </div>
     </Card>
   </article>
+
+  {/* Sección Antes/Después */}
+  {beforeAfter.length ? (
+    <article class="section section--tight post project-detail__before-after">
+      <div class="wrap" aria-labelledby="before-after-title">
+        <BeforeAfter metrics={beforeAfter} />
+      </div>
+    </article>
+  ) : null}
 
   {/* Changelog con sección compacta y respiración inferior */}
   {changelog.length ? (
