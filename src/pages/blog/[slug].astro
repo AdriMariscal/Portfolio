@@ -52,8 +52,11 @@ const title = post.data.title ?? SITE.title;
 const description = post.data.description ?? SITE.description;
 const canonical = Astro.url?.href ?? new URL(`/blog/${post.slug}/`, SITE.url).href;
 
-// OG image dinámica generada en build time para esta entrada
-const ogImageAbs = new URL(`/og/blog/${post.slug}.png`, SITE.url).href;
+// Ruta relativa de la OG image — BaseLayout la resuelve con deployBase
+// (Astro.site), garantizando que apunte al entorno real donde se sirve la build.
+// Para JSON-LD se usa la URL canónica de producción.
+const ogImageRel = `/og/blog/${post.slug}.png`;
+const ogImageCanonical = new URL(ogImageRel, SITE.url).href;
 
 // Hero dentro del artículo: solo si el frontmatter define `image`
 const heroImage =
@@ -106,7 +109,7 @@ const jsonLd = {
       "@id": canonical,
       "headline": title,
       "description": description,
-      "image": ogImageAbs,
+      "image": ogImageCanonical,
       "url": canonical,
       "mainEntityOfPage": { "@type": "WebPage", "@id": canonical },
       "inLanguage": SITE.lang ?? "es",
@@ -148,9 +151,9 @@ const jsonLd = {
   title={title}
   metaTitle={metaTitle}
   description={metaDescription}
-  ogImage={ogImageAbs}
+  ogImage={ogImageRel}
   ogImageAlt={heroAlt}
-  twitterImage={ogImageAbs}
+  twitterImage={ogImageRel}
   twitterImageAlt={heroAlt}
   ogType="article"
   articleAuthor={SITE.author}

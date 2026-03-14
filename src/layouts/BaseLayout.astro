@@ -48,25 +48,30 @@ const {
 const resolvedTitle = metaTitle ?? title;
 const resolvedDescription = ogDescription ?? description;
 
-// Canonical absoluto usando siempre el dominio canónico del config de Astro
-// (Astro.site se construye a partir de la opción `site` de astro.config.mjs)
-const canonical = new URL(Astro.url?.pathname ?? "/", Astro.site).href;
+// Canonical siempre apunta al dominio de producción (SITE.url),
+// independientemente del entorno de deploy (dev, staging, preview).
+const canonical = new URL(Astro.url?.pathname ?? "/", SITE.url).href;
 
 // Detecta tipo automáticamente: 'article' en /blog/*, 'website' en el resto
 const autoType = Astro.url?.pathname?.startsWith("/blog/") ? "article" : "website";
 const type = ogType ?? autoType;
 
+// Base para recursos estáticos: usa Astro.site (que en Netlify refleja el deploy
+// actual: dev.adrianmariscal.es, preview-*.netlify.app, etc.) para que og:image
+// y twitterImage sean fetcheables desde el entorno donde se desplegó la build.
+const deployBase = Astro.site ?? SITE.url;
+
 // Imagen OG (absoluta): prioriza prop > config por defecto
 const rawImage = ogImage ?? SITE.ogImage ?? "/og-default.png";
 const ogImageAbs = rawImage.startsWith("http")
   ? rawImage
-  : new URL(rawImage, SITE.url).href;
+  : new URL(rawImage, deployBase).href;
 const resolvedOgAlt =
   ogImageAlt ?? SITE.ogImageAlt ?? `${SITE.title} · ${SITE.description}`;
 const twitterRawImage = twitterImage ?? SITE.twitterImage ?? rawImage;
 const twitterImageAbs = twitterRawImage.startsWith("http")
   ? twitterRawImage
-  : new URL(twitterRawImage, SITE.url).href;
+  : new URL(twitterRawImage, deployBase).href;
 const resolvedTwitterAlt =
   twitterImageAlt ?? SITE.twitterImageAlt ?? resolvedOgAlt;
 const resolvedTwitterCard =
