@@ -1,0 +1,260 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - link "Saltar al contenido principal" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - link "Adrián Mariscal" [ref=e5] [cursor=pointer]:
+        - /url: /
+        - img "Logo de Adrián Mariscal" [ref=e6]
+      - navigation "Navegación principal" [ref=e7]:
+        - link "Ir a inicio" [ref=e8] [cursor=pointer]:
+          - /url: /
+          - img [ref=e10]
+          - generic [ref=e13]: Inicio
+        - link "Ir a about" [ref=e14] [cursor=pointer]:
+          - /url: /about
+          - img [ref=e16]
+          - generic [ref=e19]: About
+        - link "Ir a servicios" [ref=e20] [cursor=pointer]:
+          - /url: /services
+          - img [ref=e22]
+          - generic [ref=e26]: Servicios
+        - link "Ir a proyectos" [ref=e27] [cursor=pointer]:
+          - /url: /projects
+          - img [ref=e29]
+          - generic [ref=e32]: Proyectos
+        - link "Ir al blog" [ref=e33] [cursor=pointer]:
+          - /url: /blog
+          - img [ref=e35]
+          - generic [ref=e38]: Blog
+        - link "Ir al buscador" [ref=e39] [cursor=pointer]:
+          - /url: /search
+          - img [ref=e41]
+          - generic [ref=e44]: Buscar
+        - link "Ir a contacto" [ref=e45] [cursor=pointer]:
+          - /url: /contact
+          - img [ref=e47]
+          - generic [ref=e50]: Contacto
+        - button "Cambiar a tema claro" [pressed] [ref=e51] [cursor=pointer]:
+          - generic [ref=e53]: Claro
+  - main "Contenido principal" [ref=e54]:
+    - region "Impulsa tu web con rendimiento, SEO y UX" [ref=e55]:
+      - generic [ref=e56]:
+        - heading "Impulsa tu web con rendimiento, SEO y UX" [level=1] [ref=e57]
+        - paragraph [ref=e58]: Diseño y desarrollo en Astro y Node para sitios rápidos, claros y listos para convertir.
+        - generic [ref=e59]:
+          - link "Cuéntame tu proyecto" [ref=e60] [cursor=pointer]:
+            - /url: /contact
+          - link "Ver metodología de performance" [ref=e61] [cursor=pointer]:
+            - /url: /blog
+        - generic [ref=e62]:
+          - link "Entradas del blog con etiqueta Salesforce" [ref=e63] [cursor=pointer]:
+            - /url: /blog/tags/salesforce
+            - generic [ref=e64]:
+              - heading "10+" [level=3] [ref=e65]
+              - generic [ref=e66]:
+                - img "Experiencia técnica" [ref=e67]:
+                  - img [ref=e68]
+                - generic [ref=e72]: Años con Salesforce
+          - link "Ver proyectos" [ref=e73] [cursor=pointer]:
+            - /url: /projects
+            - generic [ref=e74]:
+              - heading "3" [level=3] [ref=e75]
+              - generic [ref=e76]:
+                - img "Proyectos" [ref=e77]:
+                  - img [ref=e78]
+                - generic [ref=e81]: Proyectos propios
+          - link "Qué es Google Lighthouse" [ref=e82] [cursor=pointer]:
+            - /url: /blog/tags/lighthouse/
+            - generic [ref=e83]:
+              - heading "98/100" [level=3] [ref=e84]
+              - generic [ref=e85]:
+                - img "Performance" [ref=e86]:
+                  - img [ref=e87]
+                - generic [ref=e90]: Lighthouse medio
+    - generic [ref=e92]:
+      - heading "Proyectos destacados" [level=2] [ref=e93]
+      - generic [ref=e94]:
+        - article [ref=e95]:
+          - 'link "Abrir ficha del proyecto: Cartas Rápidas" [ref=e96] [cursor=pointer]':
+            - /url: /projects/cartas-rapidas/
+          - generic [ref=e97]:
+            - heading "Cartas Rápidas" [level=3] [ref=e98]
+            - paragraph [ref=e99]: Generador de cartas legales frecuentes para España, con plantillas guiadas, exportación a PDF, monetización con Google AdSense/Ezoic, suite de testing completa (Vitest + Playwright) y Lighthouse CI integrado en Netlify.
+            - list "Etiquetas" [ref=e100]:
+              - listitem [ref=e101]:
+                - link "#astro" [ref=e102] [cursor=pointer]:
+                  - /url: /blog/tags/astro/
+              - listitem [ref=e103]:
+                - link "#netlify" [ref=e104] [cursor=pointer]:
+                  - /url: /blog/tags/netlify/
+              - listitem [ref=e105]:
+                - link "#seo" [ref=e106] [cursor=pointer]:
+                  - /url: /blog/tags/seo/
+              - listitem [ref=e107]:
+                - link "#performance" [ref=e108] [cursor=pointer]:
+                  - /url: /blog/tags/performance/
+              - listitem [ref=e109]:
+                - link "#core‑web‑vitals" [ref=e110] [cursor=pointer]:
+                  - /url: /blog/tags/core-web-vitals/
+              - listitem [ref=e111]:
+                - link "#ux" [ref=e112] [cursor=pointer]:
+                  - /url: /blog/tags/ux/
+        - article [ref=e113]:
+          - 'link "Abrir ficha del proyecto: Web/Portfolio Personal" [ref=e114] [cursor=pointer]':
+            - /url: /projects/portfolio/
+          - generic [ref=e115]:
+            - heading "Web/Portfolio Personal" [level=3] [ref=e116]
+            - paragraph [ref=e117]: Sitio personal y profesional hecho con Astro. Blog, proyectos y contacto.
+            - list "Etiquetas" [ref=e118]:
+              - listitem [ref=e119]:
+                - link "#portfolio" [ref=e120] [cursor=pointer]:
+                  - /url: /blog/tags/portfolio/
+              - listitem [ref=e121]:
+                - link "#astro" [ref=e122] [cursor=pointer]:
+                  - /url: /blog/tags/astro/
+              - listitem [ref=e123]:
+                - link "#ux" [ref=e124] [cursor=pointer]:
+                  - /url: /blog/tags/ux/
+              - listitem [ref=e125]:
+                - link "#seo" [ref=e126] [cursor=pointer]:
+                  - /url: /blog/tags/seo/
+              - listitem [ref=e127]:
+                - link "#performance" [ref=e128] [cursor=pointer]:
+                  - /url: /blog/tags/performance/
+              - listitem [ref=e129]:
+                - link "#lighthouse" [ref=e130] [cursor=pointer]:
+                  - /url: /blog/tags/lighthouse/
+        - article [ref=e131]:
+          - 'link "Abrir ficha del proyecto: Utilibox" [ref=e132] [cursor=pointer]':
+            - /url: /projects/utilbox/
+          - generic [ref=e133]:
+            - heading "Utilibox" [level=3] [ref=e134]
+            - paragraph [ref=e135]: Herramientas rápidas, generadores y descargas seguras para resolver tareas puntuales en minutos.
+            - list "Etiquetas" [ref=e136]:
+              - listitem [ref=e137]:
+                - link "#astro" [ref=e138] [cursor=pointer]:
+                  - /url: /blog/tags/astro/
+              - listitem [ref=e139]:
+                - link "#netlify" [ref=e140] [cursor=pointer]:
+                  - /url: /blog/tags/netlify/
+              - listitem [ref=e141]:
+                - link "#performance" [ref=e142] [cursor=pointer]:
+                  - /url: /blog/tags/performance/
+              - listitem [ref=e143]:
+                - link "#lighthouse" [ref=e144] [cursor=pointer]:
+                  - /url: /blog/tags/lighthouse/
+              - listitem [ref=e145]:
+                - link "#seo" [ref=e146] [cursor=pointer]:
+                  - /url: /blog/tags/seo/
+              - listitem [ref=e147]:
+                - link "#core-web-vitals" [ref=e148] [cursor=pointer]:
+                  - /url: /blog/tags/core-web-vitals/
+    - generic [ref=e150]:
+      - heading "Últimos artículos" [level=2] [ref=e151]
+      - generic [ref=e152]:
+        - article [ref=e153]:
+          - 'link "Abrir artículo: Release v1.25.0 — Ezoic como proveedor de monetización" [ref=e154] [cursor=pointer]':
+            - /url: /blog/release-v1-25-0--ezoic-como-proveedor-de-monetización/
+          - generic [ref=e155]:
+            - heading "Release v1.25.0 — Ezoic como proveedor de monetización" [level=3] [ref=e156]
+            - paragraph [ref=e157]:
+              - time [ref=e158]: 17 feb 2026
+            - paragraph [ref=e159]: "La versión 1.25.0 de Utilibox integra Ezoic como proveedor de publicidad: anuncios display con Consent Mode v2, slots en Home y herramientas, CSP actualizada y política de cookies revisada."
+            - list "Etiquetas" [ref=e160]:
+              - listitem [ref=e161]:
+                - link "#release-notes" [ref=e162] [cursor=pointer]:
+                  - /url: /blog/tags/release-notes/
+              - listitem [ref=e163]:
+                - link "#utilibox" [ref=e164] [cursor=pointer]:
+                  - /url: /blog/tags/utilibox/
+              - listitem [ref=e165]:
+                - link "#netlify" [ref=e166] [cursor=pointer]:
+                  - /url: /blog/tags/netlify/
+              - listitem [ref=e167]:
+                - link "#astro" [ref=e168] [cursor=pointer]:
+                  - /url: /blog/tags/astro/
+        - article [ref=e169]:
+          - 'link "Abrir artículo: GA4 para pymes: qué medir desde el primer día (sin datos inútiles)" [ref=e170] [cursor=pointer]':
+            - /url: /blog/ga4-para-pymes-qué-medir-desde-el-primer-día-sin-datos-inútiles/
+          - generic [ref=e171]:
+            - 'heading "GA4 para pymes: qué medir desde el primer día (sin datos inútiles)" [level=3] [ref=e172]'
+            - paragraph [ref=e173]:
+              - time [ref=e174]: 10 feb 2026
+            - paragraph [ref=e175]: "Instala y configura Google Analytics 4 en una pequeña empresa: aprende a activar la medición mejorada, define eventos clave y evita métricas de vanidad."
+            - list "Etiquetas" [ref=e176]:
+              - listitem [ref=e177]:
+                - link "#ga4" [ref=e178] [cursor=pointer]:
+                  - /url: /blog/tags/ga4/
+              - listitem [ref=e179]:
+                - link "#analytics" [ref=e180] [cursor=pointer]:
+                  - /url: /blog/tags/analytics/
+              - listitem [ref=e181]:
+                - link "#pymes" [ref=e182] [cursor=pointer]:
+                  - /url: /blog/tags/pymes/
+        - article [ref=e183]:
+          - 'link "Abrir artículo: Modelo de datos para un MVP: de Excel a base de datos sin caos" [ref=e184] [cursor=pointer]':
+            - /url: /blog/modelo-de-datos-para-un-mvp-de-excel-a-base-de-datos-sin-caos/
+          - generic [ref=e185]:
+            - 'heading "Modelo de datos para un MVP: de Excel a base de datos sin caos" [level=3] [ref=e186]'
+            - paragraph [ref=e187]:
+              - time [ref=e188]: 05 feb 2026
+            - paragraph [ref=e189]: "Convierte un Excel real en un modelo de datos mínimo para tu MVP: entidades, claves, relaciones, validaciones, diccionario de datos y plan de migración."
+            - list "Etiquetas" [ref=e190]:
+              - listitem [ref=e191]:
+                - link "#desarrollo" [ref=e192] [cursor=pointer]:
+                  - /url: /blog/tags/desarrollo/
+              - listitem [ref=e193]:
+                - link "#mvp" [ref=e194] [cursor=pointer]:
+                  - /url: /blog/tags/mvp/
+              - listitem [ref=e195]:
+                - link "#datos" [ref=e196] [cursor=pointer]:
+                  - /url: /blog/tags/datos/
+              - listitem [ref=e197]:
+                - link "#backend" [ref=e198] [cursor=pointer]:
+                  - /url: /blog/tags/backend/
+              - listitem [ref=e199]:
+                - link "#pymes" [ref=e200] [cursor=pointer]:
+                  - /url: /blog/tags/pymes/
+  - dialog "Preferencias de cookies" [ref=e201]:
+    - generic [ref=e203]:
+      - generic [ref=e204]:
+        - heading "Preferencias de cookies" [level=2] [ref=e205]
+        - paragraph [ref=e206]: Solo uso cookies necesarias para que el sitio funcione. Si aceptas las analíticas, podré medir rendimiento y mejorar el contenido. Puedes ajustar tu elección cuando quieras.
+        - generic "Preferencias de cookies" [ref=e207]:
+          - generic [ref=e208]:
+            - 'checkbox "Preferencias de cookies: analíticas" [ref=e209]'
+            - generic [ref=e210]:
+              - strong [ref=e211]: Analíticas
+              - generic [ref=e212]: Ayudan a entender cómo se usa la web de forma agregada para mejorar contenido y rendimiento.
+          - generic [ref=e213]:
+            - 'checkbox "Preferencias de cookies: marketing" [ref=e214]'
+            - generic [ref=e215]:
+              - strong [ref=e216]: Marketing
+              - generic [ref=e217]: Permiten mostrar campañas o contenido promocional si algún día las utilizo.
+        - paragraph [ref=e218]:
+          - text: Consulta la política de
+          - link "cookies" [ref=e219] [cursor=pointer]:
+            - /url: /legal/cookies
+          - text: .
+      - generic [ref=e220]:
+        - button "Rechazar cookies no necesarias" [ref=e221] [cursor=pointer]: Solo necesarias
+        - button "Guardar preferencias de cookies" [ref=e222] [cursor=pointer]: Guardar preferencias
+        - button "Aceptar todas las cookies" [ref=e223] [cursor=pointer]: Aceptar todas
+  - contentinfo "Información del sitio" [ref=e224]:
+    - generic [ref=e225]:
+      - navigation "Información legal" [ref=e226]:
+        - link "Aviso legal" [ref=e227] [cursor=pointer]:
+          - /url: /legal/aviso-legal
+        - link "Privacidad" [ref=e228] [cursor=pointer]:
+          - /url: /legal/privacidad
+        - link "Cookies" [ref=e229] [cursor=pointer]:
+          - /url: /legal/cookies
+        - link "Términos" [ref=e230] [cursor=pointer]:
+          - /url: /legal/terminos
+      - button "Gestionar preferencias de cookies" [ref=e231] [cursor=pointer]: Gestionar cookies
+      - generic [ref=e232]: © 2026 Adrián Mariscal · v4.4.2
+```

@@ -23,6 +23,20 @@ const hcaptchaSiteKey = import.meta.env.PUBLIC_HCAPTCHA_SITE_KEY ?? "";
       <p class="muted">Cuéntame en qué te puedo ayudar.</p>
       </header>
 
+      <!-- Formulario oculto para que Netlify Forms detecte todos los campos en el build -->
+      <form name="contact" data-netlify="true" data-netlify-honeypot="bot-field" hidden>
+        <input name="bot-field" />
+        <input name="name" />
+        <input name="email" />
+        <input name="url" />
+        <input name="stack" />
+        <input name="goal" />
+        <input name="deadline" />
+        <input name="budget" />
+        <input name="message" />
+        <input name="h-captcha-response" />
+      </form>
+
       <!-- Formulario -->
       <Card
         as="form"
@@ -35,13 +49,19 @@ const hcaptchaSiteKey = import.meta.env.PUBLIC_HCAPTCHA_SITE_KEY ?? "";
         novalidate
       >
         <div class="card__body stack" style="--stack-gap: 18px;">
+        <input type="hidden" name="form-name" value="contact" />
+        <label class="field field--honeypot" aria-hidden="true">
+          <span>No rellenar</span>
+          <Input type="text" name="bot-field" autocomplete="off" tabindex="-1" />
+        </label>
+
         <label class="field">
           <span>Nombre</span>
           <Input
             type="text"
             name="name"
             autocomplete="name"
-            placeholder="Tu nombre completo"
+            placeholder="Tu nombre"
             aria-describedby="contact-name-error"
             required
           />
@@ -76,22 +96,12 @@ const hcaptchaSiteKey = import.meta.env.PUBLIC_HCAPTCHA_SITE_KEY ?? "";
         </label>
 
         <label class="field">
-          <span>Objetivo (opcional)</span>
+          <span>URL de tu web (opcional)</span>
           <Input
-            type="text"
-            name="goal"
-            autocomplete="off"
-            placeholder="Ej: mejorar conversiones, bajar LCP o lanzar en 6 semanas."
-          />
-        </label>
-
-        <label class="field">
-          <span>Presupuesto (opcional)</span>
-          <Input
-            type="text"
-            name="budget"
-            autocomplete="off"
-            placeholder="Ej: 1.500–3.000 € o “por definir”."
+            type="url"
+            name="url"
+            autocomplete="url"
+            placeholder="https://tusitio.com"
           />
         </label>
 
@@ -101,7 +111,47 @@ const hcaptchaSiteKey = import.meta.env.PUBLIC_HCAPTCHA_SITE_KEY ?? "";
             type="text"
             name="stack"
             autocomplete="off"
-            placeholder="Ej: WordPress, Webflow, Shopify, Astro."
+            placeholder="Ej.: WordPress, Wix, HTML, Shopify"
+          />
+        </label>
+
+        <label class="field">
+          <span>Objetivo</span>
+          <Input
+            type="text"
+            name="goal"
+            autocomplete="off"
+            placeholder="Ej.: más leads, más ventas, mejor SEO"
+            aria-describedby="contact-goal-error"
+            required
+          />
+          <span
+            id="contact-goal-error"
+            class="field__error muted"
+            data-field-error="goal"
+            aria-live="polite"
+            aria-atomic="true"
+            hidden
+          ></span>
+        </label>
+
+        <label class="field">
+          <span>Plazo (opcional)</span>
+          <Input
+            type="text"
+            name="deadline"
+            autocomplete="off"
+            placeholder="Ej.: 2 semanas, 1 mes, flexible"
+          />
+        </label>
+
+        <label class="field">
+          <span>Presupuesto orientativo (opcional)</span>
+          <Input
+            type="text"
+            name="budget"
+            autocomplete="off"
+            placeholder="Ej.: 800-1500€ (si aplica)"
           />
         </label>
 
@@ -125,7 +175,9 @@ const hcaptchaSiteKey = import.meta.env.PUBLIC_HCAPTCHA_SITE_KEY ?? "";
           ></span>
         </label>
 
-        <div class="h-captcha" data-sitekey={hcaptchaSiteKey}></div>
+        {hcaptchaSiteKey && (
+          <div class="h-captcha" data-sitekey={hcaptchaSiteKey}></div>
+        )}
 
         <div class="contact__actions">
           <Button variant="primary" type="submit" block>
@@ -170,10 +222,10 @@ const hcaptchaSiteKey = import.meta.env.PUBLIC_HCAPTCHA_SITE_KEY ?? "";
     const emailMessage =
       'Ese email no parece válido. Comprueba el formato e inténtalo de nuevo.';
     const defaultSuccessMessage =
-      'Gracias por tu mensaje. En breve te respondo con los siguientes pasos.';
+      'Recibido. En breve te respondo con los siguientes pasos.';
     const submitButton = form.querySelector('button[type="submit"]');
 
-    const fields = Array.from(form.querySelectorAll('input, textarea'));
+    const fields = Array.from(form.querySelectorAll('input:not([name="bot-field"]), textarea'));
     const fieldErrors = new Map();
     form.querySelectorAll('[data-field-error]').forEach((node) => {
       if (node instanceof HTMLElement && node.dataset.fieldError) {
@@ -308,4 +360,12 @@ const hcaptchaSiteKey = import.meta.env.PUBLIC_HCAPTCHA_SITE_KEY ?? "";
   }
 </script>
 
-<script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+{hcaptchaSiteKey && (
+  <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+)}
+
+<style>
+  .field--honeypot {
+    display: none;
+  }
+</style>

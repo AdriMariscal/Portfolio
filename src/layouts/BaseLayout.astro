@@ -98,7 +98,7 @@ const schemaOrg = {
       "publisher": { "@id": organizationId },
     },
     {
-      "@type": "Organization",
+      "@type": ["ProfessionalService", "LocalBusiness"],
       "@id": organizationId,
       "name": SITE.title,
       "url": SITE.url,
@@ -109,13 +109,16 @@ const schemaOrg = {
         "url": organizationImageAbs,
       },
       "founder": { "@id": personId },
+      "areaServed": "España",
+      "priceRange": "€€",
     },
     {
       "@type": "Person",
       "@id": personId,
       "name": SITE.author,
       "url": SITE.url,
-      "jobTitle": "Consultor de rendimiento web",
+      "jobTitle": "Diseñador Web",
+      "sameAs": [SITE.linkedin, SITE.github],
       "knowsAbout": [
         "Rendimiento web",
         "SEO técnico",

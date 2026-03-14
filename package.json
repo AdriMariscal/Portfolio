@@ -1,7 +1,7 @@
 {
   "name": "portfolio",
   "type": "module",
-  "version": "3.55.7",
+  "version": "4.10.1",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
@@ -23,21 +23,26 @@
     "localize:images": "node scripts/localize-remote-images.mjs"
   },
   "dependencies": {
-    "@astrojs/mdx": "^4.3.8",
+    "@astrojs/mdx": "^4.3.14",
     "@astrojs/sitemap": "^3.6.0",
-    "astro": "^5.16.9",
-    "tailwindcss": "^4.1.16",
+    "astro": "^5.18.1",
+    "tailwindcss": "^4.2.1",
     "web-vitals": "^5.1.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "rollup": ">=4.59.0"
+    }
   },
   "devDependencies": {
     "@astrojs/markdown-remark": "^6.3.9",
-    "@axe-core/cli": "^4.11.0",
+    "@axe-core/cli": "^4.11.1",
     "@lhci/cli": "^0.15.1",
     "@playwright/test": "^1.49.0",
-    "@tailwindcss/vite": "^4.1.16",
+    "@tailwindcss/vite": "^4.2.1",
     "@typescript-eslint/eslint-plugin": "latest",
     "@typescript-eslint/parser": "latest",
-    "@vitest/coverage-v8": "^3.2.4",
+    "@vitest/coverage-v8": "^4.1.0",
     "astro-eslint-parser": "latest",
     "eslint": "latest",
     "eslint-config-prettier": "latest",
@@ -47,6 +52,6 @@
     "rehype-autolink-headings": "^7.1.0",
     "remark-images": "^4.1.0",
     "typescript": "latest",
-    "vitest": "^3.2.4"
+    "vitest": "^4.1.0"
   }
 }

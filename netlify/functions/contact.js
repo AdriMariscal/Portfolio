@@ -22,12 +22,8 @@ const parseBody = (event) => {
 
 const sanitize = (value) => (typeof value === "string" ? value.trim() : "");
 
-const buildMessage = ({ name, goal }) => {
-  if (goal) {
-    return `Gracias, ${name}. Revisaré tu objetivo (“${goal}”) y te respondo en breve.`;
-  }
-
-  return `Gracias, ${name}. He recibido tu mensaje y te respondo en breve.`;
+const buildMessage = () => {
+  return "Recibido. En breve te respondo con los siguientes pasos.";
 };
 
 const verifyHcaptcha = async ({ token, remoteip }) => {
@@ -104,15 +100,27 @@ export const handler = async (event) => {
   }
 
   const body = parseBody(event);
+
+  // Honeypot: si bot-field tiene valor, es spam — rechazar silenciosamente
+  if (sanitize(body["bot-field"])) {
+    return {
+      statusCode: 200,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: buildMessage() }),
+    };
+  }
+
   const name = sanitize(body.name);
   const email = sanitize(body.email);
   const message = sanitize(body.message);
   const goal = sanitize(body.goal);
-  const budget = sanitize(body.budget);
+  const url = sanitize(body.url);
   const stack = sanitize(body.stack);
+  const deadline = sanitize(body.deadline);
+  const budget = sanitize(body.budget);
   const captchaToken = sanitize(body["h-captcha-response"]);
 
-  if (!name || !email || !message) {
+  if (!name || !email || !message || !goal) {
     return {
       statusCode: 400,
       headers: { "Content-Type": "application/json" },
@@ -122,27 +130,31 @@ export const handler = async (event) => {
     };
   }
 
-  if (!captchaToken) {
-    return {
-      statusCode: 400,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: "Completa el hCaptcha para poder enviar el formulario." }),
-    };
-  }
+  const captchaEnabled = Boolean(process.env.HCAPTCHA_SECRET_KEY);
 
-  const verification = await verifyHcaptcha({
-    token: captchaToken,
-    remoteip: event.headers?.["x-forwarded-for"]?.split(",")[0],
-  });
+  if (captchaEnabled) {
+    if (!captchaToken) {
+      return {
+        statusCode: 400,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: "Completa el hCaptcha para poder enviar el formulario." }),
+      };
+    }
 
-  if (!verification.ok) {
-    return {
-      statusCode: 400,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        message: "No se pudo validar el hCaptcha. Reinténtalo en unos segundos.",
-      }),
-    };
+    const verification = await verifyHcaptcha({
+      token: captchaToken,
+      remoteip: event.headers?.["x-forwarded-for"]?.split(",")[0],
+    });
+
+    if (!verification.ok) {
+      return {
+        statusCode: 400,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: "No se pudo validar el hCaptcha. Reinténtalo en unos segundos.",
+        }),
+      };
+    }
   }
 
   const payload = {
@@ -150,8 +162,10 @@ export const handler = async (event) => {
     email,
     message,
     goal,
-    budget,
+    url,
     stack,
+    deadline,
+    budget,
     source: "contact-form",
     receivedAt: new Date().toISOString(),
   };
@@ -169,8 +183,10 @@ export const handler = async (event) => {
           { type: "mrkdwn", text: `*Nombre:*\n${name}` },
           { type: "mrkdwn", text: `*Email:*\n${email}` },
           { type: "mrkdwn", text: `*Objetivo:*\n${goal || "No indicado"}` },
-          { type: "mrkdwn", text: `*Presupuesto:*\n${budget || "No indicado"}` },
+          { type: "mrkdwn", text: `*URL:*\n${url || "No indicada"}` },
           { type: "mrkdwn", text: `*Stack:*\n${stack || "No indicado"}` },
+          { type: "mrkdwn", text: `*Plazo:*\n${deadline || "No indicado"}` },
+          { type: "mrkdwn", text: `*Presupuesto:*\n${budget || "No indicado"}` },
         ],
       },
       {
@@ -189,7 +205,8 @@ export const handler = async (event) => {
     }),
   ]);
 
-  if (!slackResult.ok && !crmResult.ok) {
+  const activeResults = [slackResult, crmResult].filter((r) => !r.skipped);
+  if (activeResults.length > 0 && activeResults.every((r) => !r.ok)) {
     return {
       statusCode: 500,
       headers: { "Content-Type": "application/json" },
@@ -203,6 +220,6 @@ export const handler = async (event) => {
   return {
     statusCode: 200,
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message: buildMessage({ name, goal }) }),
+    body: JSON.stringify({ message: buildMessage() }),
   };
 };

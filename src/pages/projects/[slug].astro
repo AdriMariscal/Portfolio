@@ -140,6 +140,15 @@ const projectJsonLd = {
     <!-- margen inferior ajustado a 24px -->
     <Card as="div" variant="soft" class="wrap post__card">
       <div class="post__body">
+        <nav class="breadcrumb" aria-label="Ruta de navegación">
+          <ol class="breadcrumb__list">
+            <li class="breadcrumb__item"><a href="/">Inicio</a></li>
+            <li class="breadcrumb__sep" aria-hidden="true">›</li>
+            <li class="breadcrumb__item"><a href="/projects/">Proyectos</a></li>
+            <li class="breadcrumb__sep" aria-hidden="true">›</li>
+            <li class="breadcrumb__item breadcrumb__item--current" aria-current="page">{title}</li>
+          </ol>
+        </nav>
           <h1 class="post__title">{headingTitle}</h1>
 
         <p class="post__date project-detail__meta">

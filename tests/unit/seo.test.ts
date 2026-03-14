@@ -3,10 +3,16 @@ import {
   buildHeadingTitle,
   buildMetaDescription,
   buildMetaTitle,
+  HOME_META_TITLE,
   SEO_KEYWORD,
 } from "../../src/lib/seo";
 
 describe("SEO helpers", () => {
+  it("HOME_META_TITLE cumple criterios SEO: ≤60 caracteres y keyword en primeros 30", () => {
+    expect(HOME_META_TITLE.length).toBeLessThanOrEqual(60);
+    expect(HOME_META_TITLE.slice(0, 30).toLowerCase()).toMatch(/diseñador/);
+  });
+
   it("builds a meta title with keyword prefix and trims extra whitespace", () => {
     const title = "  Portfolio   de rendimiento web y  SEO avanzado  ";
     const result = buildMetaTitle(SEO_KEYWORD, title, 60);
