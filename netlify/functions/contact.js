@@ -130,27 +130,31 @@ export const handler = async (event) => {
     };
   }
 
-  if (!captchaToken) {
-    return {
-      statusCode: 400,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: "Completa el hCaptcha para poder enviar el formulario." }),
-    };
-  }
+  const captchaEnabled = Boolean(process.env.HCAPTCHA_SECRET_KEY);
 
-  const verification = await verifyHcaptcha({
-    token: captchaToken,
-    remoteip: event.headers?.["x-forwarded-for"]?.split(",")[0],
-  });
+  if (captchaEnabled) {
+    if (!captchaToken) {
+      return {
+        statusCode: 400,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: "Completa el hCaptcha para poder enviar el formulario." }),
+      };
+    }
 
-  if (!verification.ok) {
-    return {
-      statusCode: 400,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        message: "No se pudo validar el hCaptcha. Reinténtalo en unos segundos.",
-      }),
-    };
+    const verification = await verifyHcaptcha({
+      token: captchaToken,
+      remoteip: event.headers?.["x-forwarded-for"]?.split(",")[0],
+    });
+
+    if (!verification.ok) {
+      return {
+        statusCode: 400,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: "No se pudo validar el hCaptcha. Reinténtalo en unos segundos.",
+        }),
+      };
+    }
   }
 
   const payload = {
