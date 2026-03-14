@@ -81,6 +81,14 @@ Regla: todas las versiones MINOR se registran; PATCH solo cuando aporte.
 - 4 tests unitarios nuevos en `tests/unit/schema-org.test.ts` que verifican los campos críticos del schema.
 - Refs: #587 / https://github.com/AdriMariscal/Portfolio/issues/587
 
+## v4.12.0 — 2026-03-14
+- T-017 [FEAT]: sección estandarizada "Antes/Después" implementada en fichas de proyecto.
+- Nuevo componente `BeforeAfter.astro` con tabla de métricas (Métrica / Antes / Después / Mejora), estilos con tokens del design system y scroll horizontal en móvil.
+- Fichas de Portfolio y Cartas Rápidas actualizadas con métricas reales de Lighthouse CI histórico (Performance, LCP, CLS, INP, Bundle JS, Accessibility, SEO).
+- `[slug].astro` actualizado para renderizar la sección automáticamente si el frontmatter incluye `beforeAfter`.
+- Plantilla de caso de estudio creada en `docs/plantilla-caso-estudio.md` para futuros proyectos.
+- Refs: #593 / https://github.com/AdriMariscal/Portfolio/issues/593
+
 ## v4.2.0 — 2026-03-13
 - T-002 [BRAND]: verificados con fórmula WCAG 2.1 todos los ratios de contraste de §10.1 de la guía de marca.
 - Las 4 combinaciones Sand nuevas pasan su nivel esperado: Sand 500/Charcoal 900 → 7.98:1 AAA; Teal 700/Sand 100 → 4.65:1 AA; Charcoal 900/Sand 100 → 10.69:1 AAA; Charcoal 950/Sand 500 → 9.94:1 AAA.
