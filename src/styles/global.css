@@ -301,6 +301,15 @@ strong{color:var(--color-heading)}
   color:var(--color-text-muted);
 }
 
+.nav__link:hover{
+  background:var(--color-control-bg);
+  color:var(--color-heading);
+}
+
+.nav__link:hover .nav__icon{
+  color:var(--color-accent);
+}
+
 .nav__link[aria-current="true"] .nav__icon{
   color:var(--color-heading);
 }
@@ -503,7 +512,7 @@ strong{color:var(--color-heading)}
   box-shadow:var(--shadow-md);
 }
 
-.btn--primary:hover{background:var(--palette-sand-200);border-color:var(--palette-sand-200);}
+.btn--primary:hover{background:var(--palette-sand-200);border-color:var(--palette-sand-200);box-shadow:var(--shadow-md),0 0 0 3px rgba(45,212,191,0.22);}
 .btn--secondary{background:var(--color-surface);color:var(--color-heading);border-color:var(--color-border)}
 .btn--secondary:hover{background:var(--color-surface-alt)}
 .btn--tertiary{
@@ -584,7 +593,14 @@ strong{color:var(--color-heading)}
   background:rgba(226,204,150,0.12);border:1px solid rgba(226,204,150,0.28);
   color:var(--color-text-muted);font-weight:600;font-size:.8rem;line-height:1;
   box-shadow:0 1px 0 var(--shadow-color-soft);
-  transition:background .15s ease,transform .05s ease;
+  transition:background .15s ease,border-color .15s ease,color .15s ease,transform .05s ease;
+}
+
+.tag:hover{
+  background:var(--color-accent-soft);
+  border-color:var(--color-accent-border);
+  color:var(--color-accent);
+  transform:translateY(-1px);
 }
 .taglist{display:flex;flex-wrap:wrap;gap:8px;list-style:none;margin:10px 0 0;padding:0;}
 .tags--mt{margin-top:1rem}
@@ -1910,6 +1926,15 @@ strong{color:var(--color-heading)}
   color: var(--color-heading);
   text-decoration: none;
   border: 1px solid rgba(226,204,150,0.28);
+  transition: background .15s ease, border-color .15s ease, color .15s ease, transform .05s ease;
+}
+
+.tag a:hover,
+.tag:hover {
+  background: var(--color-accent-soft);
+  border-color: var(--color-accent-border);
+  color: var(--color-accent);
+  transform: translateY(-1px);
 }
 
 /* ========== Prosa/typography (mismo tono entre blog y proyecto) ========== */
