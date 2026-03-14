@@ -96,6 +96,12 @@ Regla: todas las versiones MINOR se registran; PATCH solo cuando aporte.
 - Plantilla de caso de estudio creada en `docs/plantilla-caso-estudio.md` para futuros proyectos.
 - Refs: #593 / https://github.com/AdriMariscal/Portfolio/issues/593
 
+## v4.14.0 — 2026-03-14
+- T-026 [NETLIFY]: verificación y confirmación del hook de notificación por email del formulario de contacto.
+- Hook `submission_created` tipo `email` ya presente y activo: destino `amariscalcantudo@gmail.com`, subject "Nuevo mensaje en Portfolio", ID `6901f8ecb7b9b4445575987e`.
+- Netlify CLI (v24.2.0) instalado y autenticado en local: el MCP de Netlify queda operativo para futuras issues de configuración sin intervención manual.
+- Refs: #602 / https://github.com/AdriMariscal/Portfolio/issues/602
+
 ## v4.2.0 — 2026-03-13
 - T-002 [BRAND]: verificados con fórmula WCAG 2.1 todos los ratios de contraste de §10.1 de la guía de marca.
 - Las 4 combinaciones Sand nuevas pasan su nivel esperado: Sand 500/Charcoal 900 → 7.98:1 AAA; Teal 700/Sand 100 → 4.65:1 AA; Charcoal 900/Sand 100 → 10.69:1 AAA; Charcoal 950/Sand 500 → 9.94:1 AAA.
