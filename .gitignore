@@ -2,3 +2,6 @@
 dist/
 .astro/
 .env*
+
+# Local Netlify folder
+.netlify
