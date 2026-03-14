@@ -157,7 +157,7 @@ const servicesJsonLd = {
         <div class="services-packs">
 
           <Card class="services-card pack-card">
-            <div class="card__body stack" style="--stack-gap: 14px;">
+            <div class="card__body stack" style="--stack-gap: 16px;">
               <div class="pack-header">
                 <h3 class="h3 pack-name">Corrección</h3>
                 <p class="pack-price">desde 490€</p>
@@ -182,7 +182,7 @@ const servicesJsonLd = {
 
           <Card class="services-card pack-card pack-card--popular">
             <div class="pack-badge">Más popular</div>
-            <div class="card__body stack" style="--stack-gap: 14px;">
+            <div class="card__body stack" style="--stack-gap: 16px;">
               <div class="pack-header">
                 <h3 class="h3 pack-name">Optimización</h3>
                 <p class="pack-price">desde 990€</p>
@@ -206,7 +206,7 @@ const servicesJsonLd = {
           </Card>
 
           <Card class="services-card pack-card">
-            <div class="card__body stack" style="--stack-gap: 14px;">
+            <div class="card__body stack" style="--stack-gap: 16px;">
               <div class="pack-header">
                 <h3 class="h3 pack-name">Excelencia</h3>
                 <p class="pack-price">desde 2.490€</p>
@@ -294,6 +294,10 @@ const servicesJsonLd = {
     height: 100%;
   }
 
+  .services-grid .services-card .card__body {
+    padding: 22px;
+  }
+
   .services-list {
     margin: 0;
     padding-left: 1.1rem;
@@ -331,6 +335,10 @@ const servicesJsonLd = {
     position: relative;
   }
 
+  .pack-card .card__body {
+    padding: 24px;
+  }
+
   .pack-card--popular {
     border-color: var(--color-accent);
     box-shadow: 0 0 0 1px var(--color-accent);
@@ -354,7 +362,7 @@ const servicesJsonLd = {
   }
 
   .pack-card--popular .card__body {
-    padding-top: 20px;
+    padding-top: 24px;
   }
 
   .pack-header {
