@@ -3,6 +3,13 @@
 Notas rápidas de cambios durante el desarrollo de la línea major v4.
 Regla: todas las versiones MINOR se registran; PATCH solo cuando aporte.
 
+## v4.18.0 — 2026-03-14
+- T-008 [BRAND]: auditoría de componentes Button/CTA contra especificación de diseño v2.0.
+- Corregido `.btn--secondary`: `border-color` ahora usa `var(--palette-sand-500)` (#E2CC96) en lugar del token genérico `--color-border`; cumple "outline Sand 500" de §12.
+- Corregido `.btn--tertiary`: `color` ahora usa `var(--color-accent)` (Teal) en lugar de `--color-heading`; cumple "link Teal" de §12.
+- El resto de la especificación ya estaba correcta: altura 44px, radius 12px (--radius-md), focus ring Teal (`--color-focus`/`--color-focus-ring`), primary Sand 500 (#E2CC96).
+- Refs: #584 / https://github.com/AdriMariscal/Portfolio/issues/584
+
 ## v4.0.0 — 2026-03-13
 - Inicio de la línea major v4 (bump:major).
 - Motivo: comienzo del MVP v4 — aplicación de guía de marca v2.0 (paleta Sand desaturada, light mode rediseñado, principio de contención de color).
