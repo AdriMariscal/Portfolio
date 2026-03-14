@@ -81,10 +81,8 @@ const latest = changelog.length ? changelog[0] : undefined;
 const latestDate = latest?.date ? fmtDate(latest.date) : undefined;
 
 const canonical = Astro.url?.href ?? new URL(`/projects/${project.slug}/`, SITE.url).href;
-const rawImage = data.image ?? data.ogImage ?? SITE.ogImage ?? "/og-default.png";
-const imageAbs = rawImage.startsWith("http")
-  ? rawImage
-  : new URL(rawImage, SITE.url).href;
+// OG image dinámica generada en build time para este proyecto
+const ogImageAbs = new URL(`/og/projects/${project.slug}.png`, SITE.url).href;
 const organizationId = `${SITE.url}#organization`;
 const personId = `${SITE.url}#persona`;
 const toISO = (d: unknown) => {
@@ -103,7 +101,7 @@ const projectJsonLd = {
       "name": title,
       "description": metaDescription,
       "url": canonical,
-      "image": imageAbs,
+      "image": ogImageAbs,
       "inLanguage": SITE.lang ?? "es",
       "author": { "@id": personId },
       "publisher": { "@id": organizationId },
@@ -140,6 +138,10 @@ const projectJsonLd = {
   title={title}
   metaTitle={metaTitle}
   description={metaDescription}
+  ogImage={ogImageAbs}
+  ogImageAlt={title}
+  twitterImage={ogImageAbs}
+  twitterImageAlt={title}
 >
   <article class="section post project-detail">
     <!-- margen inferior ajustado a 24px -->

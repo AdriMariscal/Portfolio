@@ -144,6 +144,15 @@ Regla: todas las versiones MINOR se registran; PATCH solo cuando aporte.
 - Redeploy de producción forzado vía Netlify CLI; sitio live en `https://adrianmariscal.es` con las nuevas variables activas.
 - Refs: #604
 
+## v4.21.0 — 2026-03-14
+- T-014 [SEO]: OG images dinámicas por página generadas en build time con `satori` + `sharp`.
+- Endpoint `src/pages/og/[...slug].png.ts` cubre 41 posts, 3 proyectos y 5 páginas estáticas (home, about, services, auditoria-web, contact).
+- Diseño de marca: fondo Charcoal 900, acento lateral Sand 500, badge de tipo, título en Sora 700, pie con autor y dominio en Teal 500.
+- Twitter cards de blog y proyectos actualizadas a `summary_large_image` con la imagen específica (no el isotipo genérico).
+- JSON-LD (`BlogPosting.image`, `CreativeWork.image`) actualizado para referenciar la OG dinámica.
+- Deps añadidas: `satori@0.25.0`, `sharp@0.34.5`.
+- Refs: #590
+
 ## v4.2.0 — 2026-03-13
 - T-002 [BRAND]: verificados con fórmula WCAG 2.1 todos los ratios de contraste de §10.1 de la guía de marca.
 - Las 4 combinaciones Sand nuevas pasan su nivel esperado: Sand 500/Charcoal 900 → 7.98:1 AAA; Teal 700/Sand 100 → 4.65:1 AA; Charcoal 900/Sand 100 → 10.69:1 AAA; Charcoal 950/Sand 500 → 9.94:1 AAA.

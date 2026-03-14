@@ -52,11 +52,8 @@ const title = post.data.title ?? SITE.title;
 const description = post.data.description ?? SITE.description;
 const canonical = Astro.url?.href ?? new URL(`/blog/${post.slug}/`, SITE.url).href;
 
-// Imagen principal (absoluta): prioriza la del post si existe
-const rawImage = (post.data.image ?? post.data.heroImage ?? SITE.ogImage ?? '/og-default.png') as string;
-const imageAbs = rawImage?.startsWith('http')
-  ? rawImage
-  : new URL(rawImage, SITE.url).href;
+// OG image dinámica generada en build time para esta entrada
+const ogImageAbs = new URL(`/og/blog/${post.slug}.png`, SITE.url).href;
 
 // Hero dentro del artículo: solo si el frontmatter define `image`
 const heroImage =
@@ -109,7 +106,7 @@ const jsonLd = {
       "@id": canonical,
       "headline": title,
       "description": description,
-      "image": imageAbs,
+      "image": ogImageAbs,
       "url": canonical,
       "mainEntityOfPage": { "@type": "WebPage", "@id": canonical },
       "inLanguage": SITE.lang ?? "es",
@@ -151,8 +148,10 @@ const jsonLd = {
   title={title}
   metaTitle={metaTitle}
   description={metaDescription}
-  ogImage={imageAbs}
+  ogImage={ogImageAbs}
   ogImageAlt={heroAlt}
+  twitterImage={ogImageAbs}
+  twitterImageAlt={heroAlt}
   ogType="article"
   articleAuthor={SITE.author}
   articleTags={tags}

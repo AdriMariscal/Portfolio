@@ -1,7 +1,7 @@
 {
   "name": "portfolio",
   "type": "module",
-  "version": "4.20.0",
+  "version": "4.21.0",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
@@ -27,6 +27,8 @@
     "@astrojs/mdx": "^4.3.14",
     "@astrojs/sitemap": "^3.6.0",
     "astro": "^5.18.1",
+    "satori": "^0.25.0",
+    "sharp": "^0.34.5",
     "tailwindcss": "^4.2.1",
     "web-vitals": "^5.1.0"
   },
