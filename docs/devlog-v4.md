@@ -45,6 +45,13 @@ Regla: todas las versiones MINOR se registran; PATCH solo cuando aporte.
 - Netlify Function actualizada para recoger y reenviar `url`, `deadline`, `goal` como obligatorio; bloque Slack ampliado con los nuevos campos.
 - Refs: #583 / https://github.com/AdriMariscal/Portfolio/issues/583
 
+## v4.7.0 — 2026-03-14
+- T-010 [SEO]: meta title del Home optimizado para keyword al inicio — cambiado de "Rendimiento web · Portfolio de Adrián Mariscal" (47 chars) a "Diseñador Web Performance · Adrián Mariscal" (44 chars).
+- Keyword principal "Diseñador Web" en los primeros 25 caracteres (criterio: ≤30); título ≤60 caracteres (44 chars) — cumple §7 de la guía de marca.
+- Añadida constante `HOME_META_TITLE` en `src/lib/seo.ts`; `SEO_KEYWORD` global sin cambios (no impacta otras páginas).
+- Test unitario añadido en `tests/unit/seo.test.ts` verificando los dos criterios de aceptación.
+- Refs: #586 / https://github.com/AdriMariscal/Portfolio/issues/586
+
 ## v4.2.0 — 2026-03-13
 - T-002 [BRAND]: verificados con fórmula WCAG 2.1 todos los ratios de contraste de §10.1 de la guía de marca.
 - Las 4 combinaciones Sand nuevas pasan su nivel esperado: Sand 500/Charcoal 900 → 7.98:1 AAA; Teal 700/Sand 100 → 4.65:1 AA; Charcoal 900/Sand 100 → 10.69:1 AAA; Charcoal 950/Sand 500 → 9.94:1 AAA.
