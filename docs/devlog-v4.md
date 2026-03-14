@@ -52,6 +52,13 @@ Regla: todas las versiones MINOR se registran; PATCH solo cuando aporte.
 - Test unitario añadido en `tests/unit/seo.test.ts` verificando los dos criterios de aceptación.
 - Refs: #586 / https://github.com/AdriMariscal/Portfolio/issues/586
 
+## v4.8.0 — 2026-03-14
+- T-011 [SEO]: schema.org `Person` ampliado con `sameAs` (LinkedIn + GitHub) y `jobTitle` corregido a "Diseñador Web" (alineado con guía de marca v2.0).
+- Nodo `Organization` en BaseLayout elevado a `["ProfessionalService", "LocalBusiness"]` con `areaServed: "España"` y `priceRange: "€€"` para Google Knowledge Graph y featured snippets de marca.
+- URLs de redes sociales centralizadas en `SITE.linkedin` y `SITE.github` (`src/lib/config.ts`); accesibles desde cualquier componente.
+- 4 tests unitarios nuevos en `tests/unit/schema-org.test.ts` que verifican los campos críticos del schema.
+- Refs: #587 / https://github.com/AdriMariscal/Portfolio/issues/587
+
 ## v4.2.0 — 2026-03-13
 - T-002 [BRAND]: verificados con fórmula WCAG 2.1 todos los ratios de contraste de §10.1 de la guía de marca.
 - Las 4 combinaciones Sand nuevas pasan su nivel esperado: Sand 500/Charcoal 900 → 7.98:1 AAA; Teal 700/Sand 100 → 4.65:1 AA; Charcoal 900/Sand 100 → 10.69:1 AAA; Charcoal 950/Sand 500 → 9.94:1 AAA.
