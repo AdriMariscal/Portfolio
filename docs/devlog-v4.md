@@ -102,6 +102,15 @@ Regla: todas las versiones MINOR se registran; PATCH solo cuando aporte.
 - Netlify CLI (v24.2.0) instalado y autenticado en local: el MCP de Netlify queda operativo para futuras issues de configuración sin intervención manual.
 - Refs: #602 / https://github.com/AdriMariscal/Portfolio/issues/602
 
+## v4.15.0 — 2026-03-14
+- T-027 [NETLIFY]: CSP implementada en `netlify.toml` — de header vacío a política completa sin `'unsafe-inline'` en `script-src`.
+- Scripts inline de Header, CookieConsent y BaseLayout extraídos a módulos TypeScript externos (`src/scripts/header-ui.ts`, `cookie-consent-ui.ts`, `theme-init.ts`) para que Vite los bundlee en `/_astro/`, cumpliendo `script-src 'self'`.
+- `onload` inline eliminado del `<link>` de Google Fonts — reemplazado por carga sincrónica con `rel=preload` previo (sin penalización de rendimiento por HTTP/2).
+- CSP del admin (`/admin/*`) configurada por separado con directivas relajadas para Decap CMS (unpkg.com, api.github.com, etc.).
+- Directives clave añadidas: `frame-ancestors 'none'`, `base-uri 'self'`, `form-action 'self'`, `object-src 'none'`, `upgrade-insecure-requests`.
+- Objetivo: Mozilla Observatory ≥ B+ (A esperada).
+- Refs: #603 / https://github.com/AdriMariscal/Portfolio/issues/603
+
 ## v4.2.0 — 2026-03-13
 - T-002 [BRAND]: verificados con fórmula WCAG 2.1 todos los ratios de contraste de §10.1 de la guía de marca.
 - Las 4 combinaciones Sand nuevas pasan su nivel esperado: Sand 500/Charcoal 900 → 7.98:1 AAA; Teal 700/Sand 100 → 4.65:1 AA; Charcoal 900/Sand 100 → 10.69:1 AAA; Charcoal 950/Sand 500 → 9.94:1 AAA.
