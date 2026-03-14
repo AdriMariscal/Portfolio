@@ -197,6 +197,21 @@ strong{color:var(--color-heading)}
   border:1px solid var(--color-border);
   border-radius:var(--radius-md);
   box-shadow:var(--shadow-md);
+  transition:border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+
+/* Tarjetas que son directamente un enlace (ej: stat cards del hero) */
+.card--link:hover{
+  border-color:var(--color-accent-border);
+  box-shadow:var(--shadow-strong),0 0 0 1px var(--color-accent-border);
+  transform:translateY(-2px);
+}
+
+/* Tarjetas con overlay-link interior (project-card, card--post) */
+.card:has(.card__overlay-link:hover){
+  border-color:var(--color-accent-border);
+  box-shadow:var(--shadow-strong),0 0 0 1px var(--color-accent-border);
+  transform:translateY(-2px);
 }
 
 .card__body{padding:18px}
