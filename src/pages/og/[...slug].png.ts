@@ -219,7 +219,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
     },
     {
       slug: 'services',
-      title: 'Auditoría web y packs de mejora · Adrián Mariscal',
+      title: 'Auditoría web y packs de mejora SEO · Adrián Mariscal',
       description: 'Auditoría gratuita + informe base en 48-72 h + packs de mejora cerrados.',
       type: 'Servicios',
       cta: 'Ver los packs de mejora',
