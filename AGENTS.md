@@ -252,6 +252,43 @@ Mueve la issue en Project a **"Done"** + Fecha Fin = TODAY (best effort).
 
 **Trigger:** "Empezamos nuevo MVP resolviendo la issue #X" o similar.
 
+#### D.0 — Sincronización total de ramas (OBLIGATORIO antes de cualquier cambio)
+
+`main` tiene la última palabra. Antes de tocar código, asegúrate de que `staging` y `dev` son **idénticas** a `main`:
+
+```bash
+# 1. Obtén el estado real del remoto
+git fetch --all --prune
+
+# 2. Verifica si hay divergencias
+git diff origin/main origin/staging   # debe estar vacío
+git diff origin/main origin/dev       # debe estar vacío
+```
+
+Si alguna comparación **no está vacía**, aplica la sincronización forzada desde `main`:
+
+```bash
+# Sincronizar staging → main
+git checkout staging && git pull origin staging
+git rebase origin/main
+git push origin staging --force-with-lease
+
+# Sincronizar dev → main
+git checkout dev && git pull origin dev
+git rebase origin/main
+git push origin dev --force-with-lease
+
+# Verificación final (ambos diffs deben estar vacíos)
+git diff origin/main origin/staging
+git diff origin/main origin/dev
+```
+
+> ⚠️ Si el rebase produce conflictos, resuélvelos manteniendo siempre la versión de `main` como base de verdad. Si los conflictos son complejos, **DETENTE e informa al usuario** antes de continuar.
+
+Solo cuando los tres diffs estén vacíos, continúa con los pasos siguientes.
+
+#### D.1 — Continuación del flujo
+
 1. Ejecuta **Flujo A** completo, con estas diferencias:
    - En lugar de `bump:minor`, ejecuta `bump:major`.
    - Crea (si no existe) `docs/devlog-v<MAJOR>.md` con el esqueleto (ver §6.3).
