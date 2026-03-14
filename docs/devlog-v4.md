@@ -52,6 +52,14 @@ Regla: todas las versiones MINOR se registran; PATCH solo cuando aporte.
 - Test unitario añadido en `tests/unit/seo.test.ts` verificando los dos criterios de aceptación.
 - Refs: #586 / https://github.com/AdriMariscal/Portfolio/issues/586
 
+## v4.11.0 — 2026-03-14
+- T-016 [FEAT]: /services alineada con guía de marca v2.0 — packs renombrados a `Corrección / Optimización / Excelencia` (§14), descripciones completas (objetivo + incluye + ideal para), precios visibles (490€ / 990€ / 2.490€).
+- Pack "Optimización" destacado como "Más popular" con badge visual y borde de acento.
+- Informe Completo etiquetado con precio 149€ y nota de descuento; sección "Servicios futuros" eliminada (era placeholder visible en producción).
+- CTA "Consultar disponibilidad" reemplazado por "Pedir presupuesto cerrado" (§6); meta title corregido a "Auditoría web y packs de mejora · Adrián Mariscal" (49 chars, keyword al inicio — §7).
+- Constante `SERVICES_META_TITLE` añadida a `src/lib/seo.ts`; schema.org ampliado con `Service` + `Offer` por cada pack.
+- Refs: #592 / https://github.com/AdriMariscal/Portfolio/issues/592
+
 ## v4.10.0 — 2026-03-14
 - T-015 [FEAT]: Decap CMS simplificado a modo editorial `simple` — `publish_mode` cambiado de `editorial_workflow` a `simple`.
 - `branch` cambiado de `dev` a `main`: los commits del CMS van directamente a `main` y Netlify auto-despliega en producción sin pasar por staging.
