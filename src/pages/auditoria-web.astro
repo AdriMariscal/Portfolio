@@ -1,0 +1,397 @@
+---
+// src/pages/auditoria-web.astro
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Button from "../components/ui/Button.astro";
+import Card from "../components/ui/Card.astro";
+import { buildMetaDescription, AUDITORIA_META_TITLE } from "../lib/seo";
+import { SITE } from "../lib/config";
+
+const metaTitle = AUDITORIA_META_TITLE;
+const metaDescription = buildMetaDescription(
+  "Auditoría web gratuita de rendimiento, SEO técnico y accesibilidad. Informe base en 48–72h sin compromiso; informe completo (149€) con plan priorizado P0/P1/P2 descontable en cualquier pack.",
+  "Solicita la tuya hoy."
+);
+
+const canonical = new URL("/auditoria-web/", SITE.url).href;
+const personId = `${SITE.url}#persona`;
+const organizationId = `${SITE.url}#organization`;
+
+const faqItems = [
+  {
+    question: "¿Qué incluye la auditoría gratuita?",
+    answer:
+      "El Informe Base incluye resumen de métricas clave (LCP, INP, CLS), hallazgos críticos de SEO técnico y las prioridades rápidas para desbloquear impacto. Se entrega en 48–72h laborables sin ningún compromiso.",
+  },
+  {
+    question: "¿Qué diferencia el Informe Completo del Informe Base?",
+    answer:
+      "El Informe Completo (149€) añade un plan P0/P1/P2 con esfuerzo y dependencias estimadas, recomendaciones de arquitectura y stack, y una sesión de 30 minutos para revisar el plan juntos. Su coste es descontable si después se contrata un pack de mejora.",
+  },
+  {
+    question: "¿Cuánto tarda en llegar el informe?",
+    answer:
+      "El Informe Base llega en 48–72 horas laborables desde que se confirma la solicitud. El Informe Completo puede tardar hasta 5 días laborables según la complejidad del sitio.",
+  },
+  {
+    question: "¿Para qué tipo de sitios web es útil?",
+    answer:
+      "Para cualquier sitio web que quiera mejorar su posicionamiento SEO, velocidad de carga o experiencia de usuario: tiendas online, blogs, sitios corporativos, SaaS y portfolios.",
+  },
+  {
+    question: "¿Tengo que contratar algo después?",
+    answer:
+      "No. El Informe Base es completamente gratuito y sin compromiso. Si el diagnóstico confirma impacto claro, puedes valorar los packs de mejora, pero la decisión es siempre tuya.",
+  },
+];
+
+const pageJsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": canonical,
+      name: "Auditoría web gratuita: rendimiento, SEO y accesibilidad",
+      description: metaDescription,
+      url: canonical,
+      inLanguage: SITE.lang ?? "es",
+      isPartOf: { "@id": SITE.url },
+      publisher: { "@id": organizationId },
+    },
+    {
+      "@type": "Service",
+      name: "Auditoría web gratuita",
+      description:
+        "Auditoría gratuita de rendimiento web, SEO técnico y accesibilidad con informe base en 48–72h.",
+      provider: { "@id": personId },
+      areaServed: "ES",
+      serviceType: "Web Performance, SEO técnico y Accesibilidad",
+      offers: {
+        "@type": "Offer",
+        price: "0",
+        priceCurrency: "EUR",
+        description: "Informe Base gratuito. Informe Completo: 149€.",
+      },
+    },
+    {
+      "@type": "FAQPage",
+      mainEntity: faqItems.map((item) => ({
+        "@type": "Question",
+        name: item.question,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: item.answer,
+        },
+      })),
+    },
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Inicio",
+          item: SITE.url,
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Auditoría Web Gratuita",
+          item: canonical,
+        },
+      ],
+    },
+  ],
+};
+---
+
+<BaseLayout title="Auditoría Web Gratuita" metaTitle={metaTitle} description={metaDescription}>
+  <!-- Hero -->
+  <section class="section hero section--audit-hero">
+    <div class="wrap audit-hero">
+      <div class="stack" style="--stack-gap: 16px;">
+        <p class="audit-hero__kicker">Rendimiento · SEO técnico · Accesibilidad</p>
+        <h1 class="audit-hero__title">
+          Auditoría web gratuita: rendimiento, SEO y accesibilidad
+        </h1>
+        <p class="audit-hero__lead">
+          Entenderás qué frena a tu web, qué impacto tiene cada mejora y cuál es el camino
+          más eficiente. Informe base en <strong>48–72h</strong>, sin compromiso.
+        </p>
+        <div class="audit-hero__actions">
+          <Button href="/contact" variant="primary">Solicitar auditoría gratuita</Button>
+          <Button href="#informes" variant="secondary">Ver qué incluye</Button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Qué incluye cada informe -->
+  <section class="section section--audit-informes" id="informes">
+    <div class="wrap">
+      <div class="stack" style="--stack-gap: 32px;">
+        <header class="section__header stack" style="--stack-gap: 8px;">
+          <h2 class="h2 section__title">Qué incluye la auditoría</h2>
+          <p class="audit-text">
+            Dos niveles de profundidad según lo que necesites. El Informe Base siempre es
+            gratuito.
+          </p>
+        </header>
+
+        <div class="audit-informes-grid">
+          <!-- Informe Base -->
+          <Card class="audit-card">
+            <div class="card__body stack" style="--stack-gap: 16px;">
+              <div class="audit-card__header">
+                <h3 class="h3 audit-card__title">Informe Base</h3>
+                <span class="audit-badge audit-badge--free">gratis</span>
+              </div>
+              <p class="audit-card__subtitle muted">Entregado en 48–72h laborables</p>
+              <ul class="audit-list">
+                <li>Resumen de métricas clave: LCP, INP y CLS con contexto real.</li>
+                <li>Hallazgos críticos de SEO técnico que frenan la indexación.</li>
+                <li>Revisión básica de accesibilidad (barreras de impacto alto).</li>
+                <li>Prioridades rápidas para desbloquear impacto inmediato.</li>
+              </ul>
+              <Button href="/contact" variant="primary" class="audit-cta">
+                Solicitar auditoría gratuita
+              </Button>
+            </div>
+          </Card>
+
+          <!-- Informe Completo -->
+          <Card class="audit-card">
+            <div class="card__body stack" style="--stack-gap: 16px;">
+              <div class="audit-card__header">
+                <h3 class="h3 audit-card__title">Informe Completo</h3>
+                <span class="audit-badge audit-badge--paid">149€</span>
+              </div>
+              <p class="audit-card__subtitle muted">Todo lo del Base, más profundidad</p>
+              <ul class="audit-list">
+                <li>Plan P0/P1/P2 con esfuerzo y dependencias estimadas.</li>
+                <li>Recomendaciones de arquitectura y stack con criterio.</li>
+                <li>Análisis de terceros (analytics, chat, ads) con impacto en CWV.</li>
+                <li>Sesión de 30 min para revisar el plan juntos.</li>
+              </ul>
+              <p class="audit-note muted">
+                Descontable si se contrata un pack de mejora.
+              </p>
+              <Button href="/contact" variant="secondary" class="audit-cta">
+                Solicitar Informe Completo
+              </Button>
+            </div>
+          </Card>
+        </div>
+
+        <p class="audit-text muted">
+          Si el diagnóstico confirma impacto claro, la auditoría se convierte en la base de
+          un <a href="/services#packs" class="audit-link">pack de mejora</a> con foco en
+          rendimiento, SEO técnico y UX.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section section--alt section--audit-faq">
+    <div class="wrap">
+      <div class="stack" style="--stack-gap: 32px;">
+        <header class="section__header stack" style="--stack-gap: 8px;">
+          <h2 class="h2 section__title">Preguntas frecuentes</h2>
+          <p class="audit-text">Todo lo que necesitas saber antes de solicitar tu auditoría.</p>
+        </header>
+
+        <dl class="faq-list">
+          {faqItems.map((item) => (
+            <div class="faq-item">
+              <dt class="faq-question">{item.question}</dt>
+              <dd class="faq-answer muted">{item.answer}</dd>
+            </div>
+          ))}
+        </dl>
+
+        <div class="audit-cta-block">
+          <p class="audit-text">¿Tienes más dudas? Escríbeme directamente.</p>
+          <Button href="/contact" variant="primary">Solicitar auditoría gratuita</Button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script type="application/ld+json" set:html={JSON.stringify(pageJsonLd, null, 2)} />
+</BaseLayout>
+
+<style>
+  /* ── Hero ── */
+  .section--audit-hero {
+    padding-block: clamp(64px, 12vw, 140px);
+  }
+
+  .audit-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(16px, 4vw, 32px);
+  }
+
+  .audit-hero__kicker {
+    text-transform: uppercase;
+    letter-spacing: 0.24em;
+    font-size: 0.72rem;
+    color: var(--color-text-muted);
+  }
+
+  .audit-hero__title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    line-height: 1.1;
+    color: var(--color-heading);
+    margin: 0;
+    max-width: 20ch;
+  }
+
+  .audit-hero__lead {
+    font-size: 1.1rem;
+    color: var(--color-text-muted);
+    max-width: 64ch;
+    line-height: 1.6;
+  }
+
+  .audit-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  /* ── Informes ── */
+  .section--audit-informes {
+    padding-block: clamp(48px, 8vw, 96px);
+  }
+
+  .audit-text {
+    color: var(--color-text-muted);
+    max-width: 64ch;
+  }
+
+  .audit-informes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    align-items: start;
+  }
+
+  .audit-card {
+    height: 100%;
+  }
+
+  .audit-card .card__body {
+    padding: 24px;
+  }
+
+  .audit-card__header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .audit-card__title {
+    margin: 0;
+  }
+
+  .audit-card__subtitle {
+    margin: 0;
+    font-size: 0.875rem;
+  }
+
+  .audit-badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 3px 10px;
+    border-radius: 4px;
+    white-space: nowrap;
+    vertical-align: middle;
+  }
+
+  .audit-badge--free {
+    background: transparent;
+    color: var(--color-accent);
+    border: 1px solid var(--color-accent);
+  }
+
+  .audit-badge--paid {
+    background: transparent;
+    color: var(--color-text-muted);
+    border: 1px solid currentColor;
+  }
+
+  .audit-list {
+    margin: 0;
+    padding-left: 1.1rem;
+    display: grid;
+    gap: 8px;
+    color: var(--color-text-muted);
+  }
+
+  .audit-note {
+    margin: 0;
+    font-size: 0.82rem;
+  }
+
+  .audit-cta {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+    margin-top: 4px;
+  }
+
+  .audit-link {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* ── FAQ ── */
+  .section--audit-faq {
+    padding-block: clamp(48px, 8vw, 96px);
+  }
+
+  .faq-list {
+    display: grid;
+    gap: 0;
+    margin: 0;
+    border-top: 1px solid var(--color-border, rgba(255 255 255 / 0.08));
+  }
+
+  .faq-item {
+    padding-block: 20px;
+    border-bottom: 1px solid var(--color-border, rgba(255 255 255 / 0.08));
+    display: grid;
+    gap: 8px;
+  }
+
+  .faq-question {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-heading);
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  .faq-answer {
+    margin: 0;
+    line-height: 1.65;
+    max-width: 72ch;
+  }
+
+  .audit-cta-block {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .audit-cta-block .audit-text {
+    margin: 0;
+  }
+</style>
