@@ -39,7 +39,7 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Update snapshots
-        run: pnpm run test:e2e -- --update-snapshots --project=chromium
+        run: npx playwright test --update-snapshots
 
       - name: Create pull request
         uses: peter-evans/create-pull-request@v6
