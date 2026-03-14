@@ -3,7 +3,7 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import ProjectCard from "../../components/ProjectCard.astro";
 import { getCollection } from "astro:content";
-import { buildMetaDescription, buildMetaTitle, SEO_KEYWORD } from "../../lib/seo";
+import { buildMetaDescription, PROJECTS_META_TITLE } from "../../lib/seo";
 import { SITE } from "../../lib/config";
 
 // Traemos todos los proyectos
@@ -26,16 +26,14 @@ inactive.sort(byOrderThenTitle);
 
 // SEO
 const pageTitle = "Proyectos";
-const metaTitle = buildMetaTitle(SEO_KEYWORD, "Proyectos y casos reales");
+const metaTitle = PROJECTS_META_TITLE;
 const pageDescription = buildMetaDescription(
   "Proyectos propios enfocados en rendimiento web, SEO técnico y UX con resultados medibles.",
   "Explora los casos y solicita una auditoría."
 );
 const canonical = new URL("/projects/", SITE.url).href;
-const pageImage = SITE.ogImage ?? "/og-default.png";
-const pageImageAbs = pageImage.startsWith("http")
-  ? pageImage
-  : new URL(pageImage, SITE.url).href;
+const ogImageRel = "/og/projects.png";
+const pageImageAbs = new URL(ogImageRel, SITE.url).href;
 const organizationId = `${SITE.url}#organization`;
 const projectsJsonLd = {
   "@context": "https://schema.org",
@@ -72,7 +70,7 @@ const projectsJsonLd = {
 };
 ---
 
-<BaseLayout title={pageTitle} metaTitle={metaTitle} description={pageDescription}>
+<BaseLayout title={pageTitle} metaTitle={metaTitle} description={pageDescription} ogImage={ogImageRel}>
   <!-- Cabecera de página -->
   <section class="section hero section--projects-hero">
     <div class="wrap projects-header">

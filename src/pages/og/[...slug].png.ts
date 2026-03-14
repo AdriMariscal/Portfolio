@@ -238,6 +238,13 @@ export const getStaticPaths: GetStaticPaths = async () => {
       type: 'Contacto',
       cta: 'Escríbeme',
     },
+    {
+      slug: 'projects',
+      title: 'Proyectos web: rendimiento y SEO técnico · Adrián Mariscal',
+      description: 'Proyectos propios enfocados en rendimiento web, SEO técnico y UX con resultados medibles.',
+      type: 'Proyectos',
+      cta: 'Explora los casos',
+    },
   ];
 
   return [

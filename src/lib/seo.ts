@@ -17,6 +17,7 @@ export const SEO_KEYWORD = "Rendimiento web";
 export const HOME_META_TITLE = "Diseñador Web Performance y SEO Técnico · Adrián Mariscal";
 export const ABOUT_META_TITLE = "Adrián Mariscal: diseñador web, rendimiento y SEO técnico";
 export const SERVICES_META_TITLE = "Auditoría web y packs de mejora SEO · Adrián Mariscal";
+export const PROJECTS_META_TITLE = "Proyectos web: rendimiento y SEO técnico · Adrián Mariscal";
 export const AUDITORIA_META_TITLE = "Auditoría Web Gratuita: rendimiento y SEO · Adrián Mariscal";
 
 export const buildMetaTitle = (keyword: string, title: string, max = 60) => {
