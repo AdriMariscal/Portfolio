@@ -12,7 +12,7 @@ Este bloque mapea frases del usuario a flujos concretos. Léelo PRIMERO.
 |---|---|
 | "Resuelve la issue #X de Y" / "Necesito que resuelvas la issue #X" | **Flujo A — Nueva Issue** |
 | "[Ajustes/correcciones] que necesito en la issue en review…" | **Flujo B — Ajuste post-review** |
-| "Issue resuelta" / "Todo OK, cierra la issue" | **Flujo C — Cierre y merge a staging** |
+| "Issue resuelta" / "Todo OK, cierra la issue" | **Flujo C — Cierre y merge a staging** (termina en `staging`; NO toca `main`) |
 | "Empezamos nuevo MVP resolviendo la issue #X" / "Nueva versión major con #X" | **Flujo D — Inicio de MVP (nueva versión major)** |
 | "MVP terminado, vamos a producción" / "A producción" | **Flujo E — Deploy a producción** |
 | CI KO en cualquier PR | **Flujo F — CI roto** (ver §3.5) |
@@ -241,6 +241,8 @@ git diff staging dev   # debe estar vacío
 gh issue close <ID>
 ```
 Mueve la issue en Project a **"Done"** + Fecha Fin = TODAY (best effort).
+
+> ⚠️ **LÍMITE DE FLUJO C — STOP AQUÍ.** El trabajo de esta issue termina en este paso. NO crees ninguna PR hacia `main`, NO ejecutes ningún paso de Flujo E. La promoción a `main` es exclusiva de Flujo E y requiere trigger explícito del usuario ("MVP terminado" / "A producción").
 
 #### C.6 — Entrega
 - Invita al usuario a probar en el entorno de staging (batería 3–7 pruebas).
