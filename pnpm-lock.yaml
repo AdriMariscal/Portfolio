@@ -33,6 +33,9 @@ importers:
       '@axe-core/cli':
         specifier: ^4.11.1
         version: 4.11.1
+      '@axe-core/playwright':
+        specifier: ^4.11.1
+        version: 4.11.1(playwright-core@1.57.0)
       '@lhci/cli':
         specifier: ^0.15.1
         version: 0.15.1
@@ -120,6 +123,11 @@ packages:
     resolution: {integrity: sha512-xC7doMReoy7QnQ18azdpIZHoYL1HcG5c5wvEcCpm5kWny520RGTRrBcnAZENaQ9nTQAkE7fXZFK4Z1cfBDTBFg==}
     engines: {node: '>=8'}
     hasBin: true
+
+  '@axe-core/playwright@4.11.1':
+    resolution: {integrity: sha512-mKEfoUIB1MkVTht0BGZFXtSAEKXMJoDkyV5YZ9jbBmZCcWDz71tegNsdTkIN8zc/yMi5Gm2kx7Z5YQ9PfWNAWw==}
+    peerDependencies:
+      playwright-core: '>= 1.0.0'
 
   '@axe-core/webdriverjs@4.11.1':
     resolution: {integrity: sha512-UVq7uBsqaQlHj7PQPg+WhE0nV6ccYtE0cnGglStS5RE3RAB+gQcb30R1k3usI+Q/xyROSJHhusOus4BzqrlZ1w==}
@@ -1451,8 +1459,8 @@ packages:
     engines: {node: '>=12.13.0'}
     hasBin: true
 
-  chromedriver@146.0.2:
-    resolution: {integrity: sha512-/A6ht59pGGrV3bU6eC//yH6W+NRexVGXy/KEe+pNn1MP5Xb34krSA02bGlYuA5XCrfdXPsFI//slvsOBwH//4Q==}
+  chromedriver@146.0.3:
+    resolution: {integrity: sha512-RFhEoG3bmI+TaDm/9vDNntkxM76Sb/VIxvX3kHPzfQ3wvmE+PPSTw6gnD+Oa+dcJAc/kg/vQAwMrOUs8E1LdyQ==}
     engines: {node: '>=20'}
     hasBin: true
 
@@ -4108,7 +4116,7 @@ snapshots:
     dependencies:
       '@axe-core/webdriverjs': 4.11.1(selenium-webdriver@4.39.0)
       axe-core: 4.11.1
-      chromedriver: 146.0.2
+      chromedriver: 146.0.3
       colors: 1.4.0
       commander: 9.5.0
       dotenv: 17.3.1
@@ -4118,6 +4126,11 @@ snapshots:
       - debug
       - supports-color
       - utf-8-validate
+
+  '@axe-core/playwright@4.11.1(playwright-core@1.57.0)':
+    dependencies:
+      axe-core: 4.11.1
+      playwright-core: 1.57.0
 
   '@axe-core/webdriverjs@4.11.1(selenium-webdriver@4.39.0)':
     dependencies:
@@ -5414,7 +5427,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  chromedriver@146.0.2:
+  chromedriver@146.0.3:
     dependencies:
       '@testim/chrome-version': 1.1.4
       axios: 1.13.6
