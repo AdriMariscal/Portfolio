@@ -205,7 +205,8 @@ export const handler = async (event) => {
     }),
   ]);
 
-  if (!slackResult.ok && !crmResult.ok) {
+  const activeResults = [slackResult, crmResult].filter((r) => !r.skipped);
+  if (activeResults.length > 0 && activeResults.every((r) => !r.ok)) {
     return {
       statusCode: 500,
       headers: { "Content-Type": "application/json" },
