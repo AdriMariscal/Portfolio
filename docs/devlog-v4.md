@@ -37,6 +37,14 @@ Regla: todas las versiones MINOR se registran; PATCH solo cuando aporte.
 - Resultado: `--color-success` ya no es Teal (era incorrecto semánticamente); en light mode el foco y las interacciones usan el teal con contraste adecuado (4.65:1 AA sobre Sand 100 según §10.1).
 - Refs: #581 / https://github.com/AdriMariscal/Portfolio/issues/581
 
+## v4.6.0 — 2026-03-14
+- T-007 [BRAND]: formulario de contacto rediseñado con campos de cualificación de lead (URL, Stack, Objetivo, Plazo, Presupuesto).
+- Objetivo pasa a ser campo requerido; URL y Plazo son campos nuevos opcionales.
+- Placeholders alineados con la guía de marca §6; mensaje de confirmación actualizado a "Recibido. En breve te respondo con los siguientes pasos."
+- Honeypot `bot-field` añadido al formulario y verificado en la Netlify Function; hidden input `form-name` para registro en Netlify Forms.
+- Netlify Function actualizada para recoger y reenviar `url`, `deadline`, `goal` como obligatorio; bloque Slack ampliado con los nuevos campos.
+- Refs: #583 / https://github.com/AdriMariscal/Portfolio/issues/583
+
 ## v4.2.0 — 2026-03-13
 - T-002 [BRAND]: verificados con fórmula WCAG 2.1 todos los ratios de contraste de §10.1 de la guía de marca.
 - Las 4 combinaciones Sand nuevas pasan su nivel esperado: Sand 500/Charcoal 900 → 7.98:1 AAA; Teal 700/Sand 100 → 4.65:1 AA; Charcoal 900/Sand 100 → 10.69:1 AAA; Charcoal 950/Sand 500 → 9.94:1 AAA.
