@@ -15,6 +15,7 @@ export const SEO_KEYWORD = "Rendimiento web";
 
 /** Meta title específico del Home: keyword principal en los primeros 30 caracteres, ≤60 caracteres totales */
 export const HOME_META_TITLE = "Diseñador Web Performance · Adrián Mariscal";
+export const SERVICES_META_TITLE = "Auditoría web y packs de mejora · Adrián Mariscal";
 
 export const buildMetaTitle = (keyword: string, title: string, max = 60) => {
   const cleanTitle = normalizeText(title);
