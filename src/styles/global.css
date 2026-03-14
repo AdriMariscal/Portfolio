@@ -528,11 +528,11 @@ strong{color:var(--color-heading)}
 }
 
 .btn--primary:hover{background:var(--palette-sand-200);border-color:var(--palette-sand-200);box-shadow:var(--shadow-md),0 0 0 3px rgba(45,212,191,0.22);}
-.btn--secondary{background:var(--color-surface);color:var(--color-heading);border-color:var(--color-border)}
+.btn--secondary{background:var(--color-surface);color:var(--color-heading);border-color:var(--palette-sand-500)}
 .btn--secondary:hover{background:var(--color-surface-alt)}
 .btn--tertiary{
   background:transparent;
-  color:var(--color-heading);
+  color:var(--color-accent);
   border-color:transparent;
 }
 .btn--tertiary:hover{
