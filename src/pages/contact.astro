@@ -23,6 +23,20 @@ const hcaptchaSiteKey = import.meta.env.PUBLIC_HCAPTCHA_SITE_KEY ?? "";
       <p class="muted">Cuéntame en qué te puedo ayudar.</p>
       </header>
 
+      <!-- Formulario oculto para que Netlify Forms detecte todos los campos en el build -->
+      <form name="contact" data-netlify="true" data-netlify-honeypot="bot-field" hidden>
+        <input name="bot-field" />
+        <input name="name" />
+        <input name="email" />
+        <input name="url" />
+        <input name="stack" />
+        <input name="goal" />
+        <input name="deadline" />
+        <input name="budget" />
+        <input name="message" />
+        <input name="h-captcha-response" />
+      </form>
+
       <!-- Formulario -->
       <Card
         as="form"
