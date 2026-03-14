@@ -13,6 +13,8 @@ export const SITE = {
   twitterImageAlt: "Isotipo de Adrián Mariscal",
   twitterCard: "summary",
   twitterCreator: "",
+  linkedin: "https://www.linkedin.com/in/adrianmariscal",
+  github: "https://github.com/AdriMariscal",
 };
 
 export const THEME = {
