@@ -1,3 +1,4 @@
+export {};
 // Lógica del Header: nav toggle móvil + theme toggle (claro/oscuro).
 // Extraído a módulo externo para que Vite lo bundlee y la CSP pueda usar
 // script-src 'self' sin 'unsafe-inline'.

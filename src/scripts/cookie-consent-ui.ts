@@ -1,3 +1,4 @@
+export {};
 // Lógica del banner de consentimiento de cookies.
 // Extraído a módulo externo para que Vite lo bundlee y la CSP pueda usar
 // script-src 'self' sin 'unsafe-inline'.
@@ -65,8 +66,10 @@ function savePrefs(partialPrefs: { analytics: boolean; marketing: boolean }): Co
 }
 
 function initCookieConsent() {
-  const banner = document.querySelector<HTMLElement>("[data-cookie-banner]");
-  if (!banner) return;
+  const bannerEl = document.querySelector<HTMLElement>("[data-cookie-banner]");
+  if (!bannerEl) return;
+  // Alias no-nullable para que TypeScript lo infiera correctamente en closures
+  const banner: HTMLElement = bannerEl;
 
   const analyticsInput = banner.querySelector<HTMLInputElement>('[data-cookie-input="analytics"]');
   const marketingInput = banner.querySelector<HTMLInputElement>('[data-cookie-input="marketing"]');
