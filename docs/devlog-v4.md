@@ -81,6 +81,13 @@ Regla: todas las versiones MINOR se registran; PATCH solo cuando aporte.
 - 4 tests unitarios nuevos en `tests/unit/schema-org.test.ts` que verifican los campos críticos del schema.
 - Refs: #587 / https://github.com/AdriMariscal/Portfolio/issues/587
 
+## v4.13.0 — 2026-03-14
+- T-024 [A11Y]: integrado `@axe-core/playwright` en el CI para auditoría de accesibilidad automatizada.
+- Nuevo test `tests/e2e/a11y.spec.ts` que visita 5 páginas principales (/, /about, /services, /blog, /contact) y falla en violaciones "critical" o "serious"; "moderate" y "minor" no bloquean.
+- Nuevo workflow `.github/workflows/ci-a11y.yml` que se ejecuta en cada PR a dev/staging/main con reporte como artefacto.
+- Script `test:e2e:a11y` añadido a `package.json` para ejecución local aislada.
+- Refs: #600 / https://github.com/AdriMariscal/Portfolio/issues/600
+
 ## v4.12.0 — 2026-03-14
 - T-017 [FEAT]: sección estandarizada "Antes/Después" implementada en fichas de proyecto.
 - Nuevo componente `BeforeAfter.astro` con tabla de métricas (Métrica / Antes / Después / Mejora), estilos con tokens del design system y scroll horizontal en móvil.
