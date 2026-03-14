@@ -50,6 +50,23 @@ const metaDescription = buildMetaDescription(
     </div>
   </section>
 
+  <section class="section section--home-audit">
+    <div class="wrap">
+      <div class="home-audit-banner">
+        <div class="stack" style="--stack-gap: 8px;">
+          <p class="home-audit-banner__label">Diagnóstico gratuito · 48–72h</p>
+          <p class="home-audit-banner__text">
+            ¿Tu web pierde posiciones o tarda demasiado en cargar? Consigue un informe de
+            rendimiento, SEO y accesibilidad sin compromiso.
+          </p>
+        </div>
+        <a href="/auditoria-web" class="home-audit-banner__cta">
+          Ver qué incluye la auditoría gratuita →
+        </a>
+      </div>
+    </div>
+  </section>
+
   <section class="section section--alt section--home-latest">
     <div class="wrap">
       <h2 class="h2 section__title">Últimos artículos</h2>
@@ -59,3 +76,51 @@ const metaDescription = buildMetaDescription(
     </div>
   </section>
 </BaseLayout>
+
+<style>
+  .section--home-audit {
+    padding-block: clamp(32px, 5vw, 56px);
+    background: transparent;
+  }
+
+  .home-audit-banner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    border: 1px solid var(--color-accent);
+    border-radius: 8px;
+    padding: clamp(20px, 4vw, 36px);
+  }
+
+  .home-audit-banner__label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--color-accent);
+    margin: 0;
+  }
+
+  .home-audit-banner__text {
+    color: var(--color-text-muted);
+    margin: 0;
+    max-width: 60ch;
+    font-size: 1rem;
+  }
+
+  .home-audit-banner__cta {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-accent);
+    text-decoration: none;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: opacity 0.15s ease;
+  }
+
+  .home-audit-banner__cta:hover {
+    opacity: 0.8;
+  }
+</style>

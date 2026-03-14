@@ -130,6 +130,14 @@ Regla: todas las versiones MINOR se registran; PATCH solo cuando aporte.
 - Cambio mínimo de 1 carácter ("mi") que refuerza la voz personal de marca en el primer impacto visual del Home.
 - Refs: #582 / https://github.com/AdriMariscal/Portfolio/issues/582
 
+## v4.20.0 — 2026-03-14
+- T-013 [SEO]: nueva landing page dedicada `/auditoria-web` con anatomía de conversión SEO-first.
+- Estructura H1→H2→CTA alineada a featured snippets; schema.org FAQPage con 5 preguntas + WebPage + Service + BreadcrumbList.
+- Meta title (≤60ch): "Auditoría Web Gratuita: rendimiento y SEO · Adrián Mariscal". Página indexable con canonical correcto.
+- Banner de enlace interno añadido en Home (`/`) y enlace de texto en `/services` para cumplir criterio de mínimo 1 link interno.
+- Constante `AUDITORIA_META_TITLE` añadida a `src/lib/seo.ts` siguiendo el patrón existente.
+- Refs: #589 / https://github.com/AdriMariscal/Portfolio/issues/589
+
 ## v4.16.0 — 2026-03-14
 - T-028 [DX]: variables de entorno `CMS_SITE_URL` y `CMS_DISPLAY_URL` actualizadas en Netlify para contexto `production` → valor `https://adrianmariscal.es`.
 - Valores de `branch-deploy` (staging) confirmados intactos: `https://staging.adrianmariscal.es`.
