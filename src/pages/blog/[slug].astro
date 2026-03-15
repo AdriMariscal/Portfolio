@@ -52,12 +52,6 @@ const title = post.data.title ?? SITE.title;
 const description = post.data.description ?? SITE.description;
 const canonical = Astro.url?.href ?? new URL(`/blog/${post.slug}/`, SITE.url).href;
 
-// Ruta relativa de la OG image — BaseLayout la resuelve con deployBase
-// (Astro.site), garantizando que apunte al entorno real donde se sirve la build.
-// Para JSON-LD se usa la URL canónica de producción.
-const ogImageRel = `/og/blog/${post.slug}.png`;
-const ogImageCanonical = new URL(ogImageRel, SITE.url).href;
-
 // Hero dentro del artículo: solo si el frontmatter define `image`
 const heroImage =
   typeof (post.data as any).image === "string" &&
@@ -77,6 +71,13 @@ const heroCaption =
   (post.data as any).imageCaption.trim().length > 0
     ? (post.data as any).imageCaption.trim()
     : "";
+
+// OG image: si el post tiene hero image, se usa directamente (más específica y relevante).
+// Si no, se usa la imagen satori generada en build time (branded fallback 1200×630).
+// BaseLayout resuelve la ruta relativa con deployBase (Astro.site).
+// Para JSON-LD siempre se usa la URL canónica de producción.
+const ogImageRel = heroImage ?? `/og/blog/${post.slug}.png`;
+const ogImageCanonical = new URL(ogImageRel, SITE.url).href;
 
 // Fechas del frontmatter (acepta Date o string)
 const toISO = (d: unknown) => {
