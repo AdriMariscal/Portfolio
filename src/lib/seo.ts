@@ -18,6 +18,7 @@ export const HOME_META_TITLE = "Diseñador Web Performance y SEO Técnico · Adr
 export const ABOUT_META_TITLE = "Adrián Mariscal: diseñador web, rendimiento y SEO técnico";
 export const SERVICES_META_TITLE = "Auditoría web y packs de mejora SEO · Adrián Mariscal";
 export const PROJECTS_META_TITLE = "Proyectos web: rendimiento y SEO técnico · Adrián Mariscal";
+export const BLOG_META_TITLE = "Blog de rendimiento web y SEO técnico · Adrián Mariscal";
 export const AUDITORIA_META_TITLE = "Auditoría Web Gratuita: rendimiento y SEO · Adrián Mariscal";
 
 /** Meta title para fichas de proyecto: "{título} · rendimiento web y SEO · Adrián Mariscal" (50-60 chars) */

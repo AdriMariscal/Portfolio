@@ -245,6 +245,13 @@ export const getStaticPaths: GetStaticPaths = async () => {
       type: 'Proyectos',
       cta: 'Explora los casos',
     },
+    {
+      slug: 'blog',
+      title: 'Blog de rendimiento web y SEO técnico · Adrián Mariscal',
+      description: 'Artículos sobre rendimiento web, Astro, SEO técnico, Node y estrategia digital aplicada.',
+      type: 'Blog',
+      cta: 'Explora los artículos',
+    },
   ];
 
   return [
