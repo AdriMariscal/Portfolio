@@ -26,7 +26,6 @@ module.exports = {
         // Exige al menos 90/100 en accesibilidad y SEO
         'categories:accessibility': ['error', { minScore: 0.9 }],
         'categories:seo': ['error', { minScore: 0.9 }],
-        'categories:pwa': ['warn', { minScore: 0.85 }],
         // Presupuestos de métricas clave
         'cumulative-layout-shift': ['error', { maxNumericValue: 0.1 }],
         'total-blocking-time': ['error', { maxNumericValue: 200 }],
