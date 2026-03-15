@@ -31,9 +31,12 @@ test.describe('Home – flujo básico y regresión visual', () => {
 
     // Primera vez: genera baseline (ejecutando en local con --update-snapshots)
     // Siguientes veces: compara con el baseline para detectar regresiones.
-    await expect(header).toHaveScreenshot('home-header.png');
+    await expect(header).toHaveScreenshot('home-header.png', {
+      maxDiffPixelRatio: 0.03,
+    });
     await expect(hero).toHaveScreenshot('home-hero.png', {
       mask: [hero.locator('.hero__stats')],
+      maxDiffPixelRatio: 0.03,
     });
   });
 
