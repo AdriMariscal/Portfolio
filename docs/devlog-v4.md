@@ -188,6 +188,7 @@ Regla: todas las versiones MINOR se registran; PATCH solo cuando aporte.
 - El CI ahora **falla** si el score PWA cae por debajo de 85, actuando como regress guard tras la implementación de la PWA en T-019.
 - Umbrales del resto de categorías (performance 0.9, accessibility 0.9, SEO 0.9) sin cambios.
 - Refs: #599
+  - Patch v4.27.1 — Eliminada aserción `categories:pwa` de `lighthouserc.cjs`: Lighthouse 12.x (LHCI 0.15.x) eliminó la categoría PWA del scoring; la aserción provocaba fallo `auditRan` en CI. El regress guard de PWA se mantiene vía el plugin Lighthouse de Netlify.
 
 ## v4.16.0 — 2026-03-14
 - T-028 [DX]: variables de entorno `CMS_SITE_URL` y `CMS_DISPLAY_URL` actualizadas en Netlify para contexto `production` → valor `https://adrianmariscal.es`.
