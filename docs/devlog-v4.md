@@ -183,6 +183,12 @@ Regla: todas las versiones MINOR se registran; PATCH solo cuando aporte.
 - Microcopy alineado con la guía de marca §6: CTA "Suscribirme a novedades", confirmación "Listo. Te avisaré cuando publique algo relevante."
 - Refs: #597
 
+## v4.27.0 — 2026-03-15
+- T-023 [PERF]: umbral Lighthouse CI para PWA elevado de `warn` a `error` con `minScore: 0.85`.
+- El CI ahora **falla** si el score PWA cae por debajo de 85, actuando como regress guard tras la implementación de la PWA en T-019.
+- Umbrales del resto de categorías (performance 0.9, accessibility 0.9, SEO 0.9) sin cambios.
+- Refs: #599
+
 ## v4.16.0 — 2026-03-14
 - T-028 [DX]: variables de entorno `CMS_SITE_URL` y `CMS_DISPLAY_URL` actualizadas en Netlify para contexto `production` → valor `https://adrianmariscal.es`.
 - Valores de `branch-deploy` (staging) confirmados intactos: `https://staging.adrianmariscal.es`.
