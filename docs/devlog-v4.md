@@ -3,6 +3,13 @@
 Notas rápidas de cambios durante el desarrollo de la línea major v4.
 Regla: todas las versiones MINOR se registran; PATCH solo cuando aporte.
 
+## v4.22.0 — 2026-03-15
+- T-018 [FEAT]: sección de prueba social / testimonios en Home y /services (guía §14 Q5).
+- Componente `Testimonial.astro` con datos tipados: nombre/iniciales (anonimizable), empresa/sector, texto, resultado cuantificado opcional; flag `draft` para no publicar hasta tener consentimiento.
+- En producción la sección solo se muestra si hay al menos un testimonio no draft; placeholder con `draft: true` incluido para desarrollo.
+- Plantilla `docs/plantilla-testimonio.md` con proceso de obtención de consentimiento y anonimización.
+- Refs: #594
+
 ## v4.19.0 — 2026-03-14
 - T-009 [BRAND]: logo del navbar reemplazado de PNG a SVG (`logo_cuadrado_transparente.svg`).
 - Añadido logo SVG al footer (no existía previamente) con `loading="lazy"` y clase `footer__logo` a 60px de alto.

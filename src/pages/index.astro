@@ -4,7 +4,9 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import Hero from "../components/Hero.astro";
 import ProjectCard from "../components/ProjectCard.astro";
 import PostCard from "../components/PostCard.astro";
+import Testimonial from "../components/Testimonial.astro";
 import { buildMetaDescription, HOME_META_TITLE } from "../lib/seo";
+import { testimonials } from "../lib/testimonials";
 
 // contenido
 import { getCollection } from "astro:content";
@@ -36,6 +38,11 @@ const metaDescription = buildMetaDescription(
   "Portfolio de Adrián Mariscal especializado en rendimiento web, SEO técnico y UX con Astro y Node.",
   "Solicita una auditoría gratuita hoy."
 );
+
+// Testimonios: en producción solo mostramos la sección si hay al menos uno no draft
+const isProd = import.meta.env.PROD;
+const publishedTestimonials = testimonials.filter((t) => !t.draft);
+const showTestimonialsSection = !isProd || publishedTestimonials.length > 0;
 ---
 
 <BaseLayout title="Inicio" metaTitle={metaTitle} description={metaDescription} ogImage="/og/home.png">
@@ -49,6 +56,19 @@ const metaDescription = buildMetaDescription(
       </div>
     </div>
   </section>
+
+  {showTestimonialsSection && (
+    <section class="section section--alt section--home-testimonials" aria-labelledby="testimonials-heading">
+      <div class="wrap">
+        <h2 id="testimonials-heading" class="h2 section__title">Lo que dicen sobre la auditoría</h2>
+        <div class="grid grid--3" style="--stack-gap:16px">
+          {(isProd ? publishedTestimonials : testimonials).map((t) => (
+            <Testimonial testimonial={t} />
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
 
   <section class="section section--home-audit">
     <div class="wrap">

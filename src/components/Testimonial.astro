@@ -1,0 +1,82 @@
+---
+import type { TestimonialData } from "../lib/testimonials";
+import Card from "./ui/Card.astro";
+
+interface Props {
+  testimonial: TestimonialData;
+}
+
+const { testimonial } = Astro.props;
+const { nameOrInitials, companyOrSector, text, result } = testimonial;
+---
+
+<Card class="testimonial-card">
+  <div class="card__body">
+    <blockquote class="testimonial__quote">
+      <p class="testimonial__text">{text}</p>
+      {result && (
+        <p class="testimonial__result" aria-label="Resultado cuantificado">
+          {result}
+        </p>
+      )}
+    </blockquote>
+    <footer class="testimonial__footer">
+      <cite class="testimonial__cite">
+        <span class="testimonial__author">{nameOrInitials}</span>
+        <span class="testimonial__meta"> · {companyOrSector}</span>
+      </cite>
+    </footer>
+  </div>
+</Card>
+
+<style>
+  .testimonial-card {
+    height: 100%;
+  }
+
+  .testimonial-card :global(.card__body) {
+    padding: clamp(20px, 3vw, 28px);
+  }
+
+  .testimonial__quote {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .testimonial__text {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.55;
+    color: var(--color-text);
+  }
+
+  .testimonial__result {
+    margin: 0;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--color-accent);
+  }
+
+  .testimonial__footer {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid var(--color-border, rgba(0, 0, 0, 0.08));
+  }
+
+  .testimonial__cite {
+    font-style: normal;
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+  }
+
+  .testimonial__author {
+    font-weight: 600;
+    color: var(--color-heading);
+  }
+
+  .testimonial__meta {
+    font-weight: 400;
+  }
+</style>
