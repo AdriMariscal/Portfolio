@@ -1,0 +1,188 @@
+---
+export interface Metric {
+  metric: string;
+  before: string;
+  after: string;
+  improvement?: string;
+  description?: string;
+  source?: string;
+}
+
+interface Props {
+  metrics: Metric[];
+  title?: string;
+}
+
+const { metrics, title = "Antes / Después" } = Astro.props;
+
+const sources = [...new Set(metrics.filter((m) => m.source).map((m) => m.source))];
+---
+
+<section class="before-after" aria-labelledby="before-after-title">
+  <h2 id="before-after-title" class="h3 before-after__heading">{title}</h2>
+
+  <div class="before-after__scroll">
+    <table class="before-after__table" role="table">
+      <thead>
+        <tr>
+          <th scope="col" class="before-after__th before-after__th--metric">Métrica</th>
+          <th scope="col" class="before-after__th before-after__th--before">Antes</th>
+          <th scope="col" class="before-after__th before-after__th--after">Después</th>
+          <th scope="col" class="before-after__th before-after__th--improvement">Mejora</th>
+        </tr>
+      </thead>
+      <tbody>
+        {metrics.map((m) => (
+          <tr class="before-after__row">
+            <td class="before-after__td before-after__td--metric">
+              <span class="before-after__metric-name">{m.metric}</span>
+              {m.description && (
+                <span class="before-after__metric-desc">{m.description}</span>
+              )}
+            </td>
+            <td class="before-after__td before-after__td--before">
+              <span class="before-after__val before-after__val--before">{m.before}</span>
+            </td>
+            <td class="before-after__td before-after__td--after">
+              <span class="before-after__val before-after__val--after">{m.after}</span>
+            </td>
+            <td class="before-after__td before-after__td--improvement">
+              {m.improvement ? (
+                <span class="before-after__badge">{m.improvement}</span>
+              ) : (
+                <span class="before-after__badge before-after__badge--neutral">—</span>
+              )}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  {sources.length > 0 && (
+    <p class="before-after__source">
+      Fuente: {sources.join(" · ")}
+    </p>
+  )}
+</section>
+
+<style>
+  .before-after {
+    margin: 0;
+  }
+
+  .before-after__heading {
+    margin: 0 0 1rem;
+    color: var(--color-heading);
+  }
+
+  .before-after__scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+  }
+
+  .before-after__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .before-after__th {
+    padding: 0.625rem 1rem;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    background: var(--color-surface-alt);
+    border-bottom: 1px solid var(--color-border);
+    white-space: nowrap;
+  }
+
+  .before-after__th--before,
+  .before-after__th--after,
+  .before-after__th--improvement {
+    text-align: center;
+  }
+
+  .before-after__row {
+    border-bottom: 1px solid var(--color-border);
+    transition: background 0.15s ease;
+  }
+
+  .before-after__row:last-child {
+    border-bottom: none;
+  }
+
+  .before-after__row:hover {
+    background: var(--color-surface-alt);
+  }
+
+  .before-after__td {
+    padding: 0.75rem 1rem;
+    vertical-align: middle;
+  }
+
+  .before-after__td--before,
+  .before-after__td--after,
+  .before-after__td--improvement {
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .before-after__metric-name {
+    display: block;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .before-after__metric-desc {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    margin-top: 0.125rem;
+  }
+
+  .before-after__val {
+    font-variant-numeric: tabular-nums;
+    font-weight: 500;
+  }
+
+  .before-after__val--before {
+    color: var(--color-text-muted);
+  }
+
+  .before-after__val--after {
+    color: var(--color-accent);
+    font-weight: 600;
+  }
+
+  .before-after__badge {
+    display: inline-block;
+    padding: 0.2em 0.6em;
+    border-radius: var(--radius-pill);
+    font-size: 0.78rem;
+    font-weight: 600;
+    background: var(--color-accent-soft);
+    color: var(--color-accent);
+    border: 1px solid var(--color-accent-border);
+    white-space: nowrap;
+  }
+
+  .before-after__badge--neutral {
+    background: transparent;
+    color: var(--color-text-muted);
+    border-color: var(--color-border);
+    font-weight: 400;
+  }
+
+  .before-after__source {
+    margin-top: 0.625rem;
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+  }
+</style>

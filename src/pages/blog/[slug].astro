@@ -2,6 +2,8 @@
 // src/pages/blog/[slug].astro
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Button from '@/components/ui/Button.astro';
+import TableOfContents from '@/components/TableOfContents.astro';
+import NewsletterForm from '@/components/NewsletterForm.astro';
 import type { CollectionEntry } from 'astro:content';
 import { getCollection } from 'astro:content';
 import { toSlug } from '@/lib/content';
@@ -52,12 +54,6 @@ const title = post.data.title ?? SITE.title;
 const description = post.data.description ?? SITE.description;
 const canonical = Astro.url?.href ?? new URL(`/blog/${post.slug}/`, SITE.url).href;
 
-// Imagen principal (absoluta): prioriza la del post si existe
-const rawImage = (post.data.image ?? post.data.heroImage ?? SITE.ogImage ?? '/og-default.png') as string;
-const imageAbs = rawImage?.startsWith('http')
-  ? rawImage
-  : new URL(rawImage, SITE.url).href;
-
 // Hero dentro del artículo: solo si el frontmatter define `image`
 const heroImage =
   typeof (post.data as any).image === "string" &&
@@ -77,6 +73,14 @@ const heroCaption =
   (post.data as any).imageCaption.trim().length > 0
     ? (post.data as any).imageCaption.trim()
     : "";
+
+// OG image: el endpoint /og/blog/[slug].png decide en build time:
+//   · Si el post tiene hero image → sharp la procesa a 1200×630 JPEG ≤600KB
+//   · Si no tiene → satori genera la imagen branded
+// BaseLayout resuelve la ruta con deployBase (Astro.site).
+// Para JSON-LD se usa siempre la URL canónica de producción.
+const ogImageRel = `/og/blog/${post.slug}.png`;
+const ogImageCanonical = new URL(ogImageRel, SITE.url).href;
 
 // Fechas del frontmatter (acepta Date o string)
 const toISO = (d: unknown) => {
@@ -109,7 +113,7 @@ const jsonLd = {
       "@id": canonical,
       "headline": title,
       "description": description,
-      "image": imageAbs,
+      "image": ogImageCanonical,
       "url": canonical,
       "mainEntityOfPage": { "@type": "WebPage", "@id": canonical },
       "inLanguage": SITE.lang ?? "es",
@@ -151,8 +155,10 @@ const jsonLd = {
   title={title}
   metaTitle={metaTitle}
   description={metaDescription}
-  ogImage={imageAbs}
+  ogImage={ogImageRel}
   ogImageAlt={heroAlt}
+  twitterImage={ogImageRel}
+  twitterImageAlt={heroAlt}
   ogType="article"
   articleAuthor={SITE.author}
   articleTags={tags}
@@ -163,6 +169,15 @@ const jsonLd = {
   <article class="section post">
     <div class="wrap post__card card card--soft">
       <div class="post__body">
+      <nav class="breadcrumb" aria-label="Ruta de navegación">
+        <ol class="breadcrumb__list">
+          <li class="breadcrumb__item"><a href="/">Inicio</a></li>
+          <li class="breadcrumb__sep" aria-hidden="true">›</li>
+          <li class="breadcrumb__item"><a href="/blog/">Blog</a></li>
+          <li class="breadcrumb__sep" aria-hidden="true">›</li>
+          <li class="breadcrumb__item breadcrumb__item--current" aria-current="page">{title}</li>
+        </ol>
+      </nav>
       <h1 class="post__title">{headingTitle}</h1>
 
       {datePublishedISO ? (
@@ -199,36 +214,32 @@ const jsonLd = {
         </figure>
       )}        
 
-        {showToc && (
-          <nav class="post__toc" aria-label="Índice de contenidos">
-            <p class="post__toc-title">En este artículo:</p>
-            <ol class="post__toc-list">
-              {tocHeadings.map((h) => (
-                <li class={`post__toc-item post__toc-item--level-${h.depth}`}>
-                  <a href={`#${h.slug}`}>
-                    {h.text}
-                  </a>
-                </li>
-              ))}
-            </ol>
-          </nav>
-        )}
-        <div class="post__prose prose">
-      <Content />
-        </div>
+        <div class:list={['post__content-wrapper', { 'post__content-wrapper--has-toc': showToc }]}>
+          {showToc && (
+            <aside class="post__toc-aside">
+              <TableOfContents headings={tocHeadings} />
+            </aside>
+          )}
+          <div class="post__main">
+            <div class="post__prose prose">
+              <Content />
+            </div>
 
-        {/* Etiquetas SOLO al final, como en projects/[slug].astro */}
-        {tags?.length ? (
-          <footer class="post__meta">
-            <ul class="tags tags--sm tags--mt" aria-label="Etiquetas">
-              {tags.map((t) => (
-                <li>
-                  <a class="tag" href={`/blog/tags/${toSlug(t)}/`}>#{t}</a>
-                </li>
-              ))}
-            </ul>
-          </footer>
-        ) : null}
+            {tags?.length ? (
+              <footer class="post__meta">
+                <ul class="tags tags--sm tags--mt" aria-label="Etiquetas">
+                  {tags.map((t) => (
+                    <li>
+                      <a class="tag" href={`/blog/tags/${toSlug(t)}/`}>#{t}</a>
+                    </li>
+                  ))}
+                </ul>
+              </footer>
+            ) : null}
+
+            <NewsletterForm variant="inline" />
+          </div>
+        </div>
       </div>
     </div>
   </article>

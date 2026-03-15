@@ -3,11 +3,11 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Button from "../components/ui/Button.astro";
 import Card from "../components/ui/Card.astro";
-import { buildMetaDescription, buildMetaTitle, SEO_KEYWORD } from "../lib/seo";
+import { buildMetaDescription, ABOUT_META_TITLE } from "../lib/seo";
 import { SITE } from "../lib/config";
 
 const pageTitle = "About";
-const metaTitle = buildMetaTitle(SEO_KEYWORD, "About · Adrián Mariscal");
+const metaTitle = ABOUT_META_TITLE;
 const metaDescription = buildMetaDescription(
   "Historia, metodología y valores de Adrián Mariscal, consultor de rendimiento web, SEO técnico y UX.",
   "Solicita una auditoría y revisa los packs disponibles."
@@ -54,7 +54,7 @@ const aboutJsonLd = {
 };
 ---
 
-<BaseLayout title={pageTitle} metaTitle={metaTitle} description={metaDescription}>
+<BaseLayout title={pageTitle} metaTitle={metaTitle} description={metaDescription} ogImage="/og/about.png">
   <section class="section hero section--about-hero">
     <div class="wrap about-hero">
       <div class="about-hero__content stack" style="--stack-gap: 18px;">
@@ -102,6 +102,11 @@ const aboutJsonLd = {
           Desde la auditoría inicial hasta la entrega final, mantengo un enfoque editorial: menos
           ruido visual, más espacio para la lectura y una narrativa clara que explique cada decisión.
         </p>
+        <p class="about-text about-text--highlight">
+          Además de rendimiento web, tengo experiencia en Salesforce para equipos que buscan ordenar
+          ventas, CRM y automatización. Puedes consultar
+          <a class="about__link" href="/blog/tags/salesforce/">artículos sobre Salesforce en el blog</a>.
+        </p>
       </div>
       <figure class="about-photo about-photo--wide">
         <img
@@ -115,7 +120,7 @@ const aboutJsonLd = {
     </div>
   </section>
 
-  <section class="section section--alt section--about-method">
+  <section id="metodologia" class="section section--alt section--about-method">
     <div class="wrap">
       <div class="stack" style="--stack-gap: 28px;">
         <header class="section__header stack" style="--stack-gap: 10px;">
@@ -266,7 +271,7 @@ const aboutJsonLd = {
     height: 6px;
     margin-top: 0.65rem;
     border-radius: 999px;
-    background: linear-gradient(180deg, var(--color-accent), var(--color-accent-warm));
+    background: linear-gradient(180deg, var(--palette-sand-500), var(--palette-sand-200));
     box-shadow: 0 8px 18px var(--shadow-color-soft);
     flex-shrink: 0;
   }
@@ -310,6 +315,22 @@ const aboutJsonLd = {
     max-width: 64ch;
   }
 
+  .about__link {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    font-weight: 500;
+  }
+
+  .about__link:hover {
+    text-decoration-color: var(--color-accent-strong);
+  }
+
+  .about-text--highlight {
+    padding-left: 1rem;
+    border-left: 3px solid var(--color-accent-border);
+  }
+
   .about-photo--wide img {
     aspect-ratio: 4 / 3;
     object-fit: cover;
@@ -327,6 +348,10 @@ const aboutJsonLd = {
 
   .about-card {
     height: 100%;
+  }
+
+  .about-card .card__body {
+    padding: 28px;
   }
 
   .section--about-values {

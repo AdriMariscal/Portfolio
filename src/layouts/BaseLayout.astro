@@ -1,12 +1,21 @@
 ---
 // src/layouts/BaseLayout.astro
+
+// Self-hosted fonts via Fontsource (all subsets, browser picks via unicode-range)
+import "@fontsource/inter/400.css";
+import "@fontsource/inter/500.css";
+import "@fontsource/inter/600.css";
+import "@fontsource/sora/600.css";
+import "@fontsource/sora/700.css";
+import "@fontsource/sora/800.css";
+
 import "../styles/global.css";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import CookieConsent from "../components/CookieConsent.astro";
 import { SITE, THEME } from "../lib/config";
 import "../scripts/rum-core-web-vitals.ts";
-
+import { pwaInfo } from "virtual:pwa-info";
 
 type Props = {
   title?: string;
@@ -48,25 +57,30 @@ const {
 const resolvedTitle = metaTitle ?? title;
 const resolvedDescription = ogDescription ?? description;
 
-// Canonical absoluto usando siempre el dominio canónico del config de Astro
-// (Astro.site se construye a partir de la opción `site` de astro.config.mjs)
-const canonical = new URL(Astro.url?.pathname ?? "/", Astro.site).href;
+// Canonical siempre apunta al dominio de producción (SITE.url),
+// independientemente del entorno de deploy (dev, staging, preview).
+const canonical = new URL(Astro.url?.pathname ?? "/", SITE.url).href;
 
 // Detecta tipo automáticamente: 'article' en /blog/*, 'website' en el resto
 const autoType = Astro.url?.pathname?.startsWith("/blog/") ? "article" : "website";
 const type = ogType ?? autoType;
 
+// Base para recursos estáticos: usa Astro.site (que en Netlify refleja el deploy
+// actual: dev.adrianmariscal.es, preview-*.netlify.app, etc.) para que og:image
+// y twitterImage sean fetcheables desde el entorno donde se desplegó la build.
+const deployBase = Astro.site ?? SITE.url;
+
 // Imagen OG (absoluta): prioriza prop > config por defecto
 const rawImage = ogImage ?? SITE.ogImage ?? "/og-default.png";
 const ogImageAbs = rawImage.startsWith("http")
   ? rawImage
-  : new URL(rawImage, SITE.url).href;
+  : new URL(rawImage, deployBase).href;
 const resolvedOgAlt =
   ogImageAlt ?? SITE.ogImageAlt ?? `${SITE.title} · ${SITE.description}`;
 const twitterRawImage = twitterImage ?? SITE.twitterImage ?? rawImage;
 const twitterImageAbs = twitterRawImage.startsWith("http")
   ? twitterRawImage
-  : new URL(twitterRawImage, SITE.url).href;
+  : new URL(twitterRawImage, deployBase).href;
 const resolvedTwitterAlt =
   twitterImageAlt ?? SITE.twitterImageAlt ?? resolvedOgAlt;
 const resolvedTwitterCard =
@@ -79,8 +93,6 @@ const locale = "es_ES";
 const siteName = SITE.siteName ?? "Portfolio - Adrián Mariscal";
 const organizationId = `${SITE.url}#organization`;
 const personId = `${SITE.url}#persona`;
-const fontStylesheet =
-  "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap";
 const organizationImage = SITE.ogImage ?? "/logos/logo_fondo_Charcoal950.png";
 const organizationImageAbs = organizationImage.startsWith("http")
   ? organizationImage
@@ -98,7 +110,7 @@ const schemaOrg = {
       "publisher": { "@id": organizationId },
     },
     {
-      "@type": "Organization",
+      "@type": ["ProfessionalService", "LocalBusiness"],
       "@id": organizationId,
       "name": SITE.title,
       "url": SITE.url,
@@ -109,13 +121,16 @@ const schemaOrg = {
         "url": organizationImageAbs,
       },
       "founder": { "@id": personId },
+      "areaServed": "España",
+      "priceRange": "€€",
     },
     {
       "@type": "Person",
       "@id": personId,
       "name": SITE.author,
       "url": SITE.url,
-      "jobTitle": "Consultor de rendimiento web",
+      "jobTitle": "Diseñador Web",
+      "sameAs": [SITE.linkedin, SITE.github],
       "knowsAbout": [
         "Rendimiento web",
         "SEO técnico",
@@ -134,54 +149,18 @@ const schemaOrg = {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <script>
-      // Tema inicial: respeta localStorage y luego prefers-color-scheme
-      (function () {
-        const storageKey = 'am-theme';
-        const root = document.documentElement;
-
-        try {
-          const stored = window.localStorage.getItem(storageKey);
-          if (stored === 'light' || stored === 'dark') {
-            root.dataset.theme = stored;
-            return;
-          }
-        } catch (e) {
-          /* si localStorage falla, seguimos con el modo por defecto */
-        }
-
-        // Modo oscuro por defecto; el claro queda como alternativa del toggle
-        root.dataset.theme = 'dark';
-      })();
-    </script>
+        <script is:inline type="module" src="/scripts/theme-init.js"></script>
 
     <title>{resolvedTitle}</title>
     <meta name="description" content={resolvedDescription} />
     <meta name="theme-color" content={THEME.color} />
     <link rel="icon" type="image/svg+xml" href="/logos/favicon.svg" />
     <link rel="icon" type="image/png" sizes="500x500" href="/logos/favicon.png" />
-    <link
-      rel="apple-touch-icon"
-      sizes="800x800"
-      href="/logos/logo_cuadrado_fondo_Charcoal950.png"
-    />
-    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="apple-touch-icon" sizes="192x192" href="/pwa-192x192.png" />
+    {pwaInfo && <Fragment set:html={pwaInfo.webManifest.linkTag} />}
     <link rel="canonical" href={canonical} />
     {robots && <meta name="robots" content={robots} />}    
 
-    <!-- Fuentes: preload del CSS crítico + swap -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preload" as="style" href={fontStylesheet} />
-    <link
-      rel="stylesheet"
-      href={fontStylesheet}
-      media="print"
-      onload="this.media='all'"
-    />
-    <noscript>
-      <link rel="stylesheet" href={fontStylesheet} />
-    </noscript>
 
     <!-- Open Graph -->
     <meta property="og:locale" content={locale} />
@@ -245,5 +224,6 @@ const schemaOrg = {
     <script>
       import "../scripts/rum-core-web-vitals.ts";
     </script>
+    <script src="/src/pwa.ts"></script>
   </body>
 </html>

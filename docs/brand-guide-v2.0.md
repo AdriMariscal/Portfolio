@@ -355,21 +355,21 @@ El texto normal va en blanco (`#F9FAFB`) en dark mode. **Reservar Sand únicamen
 
 ---
 
-## §10.1 — Accesibilidad (contraste) *(Actualizado en v2.0)*
+## §10.1 — Accesibilidad (contraste) *(Verificado en v2.0 — T-002)*
 
-> Los ratios con Sand han sido recalculados para los nuevos valores. Los valores marcados con `~` son aproximados; verificar con herramienta de contraste (ej. Colour Contrast Analyser o WebAIM) al implementar.
+> Ratios verificados con la fórmula WCAG 2.1 de luminancia relativa (issue #578). Ver `docs/contraste-v2.md` para el informe completo.
 
 | Combinación | Texto | Fondo | Ratio | WCAG |
 |-------------|-------|-------|-------|------|
-| Sand 500 / Charcoal 900 | `#E2CC96` | `#2F3437` | ~8.5:1 | **AAA** |
-| Blanco / Charcoal 900 | `#F9FAFB` | `#2F3437` | 12.60:1 | **AAA** |
-| Teal 500 / Charcoal 900 | `#2DD4BF` | `#2F3437` | 7.30:1 | **AAA** |
-| Teal 700 / Sand 100 | `#0F766E` | `#F0ECE4` | ~6.8:1 | **AA** |
-| Charcoal 900 / Sand 100 | `#2F3437` | `#F0ECE4` | ~11.2:1 | **AAA** |
-| Charcoal 950 / Sand 500 | `#1F2426` | `#E2CC96` | ~9.5:1 | **AAA** |
+| Sand 500 / Charcoal 900 | `#E2CC96` | `#2F3437` | 7.98:1 | **AAA** |
+| Blanco / Charcoal 900 | `#F9FAFB` | `#2F3437` | 12.05:1 | **AAA** |
+| Teal 500 / Charcoal 900 | `#2DD4BF` | `#2F3437` | 6.77:1 | **AA** |
+| Teal 700 / Sand 100 | `#0F766E` | `#F0ECE4` | 4.65:1 | **AA** |
+| Charcoal 900 / Sand 100 | `#2F3437` | `#F0ECE4` | 10.69:1 | **AAA** |
+| Charcoal 950 / Sand 500 | `#1F2426` | `#E2CC96` | 9.94:1 | **AAA** |
 | Charcoal 700 / Charcoal 900 | `#4B555B` | `#2F3437` | 1.65:1 | ❌ No texto |
 
-**Nota:** Charcoal 700 y Sand 700 se usan para bordes/hover; no son aptos como texto.
+**Nota:** Charcoal 700 y Sand 700 se usan para bordes/hover; no son aptos como texto. Teal 500 alcanza AA (no AAA): su uso es interactivo (hover, focus, link), no texto primario.
 
 ---
 

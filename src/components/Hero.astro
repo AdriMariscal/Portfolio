@@ -6,8 +6,6 @@ import Card from "./ui/Card.astro";
 
 const projects = await getCollection("projects");
 const projectsCount = projects.length;
-
-const SALESFORCE_TAG_PATH = "/blog/tags/salesforce";
 ---
 
 <section
@@ -25,15 +23,15 @@ const SALESFORCE_TAG_PATH = "/blog/tags/salesforce";
 
     <div class="grid" style="grid-auto-flow: column; gap: 12px; width: max-content; margin-top: 16px">
       <Button href="/contact" variant="primary">Cuéntame tu proyecto</Button>
-      <Button href="/blog" variant="secondary">Ver metodología de performance</Button>
+      <Button href="/about#metodologia" variant="secondary">Ver mi metodología de performance</Button>
     </div>
 
     <div class="grid grid--3 hero__stats" style="margin-top: 20px">
-      <Card as="a" variant="link" href={SALESFORCE_TAG_PATH} aria-label="Entradas del blog con etiqueta Salesforce">
+      <Card as="a" variant="link" href="/services" aria-label="Ver servicios y tiempos de entrega">
         <div class="card__body">
-          <h3 class="card__title">10+</h3>
+          <h3 class="card__title">48–72h</h3>
           <div class="hero__stat-label">
-            <span class="hero__stat-icon" role="img" aria-label="Experiencia técnica">
+            <span class="hero__stat-icon" role="img" aria-label="Tiempo de entrega">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -46,12 +44,11 @@ const SALESFORCE_TAG_PATH = "/blog/tags/salesforce";
                 stroke-linejoin="round"
                 focusable="false"
               >
-                <path d="m18 16 4-4-4-4" />
-                <path d="m6 8-4 4 4 4" />
-                <path d="m14.5 4-5 16" />
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 6v6l4 2" />
               </svg>
             </span>
-            <small>Años con Salesforce</small>
+            <small>Tiempo de entrega informe</small>
           </div>
         </div>
       </Card>

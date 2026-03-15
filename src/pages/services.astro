@@ -3,18 +3,26 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Button from "../components/ui/Button.astro";
 import Card from "../components/ui/Card.astro";
-import { buildMetaDescription, buildMetaTitle, SEO_KEYWORD } from "../lib/seo";
+import Testimonial from "../components/Testimonial.astro";
+import { buildMetaDescription, SERVICES_META_TITLE } from "../lib/seo";
 import { SITE } from "../lib/config";
+import { testimonials } from "../lib/testimonials";
 
 const pageTitle = "Servicios";
-const metaTitle = buildMetaTitle(SEO_KEYWORD, "Servicios · Auditoría y packs de mejora");
+const metaTitle = SERVICES_META_TITLE;
 const metaDescription = buildMetaDescription(
-  "Servicios de Adrián Mariscal: auditoría gratuita con informe base y opción de informe completo, además de packs de mejora enfocados en rendimiento web, SEO técnico y UX.",
-  "Solicita la auditoría gratuita y revisa los packs disponibles."
+  "Auditoría gratuita de rendimiento web con informe base en 48–72h y opción de informe completo. Tres packs cerrados: Corrección, Optimización y Excelencia.",
+  "Solicita la auditoría gratuita o pide presupuesto cerrado."
 );
 
 const canonical = new URL("/services/", SITE.url).href;
 const personId = `${SITE.url}#persona`;
+
+const siteEnv = import.meta.env.PUBLIC_SITE_ENV ?? "development";
+const isProductionSite = siteEnv === "production";
+const publishedTestimonials = testimonials.filter((t) => !t.draft);
+const showTestimonialsSection = !isProductionSite || publishedTestimonials.length > 0;
+const testimonialsToShow = isProductionSite ? publishedTestimonials : testimonials;
 const organizationId = `${SITE.url}#organization`;
 const servicesJsonLd = {
   "@context": "https://schema.org",
@@ -22,7 +30,7 @@ const servicesJsonLd = {
     {
       "@type": "CollectionPage",
       "@id": canonical,
-      "name": "Servicios",
+      "name": "Auditoría web y packs de mejora",
       "description": metaDescription,
       "url": canonical,
       "inLanguage": SITE.lang ?? "es",
@@ -33,10 +41,34 @@ const servicesJsonLd = {
       "@type": "Service",
       "name": "Auditoría de rendimiento web",
       "description":
-        "Auditoría gratuita con informe base y opción de informe completo para definir un plan priorizado P0/P1/P2.",
+        "Auditoría gratuita con informe base y opción de informe completo (149€) para definir un plan priorizado P0/P1/P2.",
       "provider": { "@id": personId },
       "areaServed": "ES",
       "serviceType": "Web Performance, SEO técnico y UX"
+    },
+    {
+      "@type": "Service",
+      "name": "Pack Corrección",
+      "description": "MVP técnico. Quick wins: imágenes críticas, scripts bloqueantes, CLS evidente, caché básica.",
+      "provider": { "@id": personId },
+      "areaServed": "ES",
+      "offers": { "@type": "Offer", "price": "490", "priceCurrency": "EUR" }
+    },
+    {
+      "@type": "Service",
+      "name": "Pack Optimización",
+      "description": "Lo necesario. Estrategia de carga, revisión INP, refactor secciones críticas y third-parties con criterio.",
+      "provider": { "@id": personId },
+      "areaServed": "ES",
+      "offers": { "@type": "Offer", "price": "990", "priceCurrency": "EUR" }
+    },
+    {
+      "@type": "Service",
+      "name": "Pack Excelencia",
+      "description": "Máximo nivel. Cambios profundos de arquitectura, design system completo, automatización y performance budget.",
+      "provider": { "@id": personId },
+      "areaServed": "ES",
+      "offers": { "@type": "Offer", "price": "2490", "priceCurrency": "EUR" }
     },
     {
       "@type": "BreadcrumbList",
@@ -59,7 +91,7 @@ const servicesJsonLd = {
 };
 ---
 
-<BaseLayout title={pageTitle} metaTitle={metaTitle} description={metaDescription}>
+<BaseLayout title={pageTitle} metaTitle={metaTitle} description={metaDescription} ogImage="/og/services.png">
   <section class="section hero section--services-hero">
     <div class="wrap services-hero">
       <div class="stack" style="--stack-gap: 16px;">
@@ -90,7 +122,7 @@ const servicesJsonLd = {
         <div class="services-grid">
           <Card class="services-card">
             <div class="card__body stack" style="--stack-gap: 10px;">
-              <h3 class="h3">Informe base (gratis)</h3>
+              <h3 class="h3">Informe base <span class="pack-price-inline">gratis</span></h3>
               <ul class="services-list">
                 <li>Resumen de métricas clave (LCP, INP, CLS).</li>
                 <li>Hallazgos críticos de SEO técnico.</li>
@@ -100,18 +132,22 @@ const servicesJsonLd = {
           </Card>
           <Card class="services-card">
             <div class="card__body stack" style="--stack-gap: 10px;">
-              <h3 class="h3">Informe completo (opcional)</h3>
+              <h3 class="h3">Informe completo <span class="pack-price-inline">149€</span></h3>
               <ul class="services-list">
                 <li>Plan P0/P1/P2 con esfuerzo y dependencias.</li>
                 <li>Recomendaciones de arquitectura y stack.</li>
                 <li>Sesión de 30 min para revisar el plan.</li>
               </ul>
+              <p class="services-note muted" style="margin: 0; font-size: 0.82rem;">
+                Descontable si se contrata un pack.
+              </p>
             </div>
           </Card>
         </div>
         <p class="services-note muted">
           Si encaja, la auditoría se convierte en el punto de partida para un pack de mejora con foco
           en rendimiento, SEO técnico y UX.
+          <a href="/auditoria-web" class="services-audit-link">Ver en detalle qué incluye la auditoría →</a>
         </p>
       </div>
     </div>
@@ -128,42 +164,95 @@ const servicesJsonLd = {
           </p>
         </header>
         <div class="services-packs">
-          <Card class="services-card">
-            <div class="card__body stack" style="--stack-gap: 10px;">
-              <h3 class="h3">Pack Base</h3>
-              <p class="muted">Correcciones críticas y quick wins para mejorar la experiencia.</p>
+
+          <Card class="services-card pack-card">
+            <div class="card__body stack" style="--stack-gap: 16px;">
+              <div class="pack-header">
+                <h3 class="h3 pack-name">Corrección</h3>
+                <p class="pack-price">desde 490€</p>
+              </div>
+              <p class="pack-goal">MVP técnico. Quitar lo doloroso.</p>
+              <div class="pack-section">
+                <p class="pack-label">Incluye</p>
+                <ul class="services-list">
+                  <li>Imágenes críticas optimizadas.</li>
+                  <li>Scripts bloqueantes eliminados.</li>
+                  <li>CLS evidente corregido.</li>
+                  <li>Caché básica configurada.</li>
+                </ul>
+              </div>
+              <div class="pack-section">
+                <p class="pack-label">Ideal para</p>
+                <p class="muted pack-ideal">Presupuesto ajustado. Necesidad inmediata.</p>
+              </div>
+              <Button href="/contact" variant="secondary" class="pack-cta">Pedir presupuesto cerrado</Button>
             </div>
           </Card>
-          <Card class="services-card">
-            <div class="card__body stack" style="--stack-gap: 10px;">
-              <h3 class="h3">Pack Growth</h3>
-              <p class="muted">Optimización avanzada para consolidar SEO y conversión.</p>
+
+          <Card class="services-card pack-card pack-card--popular">
+            <div class="pack-badge">Más popular</div>
+            <div class="card__body stack" style="--stack-gap: 16px;">
+              <div class="pack-header">
+                <h3 class="h3 pack-name">Optimización</h3>
+                <p class="pack-price">desde 990€</p>
+              </div>
+              <p class="pack-goal">Lo necesario. Equilibrio coste/beneficio.</p>
+              <div class="pack-section">
+                <p class="pack-label">Incluye</p>
+                <ul class="services-list">
+                  <li>Todo lo del pack Corrección.</li>
+                  <li>Estrategia de carga (fonts/critical CSS).</li>
+                  <li>Revisión INP y refactor secciones críticas.</li>
+                  <li>Third-parties gestionados con criterio.</li>
+                </ul>
+              </div>
+              <div class="pack-section">
+                <p class="pack-label">Ideal para</p>
+                <p class="muted pack-ideal">La mayoría de webs que quieren resultados sólidos.</p>
+              </div>
+              <Button href="/contact" variant="primary" class="pack-cta">Pedir presupuesto cerrado</Button>
             </div>
           </Card>
-          <Card class="services-card">
-            <div class="card__body stack" style="--stack-gap: 10px;">
-              <h3 class="h3">Pack End-to-End</h3>
-              <p class="muted">Revisión completa de diseño, frontend y stack cuando aporta.</p>
+
+          <Card class="services-card pack-card">
+            <div class="card__body stack" style="--stack-gap: 16px;">
+              <div class="pack-header">
+                <h3 class="h3 pack-name">Excelencia</h3>
+                <p class="pack-price">desde 2.490€</p>
+              </div>
+              <p class="pack-goal">Máximo nivel. Calidad por encima del ROI inmediato.</p>
+              <div class="pack-section">
+                <p class="pack-label">Incluye</p>
+                <ul class="services-list">
+                  <li>Todo lo del pack Optimización.</li>
+                  <li>Cambios profundos de arquitectura.</li>
+                  <li>Design system completo.</li>
+                  <li>Automatización, observabilidad y performance budget.</li>
+                </ul>
+              </div>
+              <div class="pack-section">
+                <p class="pack-label">Ideal para</p>
+                <p class="muted pack-ideal">Negocios que priorizan "lo mejor" y la escalabilidad.</p>
+              </div>
+              <Button href="/contact" variant="secondary" class="pack-cta">Pedir presupuesto cerrado</Button>
             </div>
           </Card>
+
         </div>
+        {showTestimonialsSection && (
+          <div class="stack" style="--stack-gap: 24px; margin-top: 32px;">
+            <h2 id="testimonials-heading" class="h2 section__title">Lo que dicen sobre la auditoría</h2>
+            <div class="grid grid--3" style="--stack-gap:16px">
+              {testimonialsToShow.map((t) => (
+                <Testimonial testimonial={t} />
+              ))}
+            </div>
+          </div>
+        )}
         <div class="services-cta">
           <Button href="/contact" variant="primary">Quiero mi auditoría gratuita</Button>
-          <Button href="/contact" variant="secondary">Consultar disponibilidad</Button>
+          <Button href="/contact" variant="secondary">Pedir presupuesto cerrado</Button>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section section--services-future">
-    <div class="wrap">
-      <div class="stack" style="--stack-gap: 16px;">
-        <h2 class="h2 section__title">Servicios futuros</h2>
-        <p class="services-text">
-          Esta página está preparada para ampliar la oferta: reconstrucciones performance-first,
-          consultoría continua o auditorías específicas. Cuando estén disponibles, aparecerán aquí con
-          el mismo nivel de detalle.
-        </p>
       </div>
     </div>
   </section>
@@ -224,6 +313,10 @@ const servicesJsonLd = {
     height: 100%;
   }
 
+  .services-grid .services-card .card__body {
+    padding: 22px;
+  }
+
   .services-list {
     margin: 0;
     padding-left: 1.1rem;
@@ -237,15 +330,125 @@ const servicesJsonLd = {
     max-width: 70ch;
   }
 
+  /* Pack price inline (for audit cards) */
+  .pack-price-inline {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-accent);
+    margin-left: 6px;
+    padding: 2px 8px;
+    border: 1px solid var(--color-accent);
+    border-radius: 4px;
+    vertical-align: middle;
+  }
+
+  /* Pack cards */
   .services-packs {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 18px;
+    align-items: start;
+  }
+
+  .pack-card {
+    position: relative;
+  }
+
+  .pack-card .card__body {
+    padding: 24px;
+  }
+
+  .pack-card--popular {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 1px var(--color-accent);
+  }
+
+  .pack-badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--color-accent);
+    color: var(--color-charcoal-950, #1f2426);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+    z-index: 1;
+  }
+
+  .pack-card--popular .card__body {
+    padding-top: 24px;
+  }
+
+  .pack-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+  }
+
+  .pack-name {
+    margin: 0;
+  }
+
+  .pack-price {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--color-accent);
+    white-space: nowrap;
+    margin: 0;
+  }
+
+  .pack-goal {
+    color: var(--color-text-muted);
+    font-size: 0.92rem;
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  .pack-section {
+    display: grid;
+    gap: 6px;
+  }
+
+  .pack-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+
+  .pack-ideal {
+    margin: 0;
+    font-size: 0.9rem;
+  }
+
+  .pack-cta {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+    margin-top: 4px;
   }
 
   .services-cta {
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
+  }
+
+  .services-audit-link {
+    display: inline-block;
+    margin-top: 8px;
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    font-size: 0.9rem;
+    font-weight: 500;
   }
 </style>

@@ -2,6 +2,7 @@
 // src/components/Footer.astro
 import pkg from '../../package.json' assert { type: 'json' };
 import Button from './ui/Button.astro';
+import NewsletterForm from './NewsletterForm.astro';
 
 const year = new Date().getFullYear();
 const version = pkg.version;
@@ -19,6 +20,20 @@ const legalLinks = [
   aria-label="Información del sitio"
 >
   <div class="wrap footer__inner">
+    <a class="footer__brand" href="/" aria-label="Adrián Mariscal — Inicio">
+      <img
+        class="footer__logo"
+        src="/logos/logo_cuadrado_transparente.svg"
+        width="800"
+        height="800"
+        alt="Logo de Adrián Mariscal"
+        decoding="async"
+        loading="lazy"
+      />
+    </a>
+
+    <NewsletterForm variant="compact" />
+
     <nav class="footer__nav" aria-label="Información legal">
       {legalLinks.map((l) => (
         <a class="footer__link" href={l.href}>{l.label}</a>
@@ -35,7 +50,6 @@ const legalLinks = [
     >
       Gestionar cookies
     </Button>
-
 
     <div class="footer__copy">
       © {year} Adrián Mariscal · v{version}

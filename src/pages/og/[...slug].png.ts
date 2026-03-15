@@ -1,0 +1,361 @@
+// src/pages/og/[...slug].png.ts
+import type { APIContext, GetStaticPaths } from 'astro';
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
+import satori from 'satori';
+import sharp from 'sharp';
+import { getCollection } from 'astro:content';
+import { SITE } from '@/lib/config';
+
+interface OGProps {
+  title: string;
+  description: string;
+  type: string;
+  cta: string;
+  /** Ruta raíz-relativa a la hero image (ej: /images/uploads/foto.jpg).
+   *  Cuando existe, sharp la procesa a 1200×630 JPEG ≤600KB en lugar de
+   *  generar la imagen satori. */
+  heroImagePath?: string | null;
+}
+
+// ---------------------------------------------------------------------------
+// Font loading — Promise-based cache so the font is fetched only once per build
+// ---------------------------------------------------------------------------
+let soraFontPromise: Promise<ArrayBuffer> | undefined;
+
+async function loadGoogleFont(family: string, weight: number): Promise<ArrayBuffer> {
+  // CSS API v1 always returns TTF format — required by satori (no woff2 support)
+  const cssUrl = `https://fonts.googleapis.com/css?family=${encodeURIComponent(family)}:${weight}`;
+  const css = await fetch(cssUrl).then((r) => r.text());
+
+  const matches = [...css.matchAll(/url\(([^)]+\.ttf)\)/g)];
+  if (!matches.length) {
+    throw new Error(`No TTF URL found in Google Fonts CSS for ${family} ${weight}`);
+  }
+  const fontUrl = matches[matches.length - 1][1];
+  return fetch(fontUrl).then((r) => r.arrayBuffer());
+}
+
+function getSoraFont(): Promise<ArrayBuffer> {
+  if (!soraFontPromise) {
+    soraFontPromise = loadGoogleFont('Sora', 700);
+  }
+  return soraFontPromise;
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+function truncate(text: string, max: number): string {
+  if (text.length <= max) return text;
+  return text.slice(0, max).replace(/\s+\S*$/, '') + '…';
+}
+
+// ---------------------------------------------------------------------------
+// OG image layout (satori element tree — 1200 × 630)
+// Palette: Charcoal 900 bg, Sand 500 accent, Teal 500 domain
+// transparentBg: true → fondo transparente para composite sobre hero image
+// ---------------------------------------------------------------------------
+function buildElement(props: OGProps & { transparentBg?: boolean }): object {
+  const { title, description, type, cta, transparentBg = false } = props;
+  // Reduce description length slightly to leave room for the CTA line
+  const desc = truncate(description, 100);
+  const titleFontSize = title.length > 65 ? '42px' : title.length > 45 ? '50px' : '58px';
+
+  return {
+    type: 'div',
+    props: {
+      style: {
+        display: 'flex',
+        width: '1200px',
+        height: '630px',
+        backgroundColor: transparentBg ? 'transparent' : '#2F3437',
+        padding: '64px',
+        fontFamily: '"Sora"',
+      },
+      children: {
+        type: 'div',
+        props: {
+          style: {
+            display: 'flex',
+            flexDirection: 'column',
+            width: '100%',
+            height: '100%',
+            borderLeft: '8px solid #E2CC96',
+            paddingLeft: '52px',
+          },
+          children: [
+            // ── Badge ──────────────────────────────────────────────────────
+            {
+              type: 'div',
+              props: {
+                style: { display: 'flex', marginBottom: '28px' },
+                children: {
+                  type: 'div',
+                  props: {
+                    style: {
+                      display: 'flex',
+                      backgroundColor: '#E2CC96',
+                      color: '#2F3437',
+                      padding: '8px 22px',
+                      borderRadius: '6px',
+                      fontSize: '22px',
+                      fontWeight: 700,
+                      letterSpacing: '0.05em',
+                      textTransform: 'uppercase',
+                    },
+                    children: type,
+                  },
+                },
+              },
+            },
+            // ── Title ──────────────────────────────────────────────────────
+            {
+              type: 'div',
+              props: {
+                style: {
+                  display: 'flex',
+                  color: '#F9FAFB',
+                  fontSize: titleFontSize,
+                  fontWeight: 700,
+                  lineHeight: 1.2,
+                  marginBottom: '20px',
+                  flexGrow: 1,
+                  alignItems: 'flex-start',
+                },
+                children: title,
+              },
+            },
+            // ── Description ────────────────────────────────────────────────
+            {
+              type: 'div',
+              props: {
+                style: {
+                  display: 'flex',
+                  color: '#9CA3AF',
+                  fontSize: '24px',
+                  lineHeight: 1.5,
+                  marginBottom: '18px',
+                },
+                children: desc,
+              },
+            },
+            // ── CTA ────────────────────────────────────────────────────────
+            {
+              type: 'div',
+              props: {
+                style: {
+                  display: 'flex',
+                  color: '#2DD4BF',
+                  fontSize: '24px',
+                  fontWeight: 700,
+                  marginBottom: '20px',
+                },
+                children: `${cta} →`,
+              },
+            },
+            // ── Footer ─────────────────────────────────────────────────────
+            {
+              type: 'div',
+              props: {
+                style: {
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  borderTop: '1px solid #4B555B',
+                  paddingTop: '20px',
+                },
+                children: [
+                  {
+                    type: 'div',
+                    props: {
+                      style: {
+                        display: 'flex',
+                        color: '#F9FAFB',
+                        fontSize: '26px',
+                        fontWeight: 700,
+                      },
+                      children: 'Adrián Mariscal',
+                    },
+                  },
+                  {
+                    type: 'div',
+                    props: {
+                      style: {
+                        display: 'flex',
+                        color: '#2DD4BF',
+                        fontSize: '24px',
+                        fontWeight: 700,
+                      },
+                      children: 'adrianmariscal.es',
+                    },
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      },
+    },
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Static paths — blog posts + projects + key static pages
+// ---------------------------------------------------------------------------
+export const getStaticPaths: GetStaticPaths = async () => {
+  const [blogPosts, projects] = await Promise.all([
+    getCollection('blog', (entry: any) => !entry.data.draft),
+    getCollection('projects', (entry: any) => entry.data.published !== false),
+  ]);
+
+  const staticPages: Array<OGProps & { slug: string }> = [
+    {
+      slug: 'home',
+      title: 'Diseñador Web Performance y SEO Técnico · Adrián Mariscal',
+      description: SITE.description ?? '',
+      type: 'Portfolio',
+      cta: 'Solicita tu auditoría gratuita',
+    },
+    {
+      slug: 'about',
+      title: 'Adrián Mariscal: diseñador web, rendimiento y SEO técnico',
+      description: 'Historia, metodología y valores de Adrián Mariscal, diseñador web especializado en rendimiento.',
+      type: 'About',
+      cta: 'Contacta conmigo',
+    },
+    {
+      slug: 'services',
+      title: 'Auditoría web y packs de mejora SEO · Adrián Mariscal',
+      description: 'Auditoría gratuita + informe base en 48-72 h + packs de mejora cerrados.',
+      type: 'Servicios',
+      cta: 'Ver los packs de mejora',
+    },
+    {
+      slug: 'auditoria-web',
+      title: 'Auditoría Web Gratuita: rendimiento y SEO',
+      description: 'Solicita tu auditoría de rendimiento y SEO técnico. Informe en 48-72 h.',
+      type: 'Auditoría',
+      cta: 'Solicita tu auditoría',
+    },
+    {
+      slug: 'contact',
+      title: 'Contacto · Adrián Mariscal',
+      description: 'Hablemos de tu proyecto web. Rendimiento, SEO técnico y UX con Astro.',
+      type: 'Contacto',
+      cta: 'Escríbeme',
+    },
+    {
+      slug: 'projects',
+      title: 'Proyectos web: rendimiento y SEO técnico · Adrián Mariscal',
+      description: 'Proyectos propios enfocados en rendimiento web, SEO técnico y UX con resultados medibles.',
+      type: 'Proyectos',
+      cta: 'Explora los casos',
+    },
+    {
+      slug: 'blog',
+      title: 'Blog de rendimiento web y SEO técnico · Adrián Mariscal',
+      description: 'Artículos sobre rendimiento web, Astro, SEO técnico, Node y estrategia digital aplicada.',
+      type: 'Blog',
+      cta: 'Explora los artículos',
+    },
+  ];
+
+  return [
+    ...blogPosts.map((post: any) => ({
+      params: { slug: `blog/${post.slug}` },
+      props: {
+        title: String(post.data.title ?? SITE.title),
+        description: String(post.data.description ?? SITE.description ?? ''),
+        type: 'Blog',
+        cta: 'Leer el artículo',
+        heroImagePath: String((post.data as Record<string, unknown>).image ?? '').trim() || null,
+      } satisfies OGProps,
+    })),
+    ...projects.map((project: any) => ({
+      params: { slug: `projects/${project.slug}` },
+      props: {
+        title: String((project.data as Record<string, unknown>).title ?? SITE.title),
+        description: String(
+          (project.data as Record<string, unknown>).description ?? SITE.description ?? ''
+        ),
+        type: 'Proyecto',
+        cta: 'Ver el proyecto',
+      } satisfies OGProps,
+    })),
+    ...staticPages.map(({ slug, title, description, type, cta }) => ({
+      params: { slug },
+      props: { title, description, type, cta } satisfies OGProps,
+    })),
+  ];
+};
+
+// ---------------------------------------------------------------------------
+// Request handler — generates OG image from hero photo OR satori SVG
+// ---------------------------------------------------------------------------
+export async function GET({ props }: APIContext) {
+  const { title, description, type, cta, heroImagePath } = props as OGProps;
+
+  // ── Hero image: resize + dark overlay + text composite → JPEG ─────────────
+  if (heroImagePath) {
+    const absPath = join(process.cwd(), 'public', heroImagePath);
+    if (existsSync(absPath)) {
+      // 1. Resize hero to 1200×630 and apply 55% dark overlay for text legibility
+      const darkOverlay = Buffer.from(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630">' +
+        '<rect width="1200" height="630" fill="rgba(0,0,0,0.55)"/></svg>'
+      );
+      const heroWithOverlay = await sharp(absPath)
+        .resize(1200, 630, { fit: 'cover', position: 'center' })
+        .composite([{ input: darkOverlay, blend: 'over' }])
+        .toBuffer();
+
+      // 2. Generate branded text SVG with transparent background
+      const font = await getSoraFont();
+      const textSvg = await satori(
+        buildElement({ title, description, type, cta, transparentBg: true }) as Parameters<typeof satori>[0],
+        { width: 1200, height: 630, fonts: [{ name: 'Sora', data: font, weight: 700, style: 'normal' }] }
+      );
+
+      // 3. Convert text SVG to PNG (preserves transparency), composite over hero
+      const textPng = await sharp(Buffer.from(textSvg)).png().toBuffer();
+      const result = await sharp(heroWithOverlay)
+        .composite([{ input: textPng, blend: 'over' }])
+        .jpeg({ quality: 85 })
+        .toBuffer();
+
+      return new Response(new Uint8Array(result), {
+        headers: {
+          'Content-Type': 'image/jpeg',
+          'Cache-Control': 'public, max-age=31536000, immutable',
+        },
+      });
+    }
+  }
+
+  // ── Fallback: satori-generated branded image ─────────────────────────────
+  const font = await getSoraFont();
+  const element = buildElement({ title, description, type, cta });
+
+  const svg = await satori(element as Parameters<typeof satori>[0], {
+    width: 1200,
+    height: 630,
+    fonts: [
+      {
+        name: 'Sora',
+        data: font,
+        weight: 700,
+        style: 'normal',
+      },
+    ],
+  });
+
+  const png = await sharp(Buffer.from(svg)).png().toBuffer();
+
+  return new Response(new Uint8Array(png), {
+    headers: {
+      'Content-Type': 'image/png',
+      'Cache-Control': 'public, max-age=31536000, immutable',
+    },
+  });
+}
