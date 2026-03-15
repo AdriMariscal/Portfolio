@@ -6,5 +6,8 @@ dist/
 # Playwright
 test-results/
 
+# Vitest coverage
+coverage/
+
 # Local Netlify folder
 .netlify

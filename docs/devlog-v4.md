@@ -3,6 +3,13 @@
 Notas rápidas de cambios durante el desarrollo de la línea major v4.
 Regla: todas las versiones MINOR se registran; PATCH solo cuando aporte.
 
+## v4.29.0 — 2026-03-15
+- T-029 [DX]: reporte de cobertura de tests unitarios al CI (umbral 60%).
+- Umbrales de Vitest actualizados a 60% para líneas y branches en `vitest.config.ts`; el CI falla si la cobertura cae por debajo.
+- Workflow `ci-unit-tests.yml` ya ejecutaba `pnpm run test:unit:coverage` y sube el artifact `vitest-coverage` (HTML + lcov).
+- Coverage actual: 68.83% líneas, 66.66% branches — cumple umbral.
+- Refs: #605
+
 ## v4.26.0 — 2026-03-15
 - T-022 [PERF]: Auditoría y subconjunto de carga de web fonts (Sora, Inter).
 - Migración de Google Fonts CDN a self-hosting vía Fontsource: elimina 2 orígenes externos (fonts.googleapis.com + fonts.gstatic.com), 1 stylesheet render-blocking y 2 preconnects.
