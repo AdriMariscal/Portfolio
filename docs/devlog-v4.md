@@ -183,6 +183,15 @@ Regla: todas las versiones MINOR se registran; PATCH solo cuando aporte.
 - Microcopy alineado con la guía de marca §6: CTA "Suscribirme a novedades", confirmación "Listo. Te avisaré cuando publique algo relevante."
 - Refs: #597
 
+## v4.28.0 — 2026-03-15
+- T-025 [A11Y]: QA completa de navegación por teclado y focus ring en dark/light mode.
+- Regla global `focus-visible` para todos los elementos interactivos (`a`, `button`, `select`, `summary`, checkboxes, radios, `[tabindex]`) con outline Teal consistente usando `--color-focus` / `--color-focus-ring`.
+- Corregidos focus rings inconsistentes: `.nav-toggle` (usaba `--color-heading`), `.footer__link-btn` y `.codeblock__copy` (usaban `--color-accent`) ahora usan `--color-focus` + `box-shadow` ring.
+- Focus ring explícito añadido a: `.skip-link`, `.theme-toggle`, `.card--link`, `.card:has(.card__overlay-link:focus-visible)`, `.cookie-banner__link`, `.toc__item a`.
+- Touch targets 44×44px: `.nav__link`, `.theme-toggle`, `.nav-toggle`, `.pagination a/span`, `.tag`, `.footer__link`, `.footer__link-btn`, `.codeblock__copy`, `.toc__toggle`, `.breadcrumb__item a`, `.cookie-banner__pref-label`.
+- Cookie checkboxes estilizados con `accent-color: var(--color-accent)` y tamaño 20×20px.
+- Refs: #601
+
 ## v4.27.0 — 2026-03-15
 - T-023 [PERF]: umbral Lighthouse CI para PWA elevado de `warn` a `error` con `minScore: 0.85`.
 - El CI ahora **falla** si el score PWA cae por debajo de 85, actuando como regress guard tras la implementación de la PWA en T-019.
