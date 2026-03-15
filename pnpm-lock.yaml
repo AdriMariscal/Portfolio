@@ -18,6 +18,12 @@ importers:
       '@astrojs/sitemap':
         specifier: ^3.6.0
         version: 3.7.0
+      '@fontsource/inter':
+        specifier: ^5.2.8
+        version: 5.2.8
+      '@fontsource/sora':
+        specifier: ^5.2.8
+        version: 5.2.8
       astro:
         specifier: ^5.18.1
         version: 5.18.1(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.59.0)(terser@5.46.0)(typescript@5.9.3)
@@ -1003,6 +1009,12 @@ packages:
   '@eslint/plugin-kit@0.6.1':
     resolution: {integrity: sha512-iH1B076HoAshH1mLpHMgwdGeTs0CYwL0SPMkGuSebZrwBp16v415e9NZXg2jtrqPVQjf6IANe2Vtlr5KswtcZQ==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24}
+
+  '@fontsource/inter@5.2.8':
+    resolution: {integrity: sha512-P6r5WnJoKiNVV+zvW2xM13gNdFhAEpQ9dQJHt3naLvfg+LkF2ldgSLiF4T41lf1SQCM9QmkqPTn4TH568IRagg==}
+
+  '@fontsource/sora@5.2.8':
+    resolution: {integrity: sha512-1G6iTXUx8rcCKzi3mjaTQ1DE8PQz0OmW3Qnku+64S+bqRr1o/gGeiw8fxIQhhBU9ZP8ZofIqai7o00DNOPnlDw==}
 
   '@formatjs/ecma402-abstract@2.3.6':
     resolution: {integrity: sha512-HJnTFeRM2kVFVr5gr5kH1XP6K0JcJtE7Lzvtr3FS/so5f1kpsqqqxy5JF+FRaO6H2qmcMfAUIox7AJteieRtVw==}
@@ -6285,6 +6297,10 @@ snapshots:
     dependencies:
       '@eslint/core': 1.1.1
       levn: 0.4.1
+
+  '@fontsource/inter@5.2.8': {}
+
+  '@fontsource/sora@5.2.8': {}
 
   '@formatjs/ecma402-abstract@2.3.6':
     dependencies:

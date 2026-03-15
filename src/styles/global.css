@@ -575,7 +575,7 @@ strong{color:var(--color-heading)}
 
 .alert__title{
   margin:0 0 6px;
-  font-weight:700;
+  font-weight:600;
   color:var(--color-heading);
 }
 
@@ -1500,8 +1500,7 @@ strong{color:var(--color-heading)}
   border-radius: 12px;
   border: 1px solid var(--color-border);
   background: var(--color-surface-alt);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-    "Liberation Mono", "Courier New", monospace;
+  font-family: var(--font-mono);
   font-size: 0.9rem;
 }
 
@@ -1599,7 +1598,7 @@ strong{color:var(--color-heading)}
 
 /* Código dentro del bloque (multi-línea) */
 .post__prose pre code{
-  font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
+  font-family:var(--font-mono);
   font-size:.9rem;
   line-height:1.6;
   background:none;
@@ -1610,7 +1609,7 @@ strong{color:var(--color-heading)}
 /* Código en línea dentro del texto del post:
    mantiene el estilo de .prose code pero forzamos monospace coherente */
 .post__prose :not(pre) > code{
-  font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
+  font-family:var(--font-mono);
   font-size:.95em;
 }
 
