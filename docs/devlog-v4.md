@@ -165,6 +165,15 @@ Regla: todas las versiones MINOR se registran; PATCH solo cuando aporte.
 - Constante `AUDITORIA_META_TITLE` añadida a `src/lib/seo.ts` siguiendo el patrón existente.
 - Refs: #589 / https://github.com/AdriMariscal/Portfolio/issues/589
 
+## v4.25.0 — 2026-03-15
+- T-021 [FEAT]: suscripción a newsletter del blog con Buttondown (GDPR-compliant, doble opt-in).
+- Netlify Function `newsletter-subscribe` que valida email, honeypot anti-spam y envía IP del cliente a Buttondown para detección de abuso.
+- Componente `NewsletterForm.astro` reutilizable con dos variantes: `inline` (al final de cada post) y `compact` (footer del sitio).
+- Formulario integrado al final de cada artículo del blog y en el footer global.
+- Política de privacidad actualizada: datos tratados, finalidad, base jurídica, proveedor (Buttondown) y plazos de conservación.
+- Microcopy alineado con la guía de marca §6: CTA "Suscribirme a novedades", confirmación "Listo. Te avisaré cuando publique algo relevante."
+- Refs: #597
+
 ## v4.16.0 — 2026-03-14
 - T-028 [DX]: variables de entorno `CMS_SITE_URL` y `CMS_DISPLAY_URL` actualizadas en Netlify para contexto `production` → valor `https://adrianmariscal.es`.
 - Valores de `branch-deploy` (staging) confirmados intactos: `https://staging.adrianmariscal.es`.
