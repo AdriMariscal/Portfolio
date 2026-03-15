@@ -1,0 +1,133 @@
+---
+interface Props {
+  variant?: 'inline' | 'compact';
+  class?: string;
+}
+
+const { variant = 'inline', class: className = '' } = Astro.props;
+const inputId = `nl-email-${variant}`;
+---
+
+<section
+  class:list={['newsletter', `newsletter--${variant}`, className]}
+  aria-label="Suscripción a newsletter"
+>
+  {variant === 'inline' && (
+    <div class="newsletter__header">
+      <h2 class="newsletter__title">¿Te ha resultado útil?</h2>
+      <p class="newsletter__desc">
+        Recibe artículos como este directamente en tu email. Sin spam, solo contenido técnico relevante.
+      </p>
+    </div>
+  )}
+  {variant === 'compact' && (
+    <p class="newsletter__desc newsletter__desc--compact">Novedades del blog</p>
+  )}
+
+  <form class="newsletter__form" data-newsletter-form>
+    <div class="sr-only" aria-hidden="true">
+      <label>
+        No rellenar si eres humano
+        <input type="text" name="bot-field" tabindex="-1" autocomplete="off" />
+      </label>
+    </div>
+
+    <div class="newsletter__field">
+      <label for={inputId} class="sr-only">Tu email</label>
+      <input
+        class="input newsletter__input"
+        id={inputId}
+        type="email"
+        name="email"
+        placeholder="tu@email.com"
+        required
+        autocomplete="email"
+      />
+      <button type="submit" class="btn btn--primary newsletter__btn">
+        Suscribirme
+      </button>
+    </div>
+
+    <p
+      class="newsletter__status"
+      data-newsletter-status
+      role="status"
+      aria-live="polite"
+      hidden
+    ></p>
+
+    <p class="newsletter__legal">
+      Al suscribirte aceptas la
+      <a href="/legal/privacidad">política de privacidad</a>.
+      Doble opt-in vía Buttondown.
+    </p>
+  </form>
+</section>
+
+<script>
+  function initNewsletterForms() {
+    const forms = document.querySelectorAll<HTMLFormElement>('[data-newsletter-form]');
+
+    forms.forEach((form) => {
+      if (form.dataset.nlInit) return;
+      form.dataset.nlInit = 'true';
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const status = form.querySelector<HTMLParagraphElement>('[data-newsletter-status]');
+        const btn = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+        const emailInput = form.querySelector<HTMLInputElement>('input[type="email"]');
+
+        if (!status || !btn || !emailInput) return;
+
+        if (!emailInput.checkValidity()) {
+          status.textContent = 'Introduce un email válido.';
+          status.hidden = false;
+          status.className = 'newsletter__status newsletter__status--error';
+          return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = 'Enviando…';
+        status.hidden = true;
+
+        try {
+          const payload = new URLSearchParams(new FormData(form) as any);
+          const response = await fetch('/.netlify/functions/newsletter-subscribe', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+            body: payload.toString(),
+          });
+
+          const data = await response.json().catch(() => ({}));
+
+          if (!response.ok && response.status !== 429) {
+            throw new Error(data?.message || 'No se pudo completar la suscripción.');
+          }
+
+          status.textContent = data?.message || 'Listo. Te avisaré cuando publique algo relevante.';
+          status.hidden = false;
+          status.className = response.ok
+            ? 'newsletter__status newsletter__status--ok'
+            : 'newsletter__status newsletter__status--error';
+
+          if (response.ok) {
+            form.reset();
+          }
+        } catch (err) {
+          status.textContent =
+            err instanceof Error ? err.message : 'No se pudo completar la suscripción.';
+          status.hidden = false;
+          status.className = 'newsletter__status newsletter__status--error';
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'Suscribirme';
+        }
+      });
+    });
+  }
+
+  initNewsletterForms();
+  document.addEventListener('astro:page-load', initNewsletterForms);
+</script>

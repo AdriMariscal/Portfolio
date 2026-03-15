@@ -647,6 +647,76 @@ strong{color:var(--color-heading)}
 }
 
 /* ==========================================================================
+   Newsletter
+   ========================================================================== */
+.newsletter{
+  border:1px solid var(--color-border);
+  border-radius:var(--radius-md);
+  padding:24px;
+  background:var(--color-surface);
+}
+
+.newsletter--inline{
+  margin-top:32px;
+}
+
+.newsletter__header{margin-bottom:16px}
+.newsletter__title{font-size:1.15rem;font-weight:700;color:var(--color-heading);margin:0 0 6px}
+.newsletter__desc{font-size:.95rem;color:var(--color-text-muted);margin:0}
+.newsletter__desc--compact{font-weight:600;color:var(--color-heading);margin-bottom:10px;font-size:.95rem}
+
+.newsletter__form{display:flex;flex-direction:column;gap:10px}
+
+.newsletter__field{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.newsletter__input{
+  flex:1 1 200px;
+  min-width:0;
+}
+
+.newsletter__btn{
+  flex:0 0 auto;
+  white-space:nowrap;
+}
+
+.newsletter__legal{
+  font-size:.78rem;
+  color:var(--color-text-muted);
+  opacity:.8;
+  margin:0;
+}
+.newsletter__legal a{text-decoration:underline;text-decoration-color:var(--color-accent)}
+
+.newsletter__status{
+  font-size:.9rem;
+  margin:0;
+  padding:8px 12px;
+  border-radius:var(--radius-sm);
+}
+.newsletter__status--ok{
+  color:var(--color-success, #22c55e);
+  background:color-mix(in srgb, var(--color-success, #22c55e) 10%, transparent);
+}
+.newsletter__status--error{
+  color:var(--color-error, #ef4444);
+  background:color-mix(in srgb, var(--color-error, #ef4444) 10%, transparent);
+}
+
+.newsletter--compact{
+  padding:16px;
+}
+.newsletter--compact .newsletter__field{
+  flex-wrap:nowrap;
+}
+.newsletter--compact .newsletter__btn{
+  font-size:.85rem;
+}
+
+/* ==========================================================================
    Cookie banner
    ========================================================================== */
 .cookie-banner{

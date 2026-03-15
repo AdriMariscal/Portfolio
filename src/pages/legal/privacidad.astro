@@ -5,7 +5,7 @@ import { SITE_OWNER } from "../../config/siteOwner";
 import Card from "../../components/ui/Card.astro";
 import { buildMetaDescription, buildMetaTitle, SEO_KEYWORD } from "../../lib/seo";
 
-const updated = "01/11/2025";
+const updated = "15/03/2026";
 
 const metaTitle = buildMetaTitle(SEO_KEYWORD, "Política de privacidad");
 const metaDescription = buildMetaDescription(
@@ -40,24 +40,27 @@ const metaDescription = buildMetaDescription(
           <p>Los mínimos necesarios para gestionar el sitio y atender tus comunicaciones:</p>
           <ul>
             <li><em>Datos de identificación y contacto</em> (nombre, email) cuando usas el formulario de contacto.</li>
+            <li><em>Email</em> cuando te suscribes a la newsletter del blog.</li>
             <li><em>Datos técnicos</em> de uso básicos (p. ej., direcciones IP abreviadas, identificadores del navegador o registros de servidor) para seguridad y mantenimiento del sitio.</li>
           </ul>
 
           <h2>3. Finalidades</h2>
           <ul>
             <li><strong>Atender consultas</strong> enviadas mediante el formulario de contacto o por email.</li>
+            <li><strong>Envío de novedades del blog</strong> si te suscribes a la newsletter. Recibirás un email de confirmación (doble opt-in) antes de activar la suscripción. Puedes darte de baja en cualquier momento desde el enlace incluido en cada envío.</li>
             <li><strong>Gestión y seguridad del sitio web</strong> (operación, mantenimiento, prevención del abuso o fraude y mediciones técnicas de rendimiento).</li>
           </ul>
 
           <h2>4. Bases jurídicas (art. 6 RGPD)</h2>
           <ul>
-            <li><strong>Consentimiento</strong> del usuario al enviar el formulario o escribir por email.</li>
+            <li><strong>Consentimiento</strong> del usuario al enviar el formulario, escribir por email o suscribirse a la newsletter.</li>
             <li><strong>Interés legítimo</strong> del responsable en mantener la seguridad, mejorar el servicio y prevenir usos indebidos.</li>
             <li><strong>Ejecución de medidas precontractuales</strong> si solicitas información profesional sobre mis servicios.</li>
           </ul>
 
           <h2>5. Destinatarios</h2>
           <p>No se comunican datos a terceros salvo obligación legal o para prestar servicios estrictamente necesarios al funcionamiento del sitio (p. ej., alojamiento, formularios y soporte técnico). Estos proveedores actúan como <em>encargados del tratamiento</em> bajo contrato (art. 28 RGPD).</p>
+          <p>Para la gestión de la newsletter se utiliza <strong>Buttondown</strong> (Buttondown, LLC — EE. UU.), que almacena tu email con el fin exclusivo de enviarte las novedades del blog. Buttondown cumple con GDPR y aplica doble opt-in por defecto. Más información en su <a href="https://buttondown.com/legal/privacy" rel="noopener noreferrer" target="_blank">política de privacidad</a>.</p>
 
           <h3>Transferencias internacionales</h3>
           <p>
@@ -69,6 +72,7 @@ const metaDescription = buildMetaDescription(
           <h2>6. Plazos de conservación</h2>
           <ul>
             <li><strong>Consultas y comunicaciones:</strong> el tiempo imprescindible para atenderlas y, como máximo, 12 meses para seguimiento básico y defensa ante posibles incidencias.</li>
+            <li><strong>Newsletter:</strong> mientras la suscripción esté activa. Al darte de baja, tu email se elimina del servicio de envío.</li>
             <li><strong>Registros técnicos de seguridad:</strong> plazos breves y proporcionales (habitualmente &lt; 12 meses), salvo que sea necesario conservarlos para investigar incidencias.</li>
           </ul>
 
