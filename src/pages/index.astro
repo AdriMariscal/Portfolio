@@ -39,10 +39,13 @@ const metaDescription = buildMetaDescription(
   "Solicita una auditoría gratuita hoy."
 );
 
-// Testimonios: en producción solo mostramos la sección si hay al menos uno no draft
-const isProd = import.meta.env.PROD;
+// Testimonios: en producción (amariscalcantudo.es) solo mostramos si hay testimonios reales;
+// en dev/staging (dev.adrianmariscal.es, staging.adrianmariscal.es) mostramos también placeholders draft
+const siteEnv = import.meta.env.PUBLIC_SITE_ENV ?? "development";
+const isProductionSite = siteEnv === "production";
 const publishedTestimonials = testimonials.filter((t) => !t.draft);
-const showTestimonialsSection = !isProd || publishedTestimonials.length > 0;
+const showTestimonialsSection = !isProductionSite || publishedTestimonials.length > 0;
+const testimonialsToShow = isProductionSite ? publishedTestimonials : testimonials;
 ---
 
 <BaseLayout title="Inicio" metaTitle={metaTitle} description={metaDescription} ogImage="/og/home.png">
@@ -62,7 +65,7 @@ const showTestimonialsSection = !isProd || publishedTestimonials.length > 0;
       <div class="wrap">
         <h2 id="testimonials-heading" class="h2 section__title">Lo que dicen sobre la auditoría</h2>
         <div class="grid grid--3" style="--stack-gap:16px">
-          {(isProd ? publishedTestimonials : testimonials).map((t) => (
+          {testimonialsToShow.map((t) => (
             <Testimonial testimonial={t} />
           ))}
         </div>

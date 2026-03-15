@@ -6,7 +6,8 @@ Regla: todas las versiones MINOR se registran; PATCH solo cuando aporte.
 ## v4.22.0 — 2026-03-15
 - T-018 [FEAT]: sección de prueba social / testimonios en Home y /services (guía §14 Q5).
 - Componente `Testimonial.astro` con datos tipados: nombre/iniciales (anonimizable), empresa/sector, texto, resultado cuantificado opcional; flag `draft` para no publicar hasta tener consentimiento.
-- En producción la sección solo se muestra si hay al menos un testimonio no draft; placeholder con `draft: true` incluido para desarrollo.
+- En producción (amariscalcantudo.es, ENVIRONMENT=production) la sección solo se muestra si hay al menos un testimonio no draft; en dev/staging (dev.adrianmariscal.es, staging.adrianmariscal.es) se muestra siempre, incluyendo placeholders draft.
+- Variable de build `PUBLIC_SITE_ENV` inyectada desde `ENVIRONMENT` en `astro.config.mjs`; `netlify.toml` ya define `context.production` / `context.dev` / `context.branch:staging`.
 - Plantilla `docs/plantilla-testimonio.md` con proceso de obtención de consentimiento y anonimización.
 - Refs: #594
 
