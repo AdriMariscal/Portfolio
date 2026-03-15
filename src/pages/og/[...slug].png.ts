@@ -54,9 +54,10 @@ function truncate(text: string, max: number): string {
 // ---------------------------------------------------------------------------
 // OG image layout (satori element tree — 1200 × 630)
 // Palette: Charcoal 900 bg, Sand 500 accent, Teal 500 domain
+// transparentBg: true → fondo transparente para composite sobre hero image
 // ---------------------------------------------------------------------------
-function buildElement(props: OGProps): object {
-  const { title, description, type, cta } = props;
+function buildElement(props: OGProps & { transparentBg?: boolean }): object {
+  const { title, description, type, cta, transparentBg = false } = props;
   // Reduce description length slightly to leave room for the CTA line
   const desc = truncate(description, 100);
   const titleFontSize = title.length > 65 ? '42px' : title.length > 45 ? '50px' : '58px';
@@ -68,7 +69,7 @@ function buildElement(props: OGProps): object {
         display: 'flex',
         width: '1200px',
         height: '630px',
-        backgroundColor: '#2F3437',
+        backgroundColor: transparentBg ? 'transparent' : '#2F3437',
         padding: '64px',
         fontFamily: '"Sora"',
       },
@@ -295,15 +296,35 @@ export const getStaticPaths: GetStaticPaths = async () => {
 export async function GET({ props }: APIContext) {
   const { title, description, type, cta, heroImagePath } = props as OGProps;
 
-  // ── Hero image path: resize + compress to 1200×630 JPEG ≤ 600 KB ──────────
+  // ── Hero image: resize + dark overlay + text composite → JPEG ─────────────
   if (heroImagePath) {
     const absPath = join(process.cwd(), 'public', heroImagePath);
     if (existsSync(absPath)) {
-      const jpeg = await sharp(absPath)
+      // 1. Resize hero to 1200×630 and apply 55% dark overlay for text legibility
+      const darkOverlay = Buffer.from(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630">' +
+        '<rect width="1200" height="630" fill="rgba(0,0,0,0.55)"/></svg>'
+      );
+      const heroWithOverlay = await sharp(absPath)
         .resize(1200, 630, { fit: 'cover', position: 'center' })
+        .composite([{ input: darkOverlay, blend: 'over' }])
+        .toBuffer();
+
+      // 2. Generate branded text SVG with transparent background
+      const font = await getSoraFont();
+      const textSvg = await satori(
+        buildElement({ title, description, type, cta, transparentBg: true }) as Parameters<typeof satori>[0],
+        { width: 1200, height: 630, fonts: [{ name: 'Sora', data: font, weight: 700, style: 'normal' }] }
+      );
+
+      // 3. Convert text SVG to PNG (preserves transparency), composite over hero
+      const textPng = await sharp(Buffer.from(textSvg)).png().toBuffer();
+      const result = await sharp(heroWithOverlay)
+        .composite([{ input: textPng, blend: 'over' }])
         .jpeg({ quality: 85 })
         .toBuffer();
-      return new Response(new Uint8Array(jpeg), {
+
+      return new Response(new Uint8Array(result), {
         headers: {
           'Content-Type': 'image/jpeg',
           'Cache-Control': 'public, max-age=31536000, immutable',
