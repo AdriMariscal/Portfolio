@@ -1,7 +1,7 @@
 {
   "name": "portfolio",
   "type": "module",
-  "version": "4.22.0",
+  "version": "4.23.0",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
@@ -46,6 +46,7 @@
     "@tailwindcss/vite": "^4.2.1",
     "@typescript-eslint/eslint-plugin": "latest",
     "@typescript-eslint/parser": "latest",
+    "@vite-pwa/astro": "^1.2.0",
     "@vitest/coverage-v8": "^4.1.0",
     "astro-eslint-parser": "latest",
     "eslint": "latest",
@@ -56,6 +57,7 @@
     "rehype-autolink-headings": "^7.1.0",
     "remark-images": "^4.1.0",
     "typescript": "latest",
-    "vitest": "^4.1.0"
+    "vitest": "^4.1.0",
+    "workbox-window": "^7.4.0"
   }
 }

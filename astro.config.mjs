@@ -2,6 +2,7 @@
 import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
+import AstroPWA from '@vite-pwa/astro';
 import tailwind from '@tailwindcss/vite'; // Tailwind v4 (plugin de Vite)
 import remarkImages from 'remark-images';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
@@ -44,6 +45,57 @@ export default defineConfig({
     mdx(),
     sitemap({
       filter: (page) => !page.pathname?.startsWith('/staging/'),
+    }),
+    AstroPWA({
+      registerType: 'autoUpdate',
+      manifest: {
+        name: 'Adrián Mariscal · Diseñador Web Performance',
+        short_name: 'AM Portfolio',
+        description: 'Web performance end-to-end con Astro y Node para sitios rápidos, claros y listos para convertir.',
+        theme_color: '#2F3437',
+        background_color: '#2F3437',
+        display: 'standalone',
+        start_url: '/',
+        scope: '/',
+        lang: 'es',
+        icons: [
+          { src: '/pwa-192x192.png', sizes: '192x192', type: 'image/png' },
+          { src: '/pwa-512x512.png', sizes: '512x512', type: 'image/png' },
+          { src: '/pwa-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+        ],
+      },
+      workbox: {
+        navigateFallback: '/offline',
+        navigateFallbackDenylist: [/^\/admin/, /^\/api/],
+        runtimeCaching: [
+          {
+            urlPattern: /\.(?:html)$/,
+            handler: 'NetworkFirst',
+            options: { cacheName: 'html-cache', expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 * 24 } },
+          },
+          {
+            urlPattern: /\.(?:css|js)$/,
+            handler: 'CacheFirst',
+            options: { cacheName: 'static-assets', expiration: { maxEntries: 100, maxAgeSeconds: 60 * 60 * 24 * 30 } },
+          },
+          {
+            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|avif|ico)$/,
+            handler: 'CacheFirst',
+            options: { cacheName: 'image-cache', expiration: { maxEntries: 80, maxAgeSeconds: 60 * 60 * 24 * 30 } },
+          },
+          {
+            urlPattern: /\.(?:woff|woff2|ttf|otf)$/,
+            handler: 'CacheFirst',
+            options: { cacheName: 'font-cache', expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 365 } },
+          },
+          {
+            urlPattern: /^https:\/\/fonts\.(?:googleapis|gstatic)\.com\/.*/,
+            handler: 'CacheFirst',
+            options: { cacheName: 'google-fonts', expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 } },
+          },
+        ],
+      },
+      devOptions: { enabled: false },
     }),
   ],
 
