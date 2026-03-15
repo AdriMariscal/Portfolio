@@ -49,5 +49,10 @@ export default defineConfig({
 
   vite: {
     plugins: [tailwind()],
+    define: {
+      // ENVIRONMENT en Netlify: production (main/amariscalcantudo.es), development (dev), staging (branch:staging)
+      // Solo en producción ocultamos la sección de testimonios si todos son draft
+      'import.meta.env.PUBLIC_SITE_ENV': JSON.stringify(process.env.ENVIRONMENT || 'development'),
+    },
   },
 });

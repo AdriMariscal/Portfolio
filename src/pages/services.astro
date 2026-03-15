@@ -3,8 +3,10 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Button from "../components/ui/Button.astro";
 import Card from "../components/ui/Card.astro";
+import Testimonial from "../components/Testimonial.astro";
 import { buildMetaDescription, SERVICES_META_TITLE } from "../lib/seo";
 import { SITE } from "../lib/config";
+import { testimonials } from "../lib/testimonials";
 
 const pageTitle = "Servicios";
 const metaTitle = SERVICES_META_TITLE;
@@ -15,6 +17,12 @@ const metaDescription = buildMetaDescription(
 
 const canonical = new URL("/services/", SITE.url).href;
 const personId = `${SITE.url}#persona`;
+
+const siteEnv = import.meta.env.PUBLIC_SITE_ENV ?? "development";
+const isProductionSite = siteEnv === "production";
+const publishedTestimonials = testimonials.filter((t) => !t.draft);
+const showTestimonialsSection = !isProductionSite || publishedTestimonials.length > 0;
+const testimonialsToShow = isProductionSite ? publishedTestimonials : testimonials;
 const organizationId = `${SITE.url}#organization`;
 const servicesJsonLd = {
   "@context": "https://schema.org",
@@ -231,6 +239,16 @@ const servicesJsonLd = {
           </Card>
 
         </div>
+        {showTestimonialsSection && (
+          <div class="stack" style="--stack-gap: 24px; margin-top: 32px;">
+            <h2 id="testimonials-heading" class="h2 section__title">Lo que dicen sobre la auditoría</h2>
+            <div class="grid grid--3" style="--stack-gap:16px">
+              {testimonialsToShow.map((t) => (
+                <Testimonial testimonial={t} />
+              ))}
+            </div>
+          </div>
+        )}
         <div class="services-cta">
           <Button href="/contact" variant="primary">Quiero mi auditoría gratuita</Button>
           <Button href="/contact" variant="secondary">Pedir presupuesto cerrado</Button>
