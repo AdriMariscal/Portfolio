@@ -1,5 +1,7 @@
 // src/pages/og/[...slug].png.ts
 import type { APIContext, GetStaticPaths } from 'astro';
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 import satori from 'satori';
 import sharp from 'sharp';
 import { getCollection } from 'astro:content';
@@ -10,6 +12,10 @@ interface OGProps {
   description: string;
   type: string;
   cta: string;
+  /** Ruta raíz-relativa a la hero image (ej: /images/uploads/foto.jpg).
+   *  Cuando existe, sharp la procesa a 1200×630 JPEG ≤600KB en lugar de
+   *  generar la imagen satori. */
+  heroImagePath?: string | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -262,6 +268,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
         description: String(post.data.description ?? SITE.description ?? ''),
         type: 'Blog',
         cta: 'Leer el artículo',
+        heroImagePath: String((post.data as Record<string, unknown>).image ?? '').trim() || null,
       } satisfies OGProps,
     })),
     ...projects.map((project) => ({
@@ -283,11 +290,29 @@ export const getStaticPaths: GetStaticPaths = async () => {
 };
 
 // ---------------------------------------------------------------------------
-// Request handler — generates PNG from satori SVG
+// Request handler — generates OG image from hero photo OR satori SVG
 // ---------------------------------------------------------------------------
 export async function GET({ props }: APIContext) {
-  const { title, description, type, cta } = props as OGProps;
+  const { title, description, type, cta, heroImagePath } = props as OGProps;
 
+  // ── Hero image path: resize + compress to 1200×630 JPEG ≤ 600 KB ──────────
+  if (heroImagePath) {
+    const absPath = join(process.cwd(), 'public', heroImagePath);
+    if (existsSync(absPath)) {
+      const jpeg = await sharp(absPath)
+        .resize(1200, 630, { fit: 'cover', position: 'center' })
+        .jpeg({ quality: 85 })
+        .toBuffer();
+      return new Response(new Uint8Array(jpeg), {
+        headers: {
+          'Content-Type': 'image/jpeg',
+          'Cache-Control': 'public, max-age=31536000, immutable',
+        },
+      });
+    }
+  }
+
+  // ── Fallback: satori-generated branded image ─────────────────────────────
   const font = await getSoraFont();
   const element = buildElement({ title, description, type, cta });
 

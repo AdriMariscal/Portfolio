@@ -72,11 +72,12 @@ const heroCaption =
     ? (post.data as any).imageCaption.trim()
     : "";
 
-// OG image: si el post tiene hero image, se usa directamente (más específica y relevante).
-// Si no, se usa la imagen satori generada en build time (branded fallback 1200×630).
-// BaseLayout resuelve la ruta relativa con deployBase (Astro.site).
-// Para JSON-LD siempre se usa la URL canónica de producción.
-const ogImageRel = heroImage ?? `/og/blog/${post.slug}.png`;
+// OG image: el endpoint /og/blog/[slug].png decide en build time:
+//   · Si el post tiene hero image → sharp la procesa a 1200×630 JPEG ≤600KB
+//   · Si no tiene → satori genera la imagen branded
+// BaseLayout resuelve la ruta con deployBase (Astro.site).
+// Para JSON-LD se usa siempre la URL canónica de producción.
+const ogImageRel = `/og/blog/${post.slug}.png`;
 const ogImageCanonical = new URL(ogImageRel, SITE.url).href;
 
 // Fechas del frontmatter (acepta Date o string)
