@@ -13,7 +13,7 @@ const { headings } = Astro.props;
 ---
 
 <nav class="toc" aria-label="Índice de contenidos" data-toc>
-  <details class="toc__details">
+  <details class="toc__details" open>
     <summary class="toc__toggle">
       <span class="toc__title">En este artículo</span>
       <svg class="toc__chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -34,6 +34,13 @@ const { headings } = Astro.props;
   function initToc() {
     const nav = document.querySelector<HTMLElement>('[data-toc]');
     if (!nav) return;
+
+    const details = nav.querySelector<HTMLDetailsElement>('.toc__details');
+
+    // On mobile (<1024px) start collapsed; on desktop keep open
+    if (details && window.innerWidth < 1024) {
+      details.removeAttribute('open');
+    }
 
     const links = nav.querySelectorAll<HTMLAnchorElement>('[data-toc-link]');
     if (!links.length) return;

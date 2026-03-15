@@ -1314,11 +1314,7 @@ strong{color:var(--color-heading)}
   .post__toc-aside .toc__toggle{cursor:default;padding:0 0 .5rem}
   .post__toc-aside .toc__chevron{display:none}
 
-  .post__toc-aside .toc__details .toc__list{
-    display:flex !important;
-    flex-direction:column;
-    padding:0;
-  }
+  .post__toc-aside .toc__list{padding:0}
 
   .post__toc-aside::-webkit-scrollbar{width:3px}
   .post__toc-aside::-webkit-scrollbar-track{background:transparent}
