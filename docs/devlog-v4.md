@@ -3,6 +3,15 @@
 Notas rápidas de cambios durante el desarrollo de la línea major v4.
 Regla: todas las versiones MINOR se registran; PATCH solo cuando aporte.
 
+## v4.24.0 — 2026-03-15
+- T-020 [FEAT]: tabla de contenidos auto-generada para posts de blog largos (≥3 headings H2).
+- Componente `TableOfContents.astro` extraído: sticky sidebar en desktop (≥1024px), colapsable en móvil.
+- Highlight del heading activo con IntersectionObserver (smooth scroll, indicador visual).
+- Layout de post refactorizado a grid 2 columnas en desktop para acomodar sidebar ToC.
+- Anchors verificados con `rehypeHeadingIds` + `rehype-autolink-headings` existentes.
+- Refs: #596
+  - Patch v4.24.1 — Fix: ToC invisible en Chrome 131+ (`<details>` usa `content-visibility`; ahora se renderiza con `open` + JS cierra en móvil). Fix: página "Sin conexión" en navegación a posts por `navigateFallback: '/offline'` en Workbox que interceptaba todas las navegaciones en modo App Shell (incompatible con MPA); eliminado en favor de `NetworkFirst` por runtimeCaching para URLs limpias.
+
 ## v4.23.0 — 2026-03-15
 - T-019 [FEAT]: PWA completa con Service Worker + offline cache (Workbox) — sitio instalable en Chrome/Edge.
 - Integración `@vite-pwa/astro` v1.2.0 con estrategia `generateSW`: auto-genera `sw.js` y `manifest.webmanifest` en build.

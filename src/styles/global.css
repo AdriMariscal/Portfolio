@@ -1218,51 +1218,107 @@ strong{color:var(--color-heading)}
   color:var(--color-text-muted);
 }
 
-.post__toc{
-  margin:1rem 0 1.75rem;
-  padding:.85rem 1rem 1rem;
+/* ==========================================================================
+   Table of Contents — Componente reutilizable (.toc)
+   Mobile: colapsable (<details>). Desktop ≥1024px: sidebar sticky.
+   ========================================================================== */
+
+.toc{margin:1rem 0 1.5rem}
+
+.toc__details{
   border-radius:12px;
   border:1px solid var(--color-border);
   background:var(--color-surface-alt);
 }
 
-.post__toc-title{
+.toc__toggle{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:.75rem 1rem;
+  cursor:pointer;
+  list-style:none;
+  user-select:none;
+}
+.toc__toggle::-webkit-details-marker{display:none}
+
+.toc__title{
   font-size:.8rem;
   font-weight:600;
   text-transform:uppercase;
   letter-spacing:.08em;
-  margin:0 0 .5rem;
   color:var(--color-text-muted);
 }
 
-.post__toc-list{
+.toc__chevron{
+  color:var(--color-text-muted);
+  transition:transform 200ms ease;
+  flex-shrink:0;
+}
+.toc__details[open] .toc__chevron{transform:rotate(180deg)}
+
+.toc__list{
   list-style:none;
   margin:0;
-  padding-left:.1rem;
+  padding:0 1rem .85rem;
   display:flex;
   flex-direction:column;
-  gap:.25rem;
+  gap:.2rem;
 }
 
-.post__toc-item{
-  line-height:1.4;
-}
-
-.post__toc-item a{
-  font-size:.95rem;
-  text-decoration:none;
-  color:var(--color-heading);
-}
-
-.post__toc-item a:hover{
-  text-decoration:underline;
-  text-underline-offset:0.12em;
-  color:var(--color-accent);
-}
-
-.post__toc-item--level-3{
-  padding-left:1rem;
+.toc__item a{
+  display:block;
   font-size:.9rem;
+  line-height:1.4;
+  text-decoration:none;
+  color:var(--color-text-muted);
+  padding:.15rem 0 .15rem .5rem;
+  border-left:2px solid transparent;
+  transition:color 150ms,border-color 150ms;
+}
+.toc__item a:hover{color:var(--color-accent)}
+.toc__item a.toc__link--active{
+  color:var(--color-accent);
+  border-left-color:var(--color-accent);
+  font-weight:500;
+}
+
+.toc__item--depth-3 a{
+  padding-left:1.25rem;
+  font-size:.85rem;
+}
+
+/* --- Grid wrapper: sidebar en desktop --- */
+
+@media(min-width:1024px){
+  .post:has(.post__content-wrapper--has-toc) .wrap{max-width:1120px}
+
+  .post__content-wrapper--has-toc{
+    display:grid;
+    grid-template-columns:210px 1fr;
+    gap:2rem;
+    align-items:start;
+  }
+
+  .post__toc-aside{
+    position:sticky;
+    top:90px;
+    max-height:calc(100vh - 120px);
+    overflow-y:auto;
+    scrollbar-width:thin;
+    scrollbar-color:var(--color-border) transparent;
+  }
+
+  .post__toc-aside .toc{margin:0}
+  .post__toc-aside .toc__details{border:none;background:none}
+  .post__toc-aside .toc__toggle{cursor:default;padding:0 0 .5rem}
+  .post__toc-aside .toc__chevron{display:none}
+
+  .post__toc-aside .toc__list{padding:0}
+
+  .post__toc-aside::-webkit-scrollbar{width:3px}
+  .post__toc-aside::-webkit-scrollbar-track{background:transparent}
+  .post__toc-aside::-webkit-scrollbar-thumb{background:var(--color-border);border-radius:99px}
 }
 
 /* Saltos de ancla: que las cabeceras no queden ocultas bajo el header fijo */

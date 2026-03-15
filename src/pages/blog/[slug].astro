@@ -2,6 +2,7 @@
 // src/pages/blog/[slug].astro
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Button from '@/components/ui/Button.astro';
+import TableOfContents from '@/components/TableOfContents.astro';
 import type { CollectionEntry } from 'astro:content';
 import { getCollection } from 'astro:content';
 import { toSlug } from '@/lib/content';
@@ -212,36 +213,30 @@ const jsonLd = {
         </figure>
       )}        
 
-        {showToc && (
-          <nav class="post__toc" aria-label="Índice de contenidos">
-            <p class="post__toc-title">En este artículo:</p>
-            <ol class="post__toc-list">
-              {tocHeadings.map((h) => (
-                <li class={`post__toc-item post__toc-item--level-${h.depth}`}>
-                  <a href={`#${h.slug}`}>
-                    {h.text}
-                  </a>
-                </li>
-              ))}
-            </ol>
-          </nav>
-        )}
-        <div class="post__prose prose">
-      <Content />
-        </div>
+        <div class:list={['post__content-wrapper', { 'post__content-wrapper--has-toc': showToc }]}>
+          {showToc && (
+            <aside class="post__toc-aside">
+              <TableOfContents headings={tocHeadings} />
+            </aside>
+          )}
+          <div class="post__main">
+            <div class="post__prose prose">
+              <Content />
+            </div>
 
-        {/* Etiquetas SOLO al final, como en projects/[slug].astro */}
-        {tags?.length ? (
-          <footer class="post__meta">
-            <ul class="tags tags--sm tags--mt" aria-label="Etiquetas">
-              {tags.map((t) => (
-                <li>
-                  <a class="tag" href={`/blog/tags/${toSlug(t)}/`}>#{t}</a>
-                </li>
-              ))}
-            </ul>
-          </footer>
-        ) : null}
+            {tags?.length ? (
+              <footer class="post__meta">
+                <ul class="tags tags--sm tags--mt" aria-label="Etiquetas">
+                  {tags.map((t) => (
+                    <li>
+                      <a class="tag" href={`/blog/tags/${toSlug(t)}/`}>#{t}</a>
+                    </li>
+                  ))}
+                </ul>
+              </footer>
+            ) : null}
+          </div>
+        </div>
       </div>
     </div>
   </article>

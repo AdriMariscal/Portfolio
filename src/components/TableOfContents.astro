@@ -1,0 +1,101 @@
+---
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  headings: Heading[];
+}
+
+const { headings } = Astro.props;
+---
+
+<nav class="toc" aria-label="Índice de contenidos" data-toc>
+  <details class="toc__details" open>
+    <summary class="toc__toggle">
+      <span class="toc__title">En este artículo</span>
+      <svg class="toc__chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </summary>
+    <ol class="toc__list">
+      {headings.map((h) => (
+        <li class={`toc__item toc__item--depth-${h.depth}`}>
+          <a href={`#${h.slug}`} data-toc-link>{h.text}</a>
+        </li>
+      ))}
+    </ol>
+  </details>
+</nav>
+
+<script>
+  function initToc() {
+    const nav = document.querySelector<HTMLElement>('[data-toc]');
+    if (!nav) return;
+
+    const details = nav.querySelector<HTMLDetailsElement>('.toc__details');
+
+    // On mobile (<1024px) start collapsed; on desktop keep open
+    if (details && window.innerWidth < 1024) {
+      details.removeAttribute('open');
+    }
+
+    const links = nav.querySelectorAll<HTMLAnchorElement>('[data-toc-link]');
+    if (!links.length) return;
+
+    const headingEls = Array.from(links).reduce<HTMLElement[]>((acc, link) => {
+      const id = link.getAttribute('href')?.slice(1);
+      if (id) {
+        const el = document.getElementById(id);
+        if (el) acc.push(el);
+      }
+      return acc;
+    }, []);
+
+    if (!headingEls.length) return;
+
+    let activeId = '';
+
+    function setActive(id: string) {
+      if (id === activeId) return;
+      activeId = id;
+      links.forEach((link) => {
+        const isActive = link.getAttribute('href') === `#${id}`;
+        link.classList.toggle('toc__link--active', isActive);
+      });
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (visible.length) {
+          setActive(visible[0].target.id);
+        }
+      },
+      { rootMargin: '-80px 0px -60% 0px', threshold: 0 }
+    );
+
+    headingEls.forEach((el) => observer.observe(el));
+
+    links.forEach((link) => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const id = link.getAttribute('href')?.slice(1);
+        if (!id) return;
+        const target = document.getElementById(id);
+        if (!target) return;
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        history.replaceState(null, '', `#${id}`);
+        setActive(id);
+      });
+    });
+
+    if (headingEls.length) setActive(headingEls[0].id);
+  }
+
+  initToc();
+</script>

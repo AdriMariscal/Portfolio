@@ -65,13 +65,12 @@ export default defineConfig({
         ],
       },
       workbox: {
-        navigateFallback: '/offline',
-        navigateFallbackDenylist: [/^\/admin/, /^\/api/],
         runtimeCaching: [
           {
-            urlPattern: /\.(?:html)$/,
+            // Clean URLs (pages) — paths without file extensions
+            urlPattern: /\/[^.]*$/,
             handler: 'NetworkFirst',
-            options: { cacheName: 'html-cache', expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 * 24 } },
+            options: { cacheName: 'pages-cache', expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 * 24 } },
           },
           {
             urlPattern: /\.(?:css|js)$/,
