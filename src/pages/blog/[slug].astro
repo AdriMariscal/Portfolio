@@ -52,12 +52,6 @@ const title = post.data.title ?? SITE.title;
 const description = post.data.description ?? SITE.description;
 const canonical = Astro.url?.href ?? new URL(`/blog/${post.slug}/`, SITE.url).href;
 
-// Imagen principal (absoluta): prioriza la del post si existe
-const rawImage = (post.data.image ?? post.data.heroImage ?? SITE.ogImage ?? '/og-default.png') as string;
-const imageAbs = rawImage?.startsWith('http')
-  ? rawImage
-  : new URL(rawImage, SITE.url).href;
-
 // Hero dentro del artículo: solo si el frontmatter define `image`
 const heroImage =
   typeof (post.data as any).image === "string" &&
@@ -77,6 +71,14 @@ const heroCaption =
   (post.data as any).imageCaption.trim().length > 0
     ? (post.data as any).imageCaption.trim()
     : "";
+
+// OG image: el endpoint /og/blog/[slug].png decide en build time:
+//   · Si el post tiene hero image → sharp la procesa a 1200×630 JPEG ≤600KB
+//   · Si no tiene → satori genera la imagen branded
+// BaseLayout resuelve la ruta con deployBase (Astro.site).
+// Para JSON-LD se usa siempre la URL canónica de producción.
+const ogImageRel = `/og/blog/${post.slug}.png`;
+const ogImageCanonical = new URL(ogImageRel, SITE.url).href;
 
 // Fechas del frontmatter (acepta Date o string)
 const toISO = (d: unknown) => {
@@ -109,7 +111,7 @@ const jsonLd = {
       "@id": canonical,
       "headline": title,
       "description": description,
-      "image": imageAbs,
+      "image": ogImageCanonical,
       "url": canonical,
       "mainEntityOfPage": { "@type": "WebPage", "@id": canonical },
       "inLanguage": SITE.lang ?? "es",
@@ -151,8 +153,10 @@ const jsonLd = {
   title={title}
   metaTitle={metaTitle}
   description={metaDescription}
-  ogImage={imageAbs}
+  ogImage={ogImageRel}
   ogImageAlt={heroAlt}
+  twitterImage={ogImageRel}
+  twitterImageAlt={heroAlt}
   ogType="article"
   articleAuthor={SITE.author}
   articleTags={tags}

@@ -3,11 +3,11 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Button from "../components/ui/Button.astro";
 import Card from "../components/ui/Card.astro";
-import { buildMetaDescription, buildMetaTitle, SEO_KEYWORD } from "../lib/seo";
+import { buildMetaDescription, ABOUT_META_TITLE } from "../lib/seo";
 import { SITE } from "../lib/config";
 
 const pageTitle = "About";
-const metaTitle = buildMetaTitle(SEO_KEYWORD, "About · Adrián Mariscal");
+const metaTitle = ABOUT_META_TITLE;
 const metaDescription = buildMetaDescription(
   "Historia, metodología y valores de Adrián Mariscal, consultor de rendimiento web, SEO técnico y UX.",
   "Solicita una auditoría y revisa los packs disponibles."
@@ -54,7 +54,7 @@ const aboutJsonLd = {
 };
 ---
 
-<BaseLayout title={pageTitle} metaTitle={metaTitle} description={metaDescription}>
+<BaseLayout title={pageTitle} metaTitle={metaTitle} description={metaDescription} ogImage="/og/about.png">
   <section class="section hero section--about-hero">
     <div class="wrap about-hero">
       <div class="about-hero__content stack" style="--stack-gap: 18px;">

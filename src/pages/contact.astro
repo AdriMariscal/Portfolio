@@ -4,9 +4,9 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import Button from "../components/ui/Button.astro";
 import Card from "../components/ui/Card.astro";
 import Input from "../components/ui/Input.astro";
-import { buildMetaDescription, buildMetaTitle, SEO_KEYWORD } from "../lib/seo";
+import { buildMetaDescription, CONTACT_META_TITLE } from "../lib/seo";
 
-const metaTitle = buildMetaTitle(SEO_KEYWORD, "Contacto");
+const metaTitle = CONTACT_META_TITLE;
 const metaDescription = buildMetaDescription(
   "Contacta para mejorar rendimiento web, SEO técnico y UX con un plan claro y medible.",
   "Agenda tu auditoría gratuita hoy."
@@ -14,7 +14,7 @@ const metaDescription = buildMetaDescription(
 const hcaptchaSiteKey = import.meta.env.PUBLIC_HCAPTCHA_SITE_KEY ?? "";
 ---
 
-<BaseLayout title="Contacto" metaTitle={metaTitle} description={metaDescription}>
+<BaseLayout title="Contacto" metaTitle={metaTitle} description={metaDescription} ogImage="/og/contact.png">
   <main class="section section--contact">
     <div class="wrap">
       <!-- Encabezado con respiración -->

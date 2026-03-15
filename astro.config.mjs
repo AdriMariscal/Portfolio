@@ -7,9 +7,14 @@ import remarkImages from 'remark-images';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import { rehypeHeadingIds } from '@astrojs/markdown-remark';
 
+// En Netlify, DEPLOY_PRIME_URL apunta al deploy específico (dev.adrianmariscal.es,
+// preview-xxx.netlify.app, etc.). En local y en producción no está definida,
+// por lo que se usa el dominio canónico. Esto permite que og:image y otros
+// recursos estáticos resuelvan correctamente en cada entorno.
+const deployUrl = process.env.DEPLOY_PRIME_URL ?? 'https://adrianmariscal.es';
+
 export default defineConfig({
-  // Dominio canónico en producción
-  site: 'https://adrianmariscal.es',
+  site: deployUrl,
 
   // Configuración de Markdown / Shiki / plugins
   markdown: {

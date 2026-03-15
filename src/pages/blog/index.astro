@@ -4,7 +4,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import PostCard from '@/components/PostCard.astro';
 import Input from '@/components/ui/Input.astro';
 import { getCollection } from 'astro:content';
-import { buildMetaDescription, buildMetaTitle, SEO_KEYWORD } from '@/lib/seo';
+import { buildMetaDescription, BLOG_META_TITLE } from '@/lib/seo';
 import { SITE } from '@/lib/config';
 
 // Coacción segura de fecha
@@ -27,17 +27,15 @@ const VISIBLE = 9;
 const totalPages = Math.max(1, Math.ceil(posts.length / VISIBLE));
 const initialVisible = Math.min(VISIBLE, posts.length);
 
-const metaTitle = buildMetaTitle(SEO_KEYWORD, "Blog de rendimiento y SEO");
+const metaTitle = BLOG_META_TITLE;
 const metaDescription = buildMetaDescription(
   "Artículos sobre rendimiento web, Astro, SEO técnico, Node y estrategia digital aplicada.",
   "Explora las guías y mejora tu web hoy."
 );
 
 const canonical = new URL("/blog/", SITE.url).href;
-const pageImage = SITE.ogImage ?? "/og-default.png";
-const pageImageAbs = pageImage.startsWith("http")
-  ? pageImage
-  : new URL(pageImage, SITE.url).href;
+const ogImageRel = "/og/blog.png";
+const pageImageAbs = new URL(ogImageRel, SITE.url).href;
 const organizationId = `${SITE.url}#organization`;
 const blogJsonLd = {
   "@context": "https://schema.org",
@@ -78,6 +76,7 @@ const blogJsonLd = {
   title="Blog"
   metaTitle={metaTitle}
   description={metaDescription}
+  ogImage={ogImageRel}
 >
   <section class="section section--blog">
     <header class="section__header">

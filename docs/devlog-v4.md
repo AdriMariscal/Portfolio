@@ -144,6 +144,16 @@ Regla: todas las versiones MINOR se registran; PATCH solo cuando aporte.
 - Redeploy de producción forzado vía Netlify CLI; sitio live en `https://adrianmariscal.es` con las nuevas variables activas.
 - Refs: #604
 
+## v4.21.0 — 2026-03-14
+- T-014 [SEO]: OG images automáticas por página generadas en build time (`satori` + `sharp`). Cubre blog (41 posts), proyectos (3 fichas + índice), 7 páginas estáticas (home, about, services, auditoria-web, contact, /blog/, /projects/).
+- Diseño de marca: fondo Charcoal 900, borde lateral Sand 500, badge de tipo, título Sora 700, CTA en Teal 500, footer con autor + dominio.
+- Posts con `image:` en frontmatter: pipeline de 3 pasos (sharp resize 1200×630 → overlay negro 55% → composite de texto satori transparente → JPEG ≤600KB). Resuelve dimensiones erróneas, peso excesivo y añade branding consistente sobre la foto.
+- Meta titles estandarizados a 50-60 chars en todas las páginas: nuevas constantes `HOME/ABOUT/SERVICES/PROJECTS/BLOG/CONTACT_META_TITLE` + función `buildProjectMetaTitle` para fichas dinámicas de proyecto.
+- `og:image` y `twitter:image` resuelven al dominio del deploy actual (`DEPLOY_PRIME_URL` → `Astro.site`); `canonical` siempre a producción.
+- Twitter cards actualizadas a `summary_large_image`; JSON-LD (`BlogPosting.image`, `CreativeWork.image`) referencia la OG dinámica.
+- Deps añadidas: `satori@0.25.0`, `sharp@0.34.5`.
+- Refs: #590
+
 ## v4.2.0 — 2026-03-13
 - T-002 [BRAND]: verificados con fórmula WCAG 2.1 todos los ratios de contraste de §10.1 de la guía de marca.
 - Las 4 combinaciones Sand nuevas pasan su nivel esperado: Sand 500/Charcoal 900 → 7.98:1 AAA; Teal 700/Sand 100 → 4.65:1 AA; Charcoal 900/Sand 100 → 10.69:1 AAA; Charcoal 950/Sand 500 → 9.94:1 AAA.
