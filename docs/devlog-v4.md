@@ -144,15 +144,13 @@ Regla: todas las versiones MINOR se registran; PATCH solo cuando aporte.
 - Redeploy de producción forzado vía Netlify CLI; sitio live en `https://adrianmariscal.es` con las nuevas variables activas.
 - Refs: #604
 
-## v4.21.4 — 2026-03-14
-- Patch v4.21.4 — CTA añadido al template de OG images en todas las páginas (blog, proyectos, estáticas).
-
 ## v4.21.0 — 2026-03-14
-- T-014 [SEO]: OG images dinámicas por página generadas en build time con `satori` + `sharp`.
-- Endpoint `src/pages/og/[...slug].png.ts` cubre 41 posts, 3 proyectos y 5 páginas estáticas (home, about, services, auditoria-web, contact).
-- Diseño de marca: fondo Charcoal 900, acento lateral Sand 500, badge de tipo, título en Sora 700, pie con autor y dominio en Teal 500.
-- Twitter cards de blog y proyectos actualizadas a `summary_large_image` con la imagen específica (no el isotipo genérico).
-- JSON-LD (`BlogPosting.image`, `CreativeWork.image`) actualizado para referenciar la OG dinámica.
+- T-014 [SEO]: OG images automáticas por página generadas en build time (`satori` + `sharp`). Cubre blog (41 posts), proyectos (3 fichas + índice), 7 páginas estáticas (home, about, services, auditoria-web, contact, /blog/, /projects/).
+- Diseño de marca: fondo Charcoal 900, borde lateral Sand 500, badge de tipo, título Sora 700, CTA en Teal 500, footer con autor + dominio.
+- Posts con `image:` en frontmatter: pipeline de 3 pasos (sharp resize 1200×630 → overlay negro 55% → composite de texto satori transparente → JPEG ≤600KB). Resuelve dimensiones erróneas, peso excesivo y añade branding consistente sobre la foto.
+- Meta titles estandarizados a 50-60 chars en todas las páginas: nuevas constantes `HOME/ABOUT/SERVICES/PROJECTS/BLOG/CONTACT_META_TITLE` + función `buildProjectMetaTitle` para fichas dinámicas de proyecto.
+- `og:image` y `twitter:image` resuelven al dominio del deploy actual (`DEPLOY_PRIME_URL` → `Astro.site`); `canonical` siempre a producción.
+- Twitter cards actualizadas a `summary_large_image`; JSON-LD (`BlogPosting.image`, `CreativeWork.image`) referencia la OG dinámica.
 - Deps añadidas: `satori@0.25.0`, `sharp@0.34.5`.
 - Refs: #590
 
