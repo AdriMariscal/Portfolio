@@ -3,6 +3,16 @@
 Notas rápidas de cambios durante el desarrollo de la línea major v4.
 Regla: todas las versiones MINOR se registran; PATCH solo cuando aporte.
 
+## v4.23.0 — 2026-03-15
+- T-019 [FEAT]: PWA completa con Service Worker + offline cache (Workbox) — sitio instalable en Chrome/Edge.
+- Integración `@vite-pwa/astro` v1.2.0 con estrategia `generateSW`: auto-genera `sw.js` y `manifest.webmanifest` en build.
+- Manifest configurado con `theme_color`/`background_color: #2F3437` (Charcoal 900), `display: standalone`, iconos 192×192 y 512×512 generados desde el logo SVG existente vía sharp.
+- Estrategias de caché Workbox: `NetworkFirst` para HTML, `CacheFirst` para CSS/JS, imágenes, fuentes y Google Fonts; 124 entradas precacheadas (~3.2 MB).
+- Nueva página `/offline` con diseño coherente (icono WiFi off, mensaje en español, botón reintentar) que se muestra automáticamente al navegar sin conexión.
+- CSP actualizada con `worker-src 'self'`; umbral PWA añadido en `lighthouserc.cjs` (≥ 0.85) y `netlify.toml`.
+- Eliminado `site.webmanifest` manual (el plugin lo genera); `apple-touch-icon` corregido a `pwa-192x192.png`.
+- Refs: #595
+
 ## v4.22.0 — 2026-03-15
 - T-018 [FEAT]: sección de prueba social / testimonios en Home y /services (guía §14 Q5).
 - Componente `Testimonial.astro` con datos tipados: nombre/iniciales (anonimizable), empresa/sector, texto, resultado cuantificado opcional; flag `draft` para no publicar hasta tener consentimiento.
