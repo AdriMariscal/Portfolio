@@ -1,5 +1,14 @@
 ---
 // src/layouts/BaseLayout.astro
+
+// Self-hosted fonts via Fontsource (all subsets, browser picks via unicode-range)
+import "@fontsource/inter/400.css";
+import "@fontsource/inter/500.css";
+import "@fontsource/inter/600.css";
+import "@fontsource/sora/600.css";
+import "@fontsource/sora/700.css";
+import "@fontsource/sora/800.css";
+
 import "../styles/global.css";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
@@ -84,8 +93,6 @@ const locale = "es_ES";
 const siteName = SITE.siteName ?? "Portfolio - Adrián Mariscal";
 const organizationId = `${SITE.url}#organization`;
 const personId = `${SITE.url}#persona`;
-const fontStylesheet =
-  "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap";
 const organizationImage = SITE.ogImage ?? "/logos/logo_fondo_Charcoal950.png";
 const organizationImageAbs = organizationImage.startsWith("http")
   ? organizationImage
@@ -154,11 +161,6 @@ const schemaOrg = {
     <link rel="canonical" href={canonical} />
     {robots && <meta name="robots" content={robots} />}    
 
-    <!-- Fuentes: preconnect + preload para máximo rendimiento sin onload inline -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preload" as="style" href={fontStylesheet} />
-    <link rel="stylesheet" href={fontStylesheet} />
 
     <!-- Open Graph -->
     <meta property="og:locale" content={locale} />

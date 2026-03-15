@@ -3,6 +3,15 @@
 Notas rápidas de cambios durante el desarrollo de la línea major v4.
 Regla: todas las versiones MINOR se registran; PATCH solo cuando aporte.
 
+## v4.26.0 — 2026-03-15
+- T-022 [PERF]: Auditoría y subconjunto de carga de web fonts (Sora, Inter).
+- Migración de Google Fonts CDN a self-hosting vía Fontsource: elimina 2 orígenes externos (fonts.googleapis.com + fonts.gstatic.com), 1 stylesheet render-blocking y 2 preconnects.
+- Pesos cargados alineados con guía de marca: Inter 400/500/600 (UI), Sora 600/700/800 (Display). Se elimina Inter 700 (no especificado en brand guide §11).
+- Nuevo token `--font-mono` en tokens.css; bloques de código unificados con el token en vez de pilas hardcodeadas.
+- CSP, Link headers y reglas Workbox actualizados para reflejar el self-hosting.
+- Peso total de fuentes descargado por el navegador (subset latin): ~115 KB (<120 KB objetivo).
+- Refs: #598
+
 ## v4.24.0 — 2026-03-15
 - T-020 [FEAT]: tabla de contenidos auto-generada para posts de blog largos (≥3 headings H2).
 - Componente `TableOfContents.astro` extraído: sticky sidebar en desktop (≥1024px), colapsable en móvil.
