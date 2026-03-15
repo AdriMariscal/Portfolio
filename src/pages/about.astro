@@ -102,6 +102,11 @@ const aboutJsonLd = {
           Desde la auditoría inicial hasta la entrega final, mantengo un enfoque editorial: menos
           ruido visual, más espacio para la lectura y una narrativa clara que explique cada decisión.
         </p>
+        <p class="about-text about-text--highlight">
+          Además de rendimiento web, tengo experiencia en Salesforce para equipos que buscan ordenar
+          ventas, CRM y automatización. Puedes consultar
+          <a class="about__link" href="/blog/tags/salesforce/">artículos sobre Salesforce en el blog</a>.
+        </p>
       </div>
       <figure class="about-photo about-photo--wide">
         <img
@@ -308,6 +313,22 @@ const aboutJsonLd = {
   .about-text {
     color: var(--color-text-muted);
     max-width: 64ch;
+  }
+
+  .about__link {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    font-weight: 500;
+  }
+
+  .about__link:hover {
+    text-decoration-color: var(--color-accent-strong);
+  }
+
+  .about-text--highlight {
+    padding-left: 1rem;
+    border-left: 3px solid var(--color-accent-border);
   }
 
   .about-photo--wide img {

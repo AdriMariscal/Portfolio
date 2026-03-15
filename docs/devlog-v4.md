@@ -3,6 +3,13 @@
 Notas rápidas de cambios durante el desarrollo de la línea major v4.
 Regla: todas las versiones MINOR se registran; PATCH solo cuando aporte.
 
+## v4.30.0 — 2026-03-15
+- T-030 [DX]: Recolocar referencia a Salesforce: de stat de hero a About/Services.
+- Hero del Home: sustituido stat "10+ Años con Salesforce" por "48–72h Tiempo de entrega informe" (alineado con guía §1 y §5).
+- Referencia a Salesforce movida a /about (Trayectoria) y /services (capacidades adicionales) de forma selectiva.
+- Las 3 estadísticas del hero refuerzan posicionamiento performance-first: tiempo de entrega, proyectos propios, Lighthouse medio.
+- Refs: #606
+
 ## v4.29.0 — 2026-03-15
 - T-029 [DX]: reporte de cobertura de tests unitarios al CI (umbral 60%).
 - Umbrales de Vitest actualizados a 60% para líneas y branches en `vitest.config.ts`; el CI falla si la cobertura cae por debajo.
