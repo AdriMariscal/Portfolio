@@ -205,8 +205,8 @@ function buildElement(props: OGProps & { transparentBg?: boolean }): object {
 // ---------------------------------------------------------------------------
 export const getStaticPaths: GetStaticPaths = async () => {
   const [blogPosts, projects] = await Promise.all([
-    getCollection('blog', ({ data }) => !data.draft),
-    getCollection('projects', ({ data }) => data.published !== false),
+    getCollection('blog', (entry: any) => !entry.data.draft),
+    getCollection('projects', (entry: any) => entry.data.published !== false),
   ]);
 
   const staticPages: Array<OGProps & { slug: string }> = [
@@ -262,7 +262,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
   ];
 
   return [
-    ...blogPosts.map((post) => ({
+    ...blogPosts.map((post: any) => ({
       params: { slug: `blog/${post.slug}` },
       props: {
         title: String(post.data.title ?? SITE.title),
@@ -272,7 +272,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
         heroImagePath: String((post.data as Record<string, unknown>).image ?? '').trim() || null,
       } satisfies OGProps,
     })),
-    ...projects.map((project) => ({
+    ...projects.map((project: any) => ({
       params: { slug: `projects/${project.slug}` },
       props: {
         title: String((project.data as Record<string, unknown>).title ?? SITE.title),
