@@ -99,7 +99,7 @@
 [[headers]]
   for = "/admin/*"
   [headers.values]
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; connect-src 'self' https://api.netlify.com https://api.github.com https://raw.githubusercontent.com https://uploads.github.com; font-src 'self' https://fonts.gstatic.com; frame-src 'self' blob:; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://api.netlify.com https://github.com; object-src 'none'; worker-src blob:"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https:; connect-src 'self' https://api.netlify.com https://api.github.com https://raw.githubusercontent.com https://uploads.github.com https://unpkg.com https://ingesteer.services-prod.nsvcs.net; font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com; frame-src 'self' blob:; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://api.netlify.com https://github.com; object-src 'none'; worker-src blob:"
     Cross-Origin-Opener-Policy = "unsafe-none"
 
 [[headers]]
