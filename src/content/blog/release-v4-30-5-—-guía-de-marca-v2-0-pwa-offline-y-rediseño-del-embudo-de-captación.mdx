@@ -1,0 +1,154 @@
+---
+title: Release v4.30.5 — Guía de marca v2.0, PWA offline y rediseño del embudo
+  de captación
+description: La versión 4.30.5 del Portfolio aplica la guía de marca v2.0
+  end-to-end, añade PWA offline, OG images automáticas, landing SEO y
+  newsletter.
+tags:
+  - release-notes
+  - portfolio
+  - astro
+  - seo
+  - a11y
+  - performance
+  - ux
+date: 2026-03-15T14:54:00.000+01:00
+published: true
+draft: false
+---
+## Resumen
+ 
+La versión 4.30.5 es la primera major del Portfolio desde la v3.55.7 (enero 2026). Aplica la guía de imagen de marca v2.0 de principio a fin, incorpora capacidades PWA con caché offline, rediseña el embudo de captación y añade infraestructura SEO que no existía en v3.
+ 
+El salto de v3 a v4 incluye 30 versiones minor y 10 patches, agrupados en 30 tareas planificadas. Highlights:
+ 
+- Paleta Sand desaturada y light mode "Neutral funcional" sin amarillo visible.
+- Regla de contención de color (máximo 2 colores de marca por sección) y Teal restringido a estados interactivos.
+- PWA instalable con Service Worker (Workbox), página offline y score PWA en CI.
+- OG images automáticas por página generadas en build con satori + sharp.
+- Landing dedicada `/auditoria-web` con schema FAQ para captación SEO transaccional.
+- Newsletter del blog con Buttondown (GDPR, doble opt-in).
+- Página `/services` con los tres packs cerrados, precios visibles y naming de marca.
+- Sección de prueba social / testimonios preparada con flag `draft` para consentimiento.
+- Tabla de contenidos auto-generada en posts largos, breadcrumbs visuales y schema.org ampliado.
+ 
+El resumen de cambios se ha extraído del [devlog v4](https://github.com/AdriMariscal/Portfolio/blob/main/docs/devlog-v4.md), que documenta cada versión minor de la línea v4.x.
+ 
+## Por qué este cambio
+ 
+La v3 del Portfolio alcanzó Lighthouse 99/99/100/100 y un blog con más de 25 artículos, pero una ronda de feedback sobre la identidad visual reveló problemas concretos: el light mode saturaba la vista con un fondo excesivamente amarillo, la sobreexposición simultánea de colores de marca restaba coherencia y la página de servicios no reflejaba la oferta comercial real.
+ 
+La guía de marca v2.0 (febrero 2026) formalizó esos ajustes: paleta Sand desaturada, regla de contención de color y light mode reformulado como "Neutral funcional". Aplicar esos cambios requería tocar tokens, componentes, temas CSS y la lógica visual de cada sección del sitio, justificando una major.
+ 
+Al mismo tiempo, la auditoría funcional detectó gaps de producto que frenaban la conversión: formulario de contacto sin cualificación de lead, sin prueba social, sin landing de captación SEO, sin newsletter, sin PWA y con el CMS en un flujo editorial complejo innecesario para un único autor.
+ 
+La v4 resuelve ambas líneas simultáneamente: identidad visual coherente con la guía v2.0 y funcionalidades que convierten el portfolio de una carta de presentación en un canal de captación operativo.
+ 
+## Qué hay de nuevo
+ 
+### Identidad visual v2.0
+ 
+Los tokens CSS y JSON de la paleta Sand se han actualizado a los nuevos valores desaturados: Sand 500 pasa de `#FBE7B5` a `#E2CC96`, Sand 700 de `#E8D3A3` a `#C9B07A` y Sand 100 de `#FFF6E1` a `#F0ECE4`. Los ratios de contraste WCAG se verificaron con la fórmula de luminancia relativa y están documentados en [`docs/contraste-v2.md`](https://github.com/AdriMariscal/Portfolio/blob/main/docs/contraste-v2.md): todas las combinaciones Sand pasan su nivel esperado (AAA o AA según caso).
+ 
+El light mode ya no reproduce la paleta de marca en primer plano. El fondo es `#F0ECE4` (neutro cálido, no amarillo), las cards son blancas y el texto es Charcoal 900. Ninguna sección muestra fondo perceptiblemente amarillo al activar el tema claro.
+ 
+La regla de contención de color se ha aplicado sección por sección: el botón primario pasó de gradiente Teal a Sand 500, las barras decorativas de títulos de sección usan gradiente Sand, los tags/chips pasaron de teal-soft a sand-soft y el glow del hero en dark mode usa Sand cálido en lugar de Teal. Resultado: ninguna sección muestra Charcoal + Sand + Teal simultáneamente en reposo.
+ 
+Teal queda exclusivamente en estados interactivos (hover, focus, link activo). El color de éxito (`--color-success`) se corrigió de teal-500 a verde semántico (`#22C55E`). En light mode, los acentos interactivos usan teal-700 (`#0F766E`) para mejor contraste sobre Sand 100.
+ 
+Otros ajustes de marca: logo del navbar y footer migrado de PNG a SVG (nítido en Retina), CTA secundario del hero corregido a "Ver mi metodología de performance" y componentes Button/CTA auditados contra la especificación (outline Sand 500 en secondary, link Teal en tertiary, focus ring en todas las variantes).
+ 
+Refs: [#577](https://github.com/AdriMariscal/Portfolio/issues/577), [#578](https://github.com/AdriMariscal/Portfolio/issues/578), [#579](https://github.com/AdriMariscal/Portfolio/issues/579), [#580](https://github.com/AdriMariscal/Portfolio/issues/580), [#581](https://github.com/AdriMariscal/Portfolio/issues/581), [#582](https://github.com/AdriMariscal/Portfolio/issues/582), [#584](https://github.com/AdriMariscal/Portfolio/issues/584), [#585](https://github.com/AdriMariscal/Portfolio/issues/585)
+ 
+### SEO y visibilidad
+ 
+El meta title del Home se optimizó para keyword al inicio: "Diseñador Web Performance · Adrián Mariscal" (44 caracteres, keyword principal en los primeros 25).
+ 
+El schema.org se ha ampliado significativamente: nodo `Person` con `sameAs` (LinkedIn + GitHub) y `jobTitle: "Diseñador Web"`, nodo `Organization` elevado a `["ProfessionalService", "LocalBusiness"]` con `areaServed: "España"` y `priceRange: "€€"`. Breadcrumb visual y JSON-LD `BreadcrumbList` añadidos en fichas de proyecto y posts de blog.
+ 
+Nueva landing `/auditoria-web` con estructura H1→H2→CTA orientada a featured snippets, schema.org `FAQPage` con 5 preguntas, meta title SEO-first y enlaces internos desde Home y `/services`.
+ 
+OG images automáticas generadas en build time con satori + sharp para las 41 entradas del blog, 3 fichas de proyecto y 7 páginas estáticas. Diseño de marca consistente: fondo Charcoal 900, borde Sand 500, tipografía Sora. Posts con imagen en frontmatter reciben un composite con overlay y texto; el resto obtiene una tarjeta de texto con branding. Twitter cards actualizadas a `summary_large_image`.
+ 
+La página de servicios (`/services`) se ha alineado con la guía: packs renombrados a Corrección / Optimización / Excelencia con descripciones completas (objetivo, incluye, ideal para), precios visibles (490€ / 990€ / 2.490€), badge "Más popular" en Optimización y CTA "Pedir presupuesto cerrado". Schema.org `Service` + `Offer` por cada pack.
+ 
+Refs: [#586](https://github.com/AdriMariscal/Portfolio/issues/586), [#587](https://github.com/AdriMariscal/Portfolio/issues/587), [#588](https://github.com/AdriMariscal/Portfolio/issues/588), [#589](https://github.com/AdriMariscal/Portfolio/issues/589), [#590](https://github.com/AdriMariscal/Portfolio/issues/590), [#592](https://github.com/AdriMariscal/Portfolio/issues/592)
+ 
+### Captación y conversión
+ 
+El formulario de contacto se ha rediseñado con campos de cualificación de lead: URL del sitio, stack actual, objetivo (requerido), plazo y presupuesto orientativo. Placeholders alineados con la guía de marca. Honeypot `bot-field` añadido y Netlify Function actualizada para recoger y reenviar los nuevos campos, incluyendo un bloque ampliado en Slack. Mensaje de confirmación: "Recibido. En breve te respondo con los siguientes pasos."
+ 
+Sección de prueba social / testimonios implementada en Home y `/services`. Componente `Testimonial.astro` con datos tipados (nombre/iniciales, empresa/sector, texto, resultado cuantificado) y flag `draft`. En producción solo se muestra si hay al menos un testimonio publicado; en dev/staging se muestran todos, incluyendo placeholders. Proceso de obtención de consentimiento documentado en [`docs/plantilla-testimonio.md`](https://github.com/AdriMariscal/Portfolio/blob/main/docs/plantilla-testimonio.md).
+ 
+Sección estandarizada "Antes/Después" en fichas de proyecto con tabla de métricas (Métrica / Antes / Después / Mejora). Fichas de Portfolio y Cartas Rápidas actualizadas con datos reales de Lighthouse CI histórico. Plantilla para futuros proyectos en [`docs/plantilla-caso-estudio.md`](https://github.com/AdriMariscal/Portfolio/blob/main/docs/plantilla-caso-estudio.md).
+ 
+Refs: [#583](https://github.com/AdriMariscal/Portfolio/issues/583), [#593](https://github.com/AdriMariscal/Portfolio/issues/593), [#594](https://github.com/AdriMariscal/Portfolio/issues/594)
+ 
+### Blog y contenido editorial
+ 
+Decap CMS simplificado a modo `simple`: los commits van directamente a `main` y Netlify auto-despliega en producción sin pasar por staging. Elimina la fricción del flujo editorial para un único autor.
+ 
+Tabla de contenidos auto-generada para posts con 3 o más encabezados H2. Componente `TableOfContents.astro` con sidebar sticky en desktop (≥1024 px) y colapsable en móvil. Highlight del heading activo con IntersectionObserver. Layout de post refactorizado a grid de 2 columnas en desktop.
+ 
+Newsletter del blog con Buttondown: Netlify Function `newsletter-subscribe` con validación de email, honeypot anti-spam e IP del cliente. Componente `NewsletterForm.astro` con variantes `inline` (final de cada post) y `compact` (footer). Doble opt-in GDPR y política de privacidad actualizada.
+ 
+Refs: [#591](https://github.com/AdriMariscal/Portfolio/issues/591), [#596](https://github.com/AdriMariscal/Portfolio/issues/596), [#597](https://github.com/AdriMariscal/Portfolio/issues/597)
+ 
+### PWA y rendimiento
+ 
+El sitio es ahora una Progressive Web App instalable. Integración con `@vite-pwa/astro` y estrategia `generateSW` de Workbox: `NetworkFirst` para HTML, `CacheFirst` para CSS/JS, imágenes y fuentes. Página `/offline` con diseño coherente que se muestra al navegar sin conexión. Manifest configurado con `theme_color: #2F3437`, iconos 192×192 y 512×512 generados desde el logo SVG.
+ 
+Las web fonts se han migrado de Google Fonts CDN a self-hosting vía Fontsource: se eliminan 2 orígenes externos (fonts.googleapis.com + fonts.gstatic.com), una stylesheet render-blocking y 2 preconnects. Pesos cargados alineados con la guía: Inter 400/500/600, Sora 600/700/800. Peso total de fuentes: ~115 KB (por debajo del objetivo de 120 KB). Nuevo token `--font-mono` en CSS para bloques de código.
+ 
+El umbral Lighthouse CI para PWA se elevó a `minScore: 0.85` (error, no warn). La categoría PWA fue eliminada del scoring en Lighthouse 12.x, por lo que la aserción se mantiene a través del plugin Lighthouse de Netlify.
+ 
+Refs: [#595](https://github.com/AdriMariscal/Portfolio/issues/595), [#598](https://github.com/AdriMariscal/Portfolio/issues/598), [#599](https://github.com/AdriMariscal/Portfolio/issues/599)
+ 
+### Accesibilidad
+ 
+Integración de `@axe-core/playwright` en CI: nuevo test `a11y.spec.ts` que visita 5 páginas principales y falla en violaciones "critical" o "serious". Workflow independiente `ci-a11y.yml` con reporte como artefacto.
+ 
+QA completa de navegación por teclado: regla global `focus-visible` para todos los elementos interactivos con outline Teal consistente. Corregidos focus rings inconsistentes en `.nav-toggle`, `.footer__link-btn`, `.codeblock__copy`, `.skip-link`, `.theme-toggle`, `.card--link`, `.cookie-banner__link`, `.toc__item a` y otros. Touch targets 44×44 px verificados en nav links, paginación, tags, footer, toggle de tema y botón de copia de código.
+ 
+Refs: [#600](https://github.com/AdriMariscal/Portfolio/issues/600), [#601](https://github.com/AdriMariscal/Portfolio/issues/601)
+ 
+### Infraestructura y DX
+ 
+CSP implementada en `netlify.toml`: scripts inline extraídos a módulos TypeScript externos para cumplir `script-src 'self'` sin `'unsafe-inline'`. CSP del admin (`/admin/*`) configurada por separado con directivas para Decap CMS. Directivas clave: `frame-ancestors 'none'`, `base-uri 'self'`, `form-action 'self'`, `upgrade-insecure-requests`.
+ 
+Variables de entorno `CMS_SITE_URL` y `CMS_DISPLAY_URL` actualizadas para contexto `production` con `https://adrianmariscal.es`. Hook de notificación por email del formulario de contacto verificado y activo.
+ 
+Reporte de cobertura de tests unitarios añadido al CI con umbral de 60% para líneas y branches. Cobertura actual: 68.83% líneas, 66.66% branches.
+ 
+La referencia a Salesforce se ha reubicado del hero (donde tenía protagonismo indebido) a `/about` y `/services` de forma selectiva. Las tres estadísticas del hero ahora refuerzan el posicionamiento performance-first: tiempo de entrega informe (48–72h), proyectos propios y Lighthouse medio.
+ 
+Refs: [#602](https://github.com/AdriMariscal/Portfolio/issues/602), [#603](https://github.com/AdriMariscal/Portfolio/issues/603), [#604](https://github.com/AdriMariscal/Portfolio/issues/604), [#605](https://github.com/AdriMariscal/Portfolio/issues/605), [#606](https://github.com/AdriMariscal/Portfolio/issues/606)
+ 
+## Notas técnicas
+ 
+**CSP y Service Worker.** Los patches v4.30.1 a v4.30.5 resolvieron una cadena de problemas relacionados con la CSP y el Service Worker. El admin de Decap CMS requirió directivas adicionales (fonts.googleapis.com, unpkg.com, `'unsafe-eval'` para AJV). Los scripts inline de Astro en páginas de blog necesitaron un hash explícito en `script-src`. Finalmente, el Service Worker servía respuestas cacheadas con la CSP obsoleta: se excluyó HTML del precache (globIgnores) y las páginas se obtienen ahora por NetworkFirst con headers frescos.
+ 
+**Font self-hosting.** La migración a Fontsource elimina la dependencia de Google Fonts CDN y sus implicaciones de privacidad (RGPD). Se eliminó Inter 700 por no estar especificado en la guía de marca. El ahorro neto es marginal en bytes (las fuentes ya estaban comprimidas) pero significativo en conexiones de red: 2 orígenes menos, 0 stylesheets render-blocking externas.
+ 
+**OG images.** El pipeline de generación usa satori para renderizar el diseño a SVG y sharp para convertir a JPEG. Posts con `image:` en frontmatter pasan por un pipeline de 3 pasos: resize a 1200×630, overlay negro al 55% y composite del texto satori transparente. El resultado queda por debajo de 600 KB por imagen. Las URLs de `og:image` resuelven al dominio del deploy actual (`DEPLOY_PRIME_URL`); el `canonical` siempre apunta a producción.
+ 
+**Lighthouse 12.x y PWA.** Lighthouse 12.x eliminó la categoría PWA del scoring, por lo que la aserción `categories:pwa` provocaba fallos `auditRan` en CI. Se eliminó la aserción de `lighthouserc.cjs` y el regress guard de PWA se mantiene a través del plugin Lighthouse de Netlify.
+ 
+## Resultados / Impacto
+ 
+La v4 resuelve el gap de identidad visual que la ronda de feedback de febrero identificó. El light mode ya no transmite saturación ni sensación de incoherencia cromática. El dark mode, que el 75% de los revisores calificó como premium, se mantiene intacto.
+ 
+En producción se verifica que las tres estadísticas del hero refuerzan el posicionamiento performance-first. La página de servicios muestra por primera vez los precios de los packs, eliminando fricción para leads que evalúan presupuesto. El formulario de contacto recoge contexto de cualificación desde el primer mensaje.
+ 
+La PWA hace el sitio instalable en Chrome/Edge y garantiza una experiencia coherente sin conexión. Las OG images automáticas aseguran que cada contenido compartido en redes sociales lleve branding consistente. La newsletter abre un canal de captación diferida para los lectores del blog.
+ 
+El CI ahora cubre accesibilidad automatizada (axe-playwright), cobertura unitaria (≥60%), Lighthouse (performance 0.9, a11y 0.9, SEO 0.9, PWA vía plugin) y linting/typecheck. La CSP implementada apunta a una calificación Mozilla Observatory ≥ B+.
+ 
+## Próximos pasos
+ 
+- Validar la nueva paleta Sand con una ronda rápida de feedback (2–3 personas) en condiciones reales de pantalla.
+- Obtener y publicar el primer testimonio real con consentimiento para activar la sección de prueba social.
+- Definir el formato narrativo de "Antes/Después" (cuánto contexto incluir junto a las métricas).
+- Evaluar el impacto SEO de `/auditoria-web` y del schema ampliado en Search Console durante las próximas 4–6 semanas.
+- Configurar política de mantenimiento mensual cuando se active la base de clientes recurrentes.
+- Monitorizar la cobertura de tests unitarios y elevar el umbral progresivamente si se estabiliza por encima del 70%.
