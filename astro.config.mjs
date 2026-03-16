@@ -65,6 +65,9 @@ export default defineConfig({
         ],
       },
       workbox: {
+        // Excluir HTML del precache: el SW servía respuestas cacheadas con CSP obsoleta.
+        // Las páginas se obtienen por NetworkFirst (runtimeCaching) con headers frescos de Netlify.
+        globIgnores: ["**/*.html"],
         runtimeCaching: [
           {
             // Clean URLs (pages) — paths without file extensions
