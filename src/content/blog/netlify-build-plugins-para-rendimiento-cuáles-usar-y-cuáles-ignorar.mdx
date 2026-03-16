@@ -1,0 +1,164 @@
+---
+title: "Netlify build plugins para rendimiento: cuáles usar y cuáles ignorar"
+description: "Evalúa los build plugins de Netlify desde el rendimiento real:
+  cuáles aportan mejoras medibles en un proyecto Astro y cuáles solo gastan
+  minutos de build."
+tags:
+  - netlify
+  - performance
+  - astro
+  - lighthouse
+  - ci-cd
+  - pymes
+date: 2026-03-12T13:26:00.000+01:00
+published: true
+draft: false
+image: https://images.pexels.com/photos/546819/pexels-photo-546819.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1
+imageAlt: Pantalla de ordenador mostrando código fuente sobre fondo oscuro en un
+  entorno de desarrollo
+robots: max-snippet:-1, max-image-preview:large
+---
+Netlify ofrece un catálogo creciente de build plugins que prometen mejorar tu sitio. Algunos cumplen. Otros añaden tiempo de build, dependencias y complejidad sin retorno claro.
+
+Si trabajas con Astro en el plan gratuito o Pro de Netlify, cada minuto de build cuenta. Este artículo evalúa los plugins más relevantes para rendimiento desde una perspectiva pragmática: qué instalar, qué configurar y qué descartar.
+
+## 1. Qué es un build plugin y cuándo tiene sentido usarlo
+
+Un build plugin es código que se ejecuta en fases específicas del ciclo de build de Netlify: antes de compilar (`onPreBuild`), después (`onPostBuild`) o tras el deploy (`onSuccess`). Se configuran en `netlify.toml` o desde la UI.
+
+Cada plugin consume minutos de build. En el plan Free, el límite es 300 minutos/mes. En Pro, 25.000. Parece holgado, pero si haces deploys frecuentes con deploy previews por cada PR (algo recomendable), los minutos se acumulan rápido.
+
+La pregunta antes de instalar cualquier plugin es siempre la misma: ¿el beneficio que aporta justifica el coste en tiempo de build y mantenimiento?
+
+## 2. Plugins que aportan mejoras medibles
+
+### 2.1. @netlify/plugin-lighthouse
+
+Este es el plugin de rendimiento por excelencia en Netlify. Ejecuta una auditoría Lighthouse después de cada deploy y muestra las puntuaciones directamente en la UI de deploys.
+
+Lo interesante no es solo ver el número, sino poder bloquear deploys que no cumplan un umbral mínimo. La configuración en `netlify.toml` es directa:
+
+~~~toml
+[[plugins]]
+package = "@netlify/plugin-lighthouse"
+
+[plugins.inputs]
+fail_deploy_on_score_thresholds = "true"
+
+[plugins.inputs.thresholds]
+performance = 0.9
+accessibility = 0.9
+seo = 0.9
+~~~
+
+Esto convierte Lighthouse en un guardián automático: si un cambio degrada el rendimiento por debajo del 90%, el deploy falla antes de llegar a producción. Es el equivalente a un presupuesto de performance integrado en el pipeline.
+
+Para un proyecto Astro estático, el coste adicional de build suele ser inferior a 30 segundos. Relación coste-beneficio excelente.
+
+Dos detalles que conviene saber. Primero: por defecto audita la ruta `/` tras el deploy. Si tienes páginas pesadas en otras rutas, añade auditorías adicionales con `[[plugins.inputs.audits]]`. Segundo: los sitios con SSR o ISR no pueden auditarse en modo pre-deploy (antes de que el sitio esté vivo).
+
+### 2.2. Cache de dependencias (automático en Netlify)
+
+Netlify cachea automáticamente `node_modules` y las dependencias de tu gestor de paquetes entre builds. Esto no es un plugin que instales, pero merece mención porque muchos desarrolladores añaden plugins de caché de terceros sin saber que la funcionalidad base ya está cubierta.
+
+Si usas Astro con npm o pnpm, la primera build será más lenta, pero las siguientes reutilizarán la caché. Lo único que puede romperla es un cambio en `package-lock.json` o `pnpm-lock.yaml`.
+
+No necesitas un plugin adicional de caché a menos que tu framework tenga un directorio de build intermedio que Netlify no cachee por defecto (caso de `.next` en Next.js, que sí tiene plugin propio). En Astro, el directorio `dist/` se regenera completamente y no requiere caché intermedia.
+
+### 2.3. Minificación y compresión de assets
+
+Netlify incluye post-procesamiento nativo: minificación de CSS, JS y HTML, más compresión Brotli en el CDN. Se activa desde **Project configuration > Build & deploy > Post processing**.
+
+Si Astro ya minifica tu output (que lo hace por defecto en builds de producción), la minificación de Netlify es redundante para JS y CSS. Pero la minificación HTML de Netlify puede recortar algunos bytes adicionales en páginas estáticas.
+
+La compresión Brotli en el CDN es gratuita y automática. No necesitas un plugin de compresión: Netlify la aplica a nivel de edge sin que intervengas.
+
+## 3. Plugins que merecen evaluación caso por caso
+
+### 3.1. netlify-plugin-checklinks
+
+Comprueba enlaces rotos después del build. Es útil en blogs con muchos enlaces externos que pueden caducar, pero tiene un coste: escanear todas las páginas lleva tiempo proporcional al tamaño del sitio.
+
+En un blog con 40-50 posts, el escaneo puede añadir 1-2 minutos a cada build. Si publicas semanalmente, es asumible. Si haces deploys diarios con previews, el coste se multiplica.
+
+Una alternativa más eficiente es ejecutar la comprobación de enlaces en CI (GitHub Actions, por ejemplo) de forma programada, en lugar de en cada build. Así separas el coste del flujo principal de deploy.
+
+### 3.2. netlify-plugin-sitemap
+
+Genera un sitemap XML automáticamente. Si tu framework ya lo genera (Astro tiene `@astrojs/sitemap` como integración oficial), el plugin es redundante. Instalar ambos puede producir conflictos o sitemaps duplicados.
+
+Regla simple: si usas `@astrojs/sitemap`, no instales el plugin de Netlify. Si no usas ninguna integración de sitemap, el plugin es una opción rápida.
+
+### 3.3. Image Optim
+
+Optimiza imágenes PNG, JPEG, GIF y SVG durante el build. Suena atractivo, pero en un proyecto Astro moderno la optimización de imágenes debería ocurrir antes: con el componente `<Image />` de Astro o con el Image CDN de Netlify, que transforma y sirve imágenes optimizadas directamente desde el edge.
+
+El Image CDN de Netlify no requiere plugin de build. Transforma imágenes sobre la marcha con parámetros en la URL (formato, tamaño, calidad). Es más eficiente que optimizar durante el build porque evita regenerar todas las imágenes en cada deploy.
+
+Si ya usas `astro:assets` o el Image CDN, Image Optim es redundante. Si trabajas con imágenes estáticas que no pasan por ninguna transformación, puede aportar valor, pero revisa primero si la ganancia justifica los segundos extra de build.
+
+## 4. Plugins que puedes ignorar en la mayoría de casos
+
+### 4.1. Plugins de caché específicos de framework (para Astro)
+
+`netlify-plugin-gatsby-cache`, `netlify-plugin-cache-nextjs` y similares están diseñados para frameworks con builds incrementales pesados. Astro genera builds estáticos ligeros por defecto. No necesitas caché de directorio intermedio.
+
+Si tu build de Astro tarda más de lo esperado, la solución rara vez es un plugin de caché. Suele ser una integración mal configurada, imágenes sin optimizar o un exceso de páginas generadas dinámicamente.
+
+### 4.2. Plugins de notificación o reporting
+
+Plugins que envían notificaciones a Slack, generan badges o publican resultados en PRs. No tocan el rendimiento de tu sitio. Si los necesitas para tu flujo de trabajo, adelante, pero no los confundas con optimización de performance.
+
+### 4.3. Subfont
+
+`netlify-plugin-subfont` analiza el uso de fuentes y optimiza la estrategia de carga. Es técnicamente interesante, pero en un proyecto Astro donde controlas la carga de fuentes con `<link rel="preload">` y `font-display: swap`, el beneficio marginal no suele compensar el tiempo extra de análisis en cada build.
+
+## 5. Configuración mínima recomendada para un proyecto Astro
+
+Con todo lo anterior, la configuración en `netlify.toml` que recomiendo como punto de partida para un sitio Astro enfocado en rendimiento es esta:
+
+~~~toml
+[build]
+  command = "astro build"
+  publish = "dist"
+
+# Lighthouse como guardián de performance
+[[plugins]]
+  package = "@netlify/plugin-lighthouse"
+
+  [plugins.inputs]
+  fail_deploy_on_score_thresholds = "true"
+
+  [plugins.inputs.thresholds]
+  performance = 0.9
+  accessibility = 0.9
+  best-practices = 0.9
+  seo = 0.9
+
+  # Audita también una página interior representativa
+  [[plugins.inputs.audits]]
+  path = "/blog/"
+
+  [plugins.inputs.audits.thresholds]
+  performance = 0.85
+~~~
+
+Un solo plugin. Claro, medible y con impacto real. Si más adelante necesitas checklinks o sitemap, evalúa primero si tu framework o tu CI ya lo cubren.
+
+## 6. Cómo medir el impacto real
+
+Instalar un plugin sin medir es como añadir una dependencia sin saber si la usas. Para cada plugin que consideres:
+
+1. Anota el tiempo medio de build antes de instalarlo (visible en el log de deploys de Netlify).
+2. Instala el plugin, haz 3-5 builds y compara el tiempo medio.
+3. Verifica que el beneficio prometido se refleja en las métricas reales: puntuación Lighthouse, tamaño de assets, tiempo de carga.
+
+Si el plugin añade 45 segundos de build pero no mueve ninguna métrica visible, elimínalo.
+
+## 7. Conclusión
+
+El ecosistema de build plugins de Netlify es extenso, pero para un proyecto Astro orientado a rendimiento, la configuración mínima es también la más efectiva. Lighthouse como guardián, la caché nativa de Netlify como base, y el Image CDN o `astro:assets` para imágenes.
+
+Todo lo demás merece una pregunta antes de instalarse: ¿qué métrica concreta va a mejorar esto, y cuánto me cuesta en minutos de build?
+
+Los minutos de build no son gratis. Trátales con el mismo criterio que aplicas al rendimiento de tu sitio: medir, decidir, recortar lo que no aporta.
