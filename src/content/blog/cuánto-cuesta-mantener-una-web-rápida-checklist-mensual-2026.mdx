@@ -120,13 +120,13 @@ Copia esta tabla a Google Sheets/Excel y rellena filas:
 ### Fórmulas útiles (opcional)
 Si tienes costes anuales, crea una columna “Coste (€/año)” y calcula €/mes:
 
-~~~excel
+~~~plaintext
 =SI([@[Coste (€/año)]]<>""; [@[Coste (€/año)]]/12; "")
 ~~~
 
 Y para sumar por categoría:
 
-~~~excel
+~~~plaintext
 =SUMAR.SI.CONJUNTO([Coste (€/mes)]; [Categoría]; "Base")
 ~~~
 
