@@ -1,0 +1,174 @@
+---
+title: "Lanzar tu MVP sin sorpresas: checklist técnico de puesta en producción"
+description: "Checklist técnico ordenado por prioridad para llevar tu MVP a
+  producción sin sustos: dominio, hosting, secretos, HTTPS, backups,
+  monitorización y rollback."
+tags:
+  - desarrollo
+  - mvp
+  - pymes
+  - backend
+  - infraestructura
+date: 2026-03-03T12:20:00.000+01:00
+published: true
+draft: false
+image: https://images.pexels.com/photos/4508751/pexels-photo-4508751.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1
+imageAlt: Racks de servidores iluminados en un centro de datos, vistos en
+  perspectiva desde un pasillo estrecho
+robots: max-snippet:-1, max-image-preview:large
+---
+Has definido el alcance, estimado tiempos y diseñado tu modelo de datos. El código compila, los tests pasan y la demo en local funciona. Ahora llega el paso que más ansiedad genera: poner todo esto en producción para que lo usen personas reales.
+
+Este artículo cierra la serie que empezó con la fase de discovery y estimación y continuó con el diseño del modelo de datos. Aquí recojo los puntos técnicos que reviso antes de cada despliegue a producción, ordenados por prioridad (P0 = bloqueante, P1 = importante, P2 = recomendable) y pensados para pymes y equipos pequeños que lanzan su primer producto digital.
+
+No es una guía de infraestructura en la nube —eso ya lo cubrí en otro post del blog—, sino el checklist general que aplica independientemente de si despliegas en un VPS, en Netlify, en Railway o en AWS.
+
+---
+
+## 1. Dominio y DNS (P0)
+
+El dominio es la primera impresión de tu producto. Antes de lanzar:
+
+- **Registra el dominio** en un proveedor que separe registro de hosting (Cloudflare Registrar, Porkbun, Google Domains). Si tu cliente ya tiene dominio, pide acceso al panel DNS con tiempo.
+- **Configura los registros DNS** necesarios: un `A` o `CNAME` apuntando al servidor de producción, registros `MX` si hay correo y un `TXT` para SPF/DKIM si envías emails transaccionales.
+- **Baja el TTL** a 300 segundos unos días antes del lanzamiento. Así, si algo falla, los cambios de DNS propagarán rápido. Después del lanzamiento estable, sube el TTL a 3600 o más.
+- **Verifica la propagación** con herramientas como `dig`, `nslookup` o servicios web de propagación DNS. No asumas que "ya habrá propagado": compruébalo.
+
+**Señal de que algo falla:** el dominio resuelve a la IP anterior 24 horas después del cambio. Revisa TTL y cachés del navegador.
+
+---
+
+## 2. Entorno de hosting: lo justo, no más (P0)
+
+No necesitas Kubernetes para un MVP. El criterio es: **la infraestructura mínima que soporte tu carga esperada con margen razonable**.
+
+Preguntas para decidir:
+
+- ¿Tu aplicación es estática (HTML/CSS/JS generado)? → Un CDN como Netlify o Vercel es suficiente y probablemente gratis.
+- ¿Necesitas backend con base de datos? → Un VPS pequeño (2 GB RAM), Railway, Render o un servicio gestionado de base de datos.
+- ¿Esperas picos de tráfico impredecibles? → Entonces sí, un servicio con auto-scaling. Pero si estás lanzando un MVP para 50 usuarios, no lo necesitas.
+
+La regla: **dimensiona para el tráfico real que esperas en los próximos 3 meses**, no para el que imaginas dentro de 2 años. Migrar después es más barato que mantener infraestructura sobredimensionada desde el día uno.
+
+---
+
+## 3. Variables de entorno y secretos (P0)
+
+Uno de los errores más frecuentes en primeros despliegues: credenciales de base de datos, claves de API o tokens de servicios externos que funcionaban en local y fallan en producción porque nadie los configuró.
+
+Checklist mínimo:
+
+- **Inventario de variables**: recorre tu código, busca todas las referencias a `process.env`, `import.meta.env` o el equivalente de tu stack, y haz una lista.
+- **Separa entornos**: producción y desarrollo deben tener credenciales distintas. Nunca reutilices la base de datos de desarrollo en producción.
+- **Gestiona secretos de forma segura**: usa el gestor de secretos de tu proveedor (Netlify Environment Variables, Railway Variables, AWS Parameter Store). No los metas en el repositorio, ni siquiera en un `.env` commiteado.
+- **Verifica tras el despliegue**: comprueba que cada integración externa (pasarela de pago, email transaccional, analytics) responde correctamente en el entorno de producción.
+
+**Señal de que algo falla:** errores 500 justo después de desplegar que no aparecían en local. Revisa los logs: casi siempre es una variable de entorno ausente.
+
+---
+
+## 4. HTTPS y seguridad mínima (P0)
+
+HTTPS no es opcional. Los navegadores marcan como "No seguro" cualquier sitio sin certificado, y Google penaliza en ranking.
+
+- **Activa HTTPS** en tu proveedor. La mayoría (Netlify, Vercel, Cloudflare, Render) emiten certificados Let's Encrypt automáticamente. Si usas un VPS, configúralo con Certbot.
+- **Fuerza la redirección** de HTTP a HTTPS. No basta con tener el certificado: asegúrate de que todas las peticiones van por HTTPS.
+- **Revisa contenido mixto**: si tu HTML carga recursos (imágenes, scripts, fuentes) por HTTP, el navegador los bloqueará o mostrará advertencias. Busca URLs con `http://` en tu código y cámbialas.
+- **Cabeceras de seguridad básicas**: al menos `X-Frame-Options`, `X-Content-Type-Options` y `Strict-Transport-Security`. No necesitas una política CSP perfecta el día uno, pero las tres anteriores son rápidas de configurar y reducen superficie de ataque.
+
+---
+
+## 5. Migración de datos (P1)
+
+Si tu MVP parte de datos existentes (un Excel, un CRM, una base de datos de pruebas con datos reales), necesitas un plan de migración:
+
+- **Documenta el origen y el destino**: qué campos del Excel o sistema antiguo van a qué tabla/columna de la nueva base de datos.
+- **Escribe un script de migración reproducible**: no hagas la migración a mano. Si algo falla y necesitas repetirla, un script te ahorra horas.
+- **Valida los datos después de migrar**: cuenta registros, verifica integridad referencial, comprueba que no hay campos vacíos donde no debería haberlos.
+- **Prueba la migración en un entorno de staging** antes de ejecutarla en producción. Nunca en caliente y sin ensayo previo.
+
+Si no hay datos que migrar (empiezas con la base vacía), asegúrate al menos de que el esquema de producción coincide con el de desarrollo y de que los seeds o datos iniciales (roles, configuraciones, catálogos) están cargados.
+
+---
+
+## 6. Backups y plan de rollback (P1)
+
+Antes de que entre el primer usuario, necesitas responder a dos preguntas: ¿cómo recupero los datos si algo sale mal? ¿Cómo vuelvo a la versión anterior del código?
+
+**Backups:**
+
+- Configura backups automáticos de la base de datos. La mayoría de servicios gestionados los incluyen (Railway, PlanetScale, Supabase). Si usas un VPS, programa un cron con `pg_dump` o `mysqldump` y guarda las copias fuera del servidor.
+- **Prueba la restauración** al menos una vez antes del lanzamiento. Un backup que no has probado restaurar no es un backup.
+
+**Rollback de código:**
+
+- Si despliegas con Git (Netlify, Vercel, Render), cada commit es un punto de restauración. Asegúrate de saber cómo hacer rollback desde el panel o la CLI.
+- Si despliegas con contenedores o un VPS manual, ten documentado el proceso para volver a la imagen o release anterior.
+- Considera desplegar primero a un entorno de staging y, tras validar, promover a producción. No es imprescindible para un MVP de 50 usuarios, pero reduce el riesgo.
+
+---
+
+## 7. Monitorización básica (P1)
+
+No necesitas un stack de observabilidad completo el día uno. Necesitas saber si tu aplicación está funcionando y si algo se rompe.
+
+Mínimo viable de monitorización:
+
+- **Uptime check**: un servicio gratuito (UptimeRobot, Better Stack free tier) que haga ping a tu URL principal cada 5 minutos y te avise si cae. Configurarlo lleva 2 minutos.
+- **Logs accesibles**: asegúrate de que puedes consultar los logs de tu aplicación sin conectarte por SSH cada vez. La mayoría de plataformas (Netlify Functions, Railway, Render) tienen un visor de logs integrado.
+- **Alertas de errores**: si tu backend lanza excepciones, necesitas enterarte. Un servicio como Sentry (free tier) o simplemente un webhook a un canal de Slack/Discord con los errores críticos.
+- **Analytics básico**: si quieres saber si alguien está usando tu producto, configura GA4 con Consent Mode o una alternativa ligera. Sin datos de uso, no puedes priorizar mejoras.
+
+**Señal de que algo falla:** descubres un bug porque un usuario te escribe, no porque tu sistema te avisó. Si eso pasa, tu monitorización es insuficiente.
+
+---
+
+## 8. Checklist de verificación post-despliegue (P1)
+
+Una vez desplegado, recorre esta lista antes de anunciar el lanzamiento:
+
+1. El dominio resuelve correctamente y carga la aplicación.
+2. HTTPS funciona y la redirección desde HTTP también.
+3. El formulario principal (contacto, registro, compra) envía datos y llegan al destino.
+4. Los emails transaccionales se envían y no caen en spam.
+5. Las integraciones externas (pasarela de pago, API de terceros) responden sin errores.
+6. La aplicación se ve correctamente en móvil y en los navegadores principales.
+7. Las páginas de error (404, 500) muestran mensajes útiles, no trazas de stack.
+8. El sitemap y el robots.txt están accesibles si te importa el SEO desde el día uno.
+
+Esta revisión manual no sustituye a los tests automatizados, pero cubre los puntos que los tests suelen no cubrir: DNS, email, contenido mixto, apariencia en dispositivos reales.
+
+---
+
+## 9. Las primeras 48 horas: qué vigilar
+
+Los dos primeros días tras el lanzamiento son los más reveladores. Estas son las métricas y señales que conviene vigilar:
+
+- **Tasa de errores 5xx**: si sube por encima del 1%, investiga. Revisa logs.
+- **Tiempo de respuesta**: si las páginas tardan más de 3 segundos en cargar, hay un cuello de botella. Puede ser una consulta sin índice, un recurso externo lento o un servidor infradimensionado.
+- **Conversión del flujo principal**: si el MVP tiene un formulario de contacto o un proceso de compra, mide cuántos usuarios empiezan el flujo y cuántos lo completan. Una caída brusca indica un problema de UX o un error técnico.
+- **Feedback directo**: en un MVP con pocos usuarios, cada comentario es oro. Ten un canal abierto (email, formulario, chat) y responde rápido.
+
+Si nada se rompe en 48 horas, no significa que todo está bien para siempre. Pero sí que los cimientos aguantan.
+
+---
+
+## 10. Lo que puedes posponer (P2)
+
+No todo tiene que estar resuelto antes del primer despliegue. Estas tareas son importantes pero pueden esperar a la siguiente iteración:
+
+- **CDN y caché avanzada**: si tu aplicación carga en menos de 2 segundos sin CDN, no es urgente.
+- **CI/CD completo**: desplegar manualmente con `git push` es suficiente al principio. Automatiza cuando el proceso manual empiece a generar errores o a consumir demasiado tiempo.
+- **Tests end-to-end**: los tests unitarios y una revisión manual cubren el MVP. Los E2E son una inversión que renta más cuando el producto se estabiliza.
+- **Multi-región y alta disponibilidad**: si todos tus usuarios están en España, un solo nodo en Europa es suficiente.
+- **Política de mantenimiento mensual estructurada**: llegarás a necesitarla, pero no el día uno.
+
+El criterio es el mismo de siempre: resuelve lo que bloquea al usuario ahora y planifica lo que mejorará la operación después.
+
+---
+
+## Cierre
+
+Poner un MVP en producción no requiere una infraestructura compleja, pero sí un repaso metódico de los puntos que, si fallan, arruinan la primera impresión. DNS, HTTPS, secretos, backups y una monitorización mínima son la base. Todo lo demás se puede iterar.
+
+Si estás en esa fase y prefieres que alguien revise tu configuración antes de lanzar, puedes solicitar una auditoría gratuita. Te doy un informe base con los puntos críticos que necesitas resolver antes de abrir las puertas.
