@@ -85,6 +85,7 @@ changelog:
         text: Verificación de contraste WCAG 2.1 con valores exactos
           (docs/contraste-v2.md); plantillas de caso de estudio y testimonio
           creadas en docs/.
+    date: 2026-03-15T14:39:00.000+01:00
   - version: 3.55.6
     date: 2026-01-20T21:13:00.000+01:00
     changes:
