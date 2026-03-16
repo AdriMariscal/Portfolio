@@ -1,0 +1,181 @@
+---
+title: "GitHub Actions más rápido: caché, matrices y artefactos reutilizables"
+description: Reduce los tiempos de CI en GitHub Actions con caché de
+  dependencias, matrices de estrategia, artefactos entre jobs y concurrency
+  groups. Ejemplos con Astro.
+tags:
+  - ci-cd
+  - github-actions
+  - astro
+  - netlify
+  - performance
+date: 2026-02-17T09:02:00.000+01:00
+published: true
+draft: false
+image: https://images.pexels.com/photos/4164418/pexels-photo-4164418.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2
+imageAlt: Pantalla de ordenador mostrando código JavaScript y HTML sobre fondo
+  oscuro en Visual Studio Code
+robots: max-snippet:-1, max-image-preview:large
+---
+Si tu pipeline de GitHub Actions tarda más de lo razonable en cada push, el problema no suele estar en los tests ni en el build, sino en cómo está configurado el propio workflow. Cachear dependencias, paralelizar jobs y reutilizar artefactos son técnicas que a menudo se dejan para "cuando haya tiempo", pero su impacto en minutos facturables es inmediato.
+
+Este artículo recoge las cuatro palancas que más recortan tiempos en pipelines reales de Astro desplegados en Netlify: caché, matrices de estrategia, artefactos compartidos y concurrency groups.
+
+## 1. Caché de dependencias con actions/cache
+
+Cada vez que un workflow instala dependencias desde cero, repite un trabajo que rara vez cambia entre commits. `actions/cache` (o la opción `cache` integrada en `actions/setup-node`) permite guardar la carpeta de módulos y restaurarla en ejecuciones posteriores si el lockfile no ha cambiado.
+
+La configuración mínima con `setup-node` y npm:
+
+~~~yaml
+- uses: actions/setup-node@v4
+  with:
+    node-version: 20
+    cache: 'npm'
+~~~
+
+Si prefieres control explícito, por ejemplo para cachear también la carpeta `.astro/` de builds parciales:
+
+~~~yaml
+- uses: actions/cache@v4
+  with:
+    path: |
+      node_modules
+      .astro
+    key: deps-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+    restore-keys: |
+      deps-${{ runner.os }}-
+~~~
+
+La clave es que `key` debe invalidarse cuando las dependencias realmente cambian. Por eso se usa el hash del lockfile. El campo `restore-keys` permite un fallback parcial si no hay coincidencia exacta: restaura la última caché del mismo SO y reconstruye solo lo necesario.
+
+**Impacto típico:** la instalación de dependencias pasa de 30–60 segundos a 2–5 segundos en cada ejecución con caché válida. En pipelines que se ejecutan decenas de veces al día, el ahorro se nota en la factura de minutos de GitHub Actions.
+
+## 2. Matrices de estrategia: paralelizar sin duplicar
+
+Las matrices permiten ejecutar el mismo job en paralelo con distintas combinaciones de variables (versión de Node, sistema operativo, entorno). Esto es útil para:
+
+- Validar compatibilidad con múltiples versiones de Node antes de migrar.
+- Ejecutar linting, tests y build como jobs separados en paralelo.
+- Probar contra distintos entornos si el proyecto tiene lógica condicional.
+
+Un ejemplo básico para un proyecto Astro donde quieres verificar compatibilidad con Node 18 y 20:
+
+~~~yaml
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18, 20]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+      - run: npm ci
+      - run: npm test
+~~~
+
+Cada combinación se ejecuta en un runner independiente y en paralelo, así que el tiempo total es el del job más lento, no la suma de todos.
+
+**Consejo práctico:** no abuses de las matrices. Si solo despliegas con Node 20, no tiene sentido testear contra cuatro versiones en cada PR. Reserva la matriz completa para el workflow de merge a `main` y usa una sola versión en los checks de PR para no desperdiciar minutos.
+
+## 3. Artefactos entre jobs: build una vez, usar muchas
+
+Un patrón habitual en pipelines más maduros es separar el build de los pasos posteriores (tests de integración, auditoría Lighthouse, deploy). Sin artefactos, cada job tendría que repetir el build completo. `actions/upload-artifact` y `actions/download-artifact` resuelven esto.
+
+El flujo es sencillo:
+
+1. Un job de build genera la carpeta `dist/`.
+2. Sube el resultado como artefacto.
+3. Los jobs siguientes descargan ese artefacto y trabajan sobre él.
+
+~~~yaml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  lighthouse:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - name: Auditar con Lighthouse CI
+        run: npx @lhci/cli autorun
+~~~
+
+Esto garantiza que la auditoría de rendimiento se ejecute sobre exactamente el mismo build que irá a producción, sin reconstruir. Cada job adicional (tests E2E, validación de accesibilidad) puede depender del mismo artefacto.
+
+**Detalle importante:** los artefactos en GitHub Actions v4 tienen un período de retención configurable (por defecto 90 días). Para CI, esto rara vez importa, pero conviene saberlo si usas artefactos para conservar reportes de rendimiento históricos.
+
+## 4. Concurrency groups: evitar ejecuciones redundantes
+
+Cuando haces varios pushes seguidos a la misma rama (algo normal durante desarrollo), GitHub Actions lanza un workflow por cada push. Si el pipeline tarda cuatro minutos, acabas con tres o cuatro ejecuciones solapadas de las cuales solo la última importa.
+
+Los `concurrency` groups cancelan automáticamente ejecuciones anteriores del mismo grupo:
+
+~~~yaml
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+~~~
+
+Esto crea un grupo por rama. Si hay una ejecución activa para `feature/nueva-seccion` y llega otro push a la misma rama, la ejecución anterior se cancela y la nueva arranca inmediatamente.
+
+**Precaución:** no uses `cancel-in-progress: true` en el workflow de deploy a producción. Si un deploy está a medio completar y llega otro commit, cancelarlo podría dejar el entorno en un estado inconsistente. Reserva la cancelación para los checks de PR y usa un grupo separado sin cancelación para `main`:
+
+~~~yaml
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+~~~
+
+## 5. Checklist de auditoría para tu pipeline
+
+Antes de dar por bueno un workflow, revisa estos puntos:
+
+**Caché.** ¿Se cachean las dependencias (npm, pip, etc.)? ¿La key del caché usa el hash del lockfile? ¿Hay fallback con `restore-keys`?
+
+**Paralelismo.** ¿Hay jobs que podrían ejecutarse en paralelo y se están ejecutando en secuencia? ¿La matriz de estrategia cubre solo las combinaciones relevantes, sin redundancias?
+
+**Artefactos.** ¿Algún job está repitiendo un build que ya hizo otro job? ¿Se suben y descargan artefactos para reutilizar el resultado?
+
+**Concurrencia.** ¿Hay un grupo de concurrencia que cancele ejecuciones obsoletas en PRs? ¿El workflow de producción tiene cancelación deshabilitada?
+
+**Minutos.** ¿Revisas periódicamente el consumo de minutos en Settings > Billing de tu organización o cuenta? GitHub Actions tiene un tier gratuito generoso, pero los minutos en runners macOS y Windows cuentan multiplicados.
+
+**Timeouts.** ¿Cada job tiene un `timeout-minutes` razonable? Un test colgado puede consumir los 360 minutos por defecto antes de fallar.
+
+## Cuánto se puede ahorrar en la práctica
+
+El impacto varía según el proyecto, pero en un pipeline típico de Astro + Netlify con lint, tests, build y auditoría Lighthouse, la combinación de las cuatro técnicas suele reducir el tiempo medio de ejecución entre un 40% y un 60%.
+
+Un ejemplo orientativo:
+
+- **Sin optimizar:** lint (45s) + install (40s) + build (30s) + tests (20s) + Lighthouse (50s) = ~3 min por ejecución, secuencial, sin caché.
+- **Optimizado:** install con caché (5s) + lint y tests en paralelo (~25s) + build (30s) + Lighthouse con artefacto reutilizado (~35s) = ~1.5 min. Con concurrency, las ejecuciones redundantes ni siquiera se completan.
+
+En un día de desarrollo activo con 15–20 pushes, eso puede significar la diferencia entre 45 minutos y 20 minutos de consumo. En equipos o cuentas con runners de pago, el ahorro se traslada directamente a coste.
+
+## Conclusión
+
+Optimizar el pipeline no es un lujo de proyectos grandes. Es el mismo principio que aplicamos al rendimiento web: medir, identificar el cuello de botella y aplicar la solución más directa. La caché elimina trabajo repetido, las matrices paralelizan lo que puede ir en paralelo, los artefactos evitan rebuilds innecesarios y los concurrency groups cancelan ejecuciones que nadie va a mirar.
+
+Si tu workflow actual tarda más de dos minutos por ejecución, probablemente alguna de estas cuatro palancas lo recorte a la mitad sin cambiar una sola línea de código de tu proyecto.
