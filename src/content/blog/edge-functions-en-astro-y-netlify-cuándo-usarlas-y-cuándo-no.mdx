@@ -1,0 +1,129 @@
+---
+title: "Edge Functions en Astro y Netlify: cuándo usarlas y cuándo no"
+description: Qué son las Netlify Edge Functions, en qué se diferencian de
+  serverless y cuándo aportan valor real en un proyecto Astro. Incluye árbol de
+  decisión.
+tags:
+  - edge‑functions
+  - netlify
+  - astro
+  - serverless
+  - performance
+date: 2026-02-26T11:14:00.000+01:00
+published: true
+draft: false
+image: https://images.pexels.com/photos/2881224/pexels-photo-2881224.jpeg
+imageAlt: Cables ethernet de colores conectados a un switch de red en un centro de datos
+robots: max-snippet:-1, max-image-preview:large
+---
+Si trabajas con Astro desplegado en Netlify, en algún momento te habrás cruzado con el concepto de **Edge Functions**. La promesa suena bien: ejecutar lógica en el nodo CDN más cercano al usuario, con latencia mínima y sin cold starts pesados. Pero la realidad tiene matices, y usarlas donde no toca puede complicar tu stack sin aportar nada.
+
+Este artículo es una guía práctica para decidir cuándo una edge function tiene sentido, cuándo te basta con una serverless function clásica y cuándo lo mejor es quedarte con contenido estático.
+
+## 1. Qué son las Edge Functions de Netlify (y qué no son)
+
+Las Edge Functions de Netlify son funciones JavaScript o TypeScript que se ejecutan en el edge de la CDN, sobre un runtime basado en Deno. La diferencia principal con las serverless functions clásicas (Netlify Functions) es dónde y cómo se ejecutan:
+
+- **Serverless function clásica**: se ejecuta en un entorno Node.js en una región concreta (normalmente `us-east-1` o similar). El cold start puede oscilar entre 50 y 500 ms dependiendo del tamaño del bundle.
+- **Edge function**: se ejecuta en el nodo CDN más cercano al usuario, sobre un runtime ligero (Deno/V8). Los cold starts son significativamente menores y la latencia de red se reduce porque no hay viaje al servidor de origen.
+
+Dicho de otra forma: las edge functions no son "serverless functions rápidas". Son un **modelo de ejecución diferente**, con restricciones propias.
+
+## 2. Cuándo sí: casos donde las Edge Functions aportan valor real
+
+Hay escenarios concretos donde ejecutar lógica en el edge marca una diferencia medible:
+
+### Geolocalización y personalización por idioma
+
+Si necesitas redirigir al usuario a una versión localizada antes de que llegue al HTML estático, una edge function puede leer la cabecera `x-country` o los datos del objeto `context.geo` de Netlify y hacer la redirección sin JavaScript en cliente. Astro soporta esto a través de su middleware en modo edge (`middlewareMode: 'edge'` en la configuración del adaptador Netlify).
+
+### A/B testing sin JavaScript en cliente
+
+Servir variantes directamente desde el edge, asignando la variante vía cookie en la propia función, elimina el parpadeo (FOUC) típico de los scripts de testing en cliente. El usuario recibe directamente la versión correcta.
+
+### Redirecciones condicionales y control de acceso
+
+Verificar una cookie de sesión, comprobar una cabecera de autenticación o aplicar reglas de acceso antes de que la request llegue a tu función serverless o a tu HTML estático. Esto es especialmente útil en proyectos con páginas pre-renderizadas donde no hay middleware server-side por defecto.
+
+### Cabeceras HTTP dinámicas
+
+Inyectar cabeceras `Cache-Control` condicionales, cabeceras de seguridad según la ruta, o cabeceras personalizadas para la CDN upstream.
+
+## 3. Cuándo no: escenarios donde el edge no aporta (o complica)
+
+### Acceso a base de datos
+
+Si tu función necesita consultar una base de datos (PostgreSQL, MongoDB, etc.), piensa en la topología: tu base de datos está en una región concreta. Si la edge function se ejecuta en un nodo CDN en Tokio pero tu base de datos está en Frankfurt, el round-trip de red puede ser mayor que si usaras una serverless function desplegada en la misma región que la base de datos. El edge te acerca al usuario, pero te aleja de tus datos.
+
+Excepción: si usas una base de datos distribuida globalmente (como las que ofrecen algunos proveedores BaaS), esta restricción se suaviza.
+
+### Lógica pesada o dependencias Node.js
+
+El runtime Deno de las edge functions no soporta módulos nativos de Node.js. Si tu lógica depende de paquetes npm que usan `fs`, `child_process` u otros built-ins de Node, no podrás moverla al edge sin refactorizar. Además, las edge functions están diseñadas para operaciones cortas: Netlify recomienda mantener la ejecución por debajo de 50 ms.
+
+### Procesamiento de formularios o integraciones con APIs externas lentas
+
+Si tu función necesita hacer varias llamadas a APIs externas, procesar un payload complejo o ejecutar lógica de negocio larga, una serverless function con su timeout más generoso es mejor opción.
+
+### Cuando el contenido ya es estático
+
+Si tu página es 100% pre-renderizada y no necesita personalización, las edge functions añaden una capa de ejecución innecesaria. El HTML estático servido directamente desde la CDN es más rápido que cualquier función, incluida una edge function.
+
+## 4. Árbol de decisión: edge vs serverless vs estático
+
+La siguiente lógica simplificada te ayuda a elegir:
+
+1. **¿La página necesita lógica en el servidor?** No → contenido estático. Fin.
+2. **¿La lógica es de transformación de request/response?** (redirección, cabecera, cookie, geolocalización) → **edge function**.
+3. **¿La lógica necesita acceso a base de datos o APIs externas con latencia?** Sí → **serverless function** en la misma región que tus datos.
+4. **¿La lógica depende de módulos Node.js nativos?** Sí → **serverless function**.
+5. **¿La ejecución supera ~50 ms de forma habitual?** Sí → **serverless function**.
+6. **¿Necesitas personalización rápida sin JS en cliente?** Sí → **edge function**.
+
+En la práctica, muchos proyectos combinan las tres opciones: páginas pre-renderizadas como base, una edge function para middleware ligero (idioma, A/B, auth checks) y serverless functions para la lógica de backend.
+
+## 5. Cómo se integra en Astro con el adaptador de Netlify
+
+El adaptador oficial `@astrojs/netlify` genera automáticamente tanto Netlify Functions como Edge Functions. El comportamiento depende de tu configuración:
+
+- **Páginas pre-renderizadas**: se sirven como HTML estático. El middleware de Astro se aplica en build-time.
+- **Páginas on-demand (SSR)**: el adaptador las despliega como Netlify Functions, con el middleware ejecutándose en runtime.
+- **Middleware en modo edge**: si configuras `middlewareMode: 'edge'` en el adaptador, una edge function ejecutará tu middleware para **todas** las requests, incluidas las de assets estáticos y páginas pre-renderizadas.
+
+Un ejemplo mínimo de configuración:
+
+~~~js
+// astro.config.mjs
+import { defineConfig } from 'astro/config';
+import netlify from '@astrojs/netlify';
+
+export default defineConfig({
+  output: 'hybrid',
+  adapter: netlify({
+    edgeMiddleware: true
+  })
+});
+~~~
+
+Además, puedes acceder al contexto de Netlify (geolocalización, IP, cookies) desde tu código Astro a través de `Astro.locals.netlify.context`.
+
+## 6. Limitaciones reales que debes conocer
+
+Antes de adoptar edge functions, ten en cuenta estas restricciones:
+
+- **Runtime Deno, no Node.js.** Muchos paquetes npm funcionan, pero los que dependen de APIs nativas de Node no. El adaptador de Astro se encarga de la compilación, pero si añades lógica custom, comprueba la compatibilidad.
+- **Tiempo de ejecución limitado.** Netlify recomienda mantener las edge functions por debajo de 50 ms de CPU. Para SSR completo, el modelo funciona, pero no es el lugar para tareas pesadas.
+- **Sin acceso al sistema de archivos.** No puedes leer ni escribir archivos. Todo debe ser in-memory o delegado a un servicio externo.
+- **Depuración local.** Necesitas Netlify CLI (`netlify dev`) para emular el comportamiento edge en local. Desde Astro 5.12+, el adaptador simplifica esto, pero hay diferencias con producción.
+- **Coste.** Las edge functions se facturan por invocación. En un proyecto con mucho tráfico y el middleware en modo edge activado, cada request (incluidas imágenes y assets) cuenta. Revisa los límites de tu plan.
+
+## 7. Criterio pragmático: lo que recomiendo en un proyecto real
+
+Para la mayoría de proyectos Astro en Netlify —portfolios, webs corporativas, blogs, landing pages de pymes—, mi recomendación es:
+
+- **Base estática** (`output: 'static'` o `'hybrid'`). Pre-renderiza todo lo que puedas.
+- **Edge function solo si necesitas middleware global** (redirección por idioma, check de auth en rutas protegidas, A/B sin FOUC).
+- **Serverless function para lógica de backend** (formularios, webhooks, integraciones con CRM o APIs externas).
+- **Mide antes de optimizar.** Si tu web ya sirve HTML estático en <100 ms desde la CDN, añadir una edge function intermedia no va a mejorar nada perceptible.
+
+La edge no es una mejora automática. Es una herramienta con un caso de uso concreto. Usarla bien es saber cuándo no usarla.
