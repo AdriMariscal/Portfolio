@@ -1,0 +1,171 @@
+---
+title: Cómo conectar tu web con un CRM y medir cada conversión
+description: "Conecta tu formulario web con un CRM paso a paso: campos mínimos,
+  UTMs, atribución en GA4 y verificación de leads. Checklist aplicable a
+  cualquier CRM."
+tags:
+  - crm
+  - formularios
+  - conversion
+  - ga4
+  - analytics
+  - pymes
+date: 2026-03-10T13:05:00.000+01:00
+published: true
+draft: false
+image: https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1470&q=80
+imageAlt: Pantalla de portátil mostrando gráficos de rendimiento y métricas de
+  analítica sobre fondo oscuro
+robots: max-snippet:-1, max-image-preview:large
+---
+Tu web genera visitas. Tu formulario genera leads. Pero si entre el envío del formulario y la entrada en el CRM hay un agujero negro de datos, no puedes saber qué canal funciona, qué campaña convierte ni cuánto te cuesta cada cliente.
+
+Este artículo cubre el recorrido técnico completo: desde los campos del formulario hasta el registro limpio en el CRM, pasando por UTMs, atribución en GA4 y una checklist de verificación que puedes aplicar con Salesforce, HubSpot o cualquier alternativa.
+
+---
+
+## 1. El eslabón que falta
+
+Muchas webs tienen formularios que funcionan (el email llega) y un CRM donde se gestionan los contactos. El problema es lo que ocurre entre ambos:
+
+- El lead llega al CRM sin origen: no sabes si vino de Google, de LinkedIn o de una campaña de email.
+- Los campos del formulario no coinciden con los del CRM, así que alguien los copia a mano o se pierden datos.
+- GA4 registra el envío como evento genérico, pero no lo conecta con el resultado comercial.
+
+El resultado es un equipo comercial que trabaja a ciegas y un presupuesto de marketing que no se puede justificar con datos.
+
+---
+
+## 2. Diseña el formulario para que el CRM lo entienda
+
+El formulario no es solo una interfaz para el usuario: es el primer paso de un flujo de datos. Si los campos no están pensados para alimentar el CRM, necesitarás limpieza manual en cada lead.
+
+**Campos mínimos recomendados para un formulario de contacto B2B:**
+
+- Nombre (un solo campo o nombre + apellidos, según cómo los gestione tu CRM).
+- Email (con validación de formato en cliente y servidor).
+- Teléfono (opcional pero útil para equipos comerciales que priorizan por canal).
+- Mensaje o motivo de contacto.
+
+**Campos ocultos para trazabilidad (no visibles para el usuario):**
+
+- `utm_source`, `utm_medium`, `utm_campaign` (capturados automáticamente desde la URL).
+- `referrer` o página de origen dentro de tu web.
+- `timestamp` del envío.
+- Identificador de sesión de GA4 (`client_id`) si tu stack lo permite.
+
+La regla es simple: cada campo visible debe aportar valor al usuario o al equipo comercial. Todo lo que sea trazabilidad va en campos ocultos, rellenados con JavaScript al cargar la página.
+
+---
+
+## 3. Marca la procedencia con UTMs
+
+Los parámetros UTM son la forma estándar de decirle a GA4 (y a tu CRM) de dónde viene cada visita. Si no los usas, todo tu tráfico de campañas aparece como "directo" o "referral" genérico.
+
+**Estructura mínima que funciona:**
+
+- `utm_source`: la plataforma (google, linkedin, newsletter).
+- `utm_medium`: el tipo de canal (cpc, social, email).
+- `utm_campaign`: el nombre de la campaña o acción concreta.
+
+**Ejemplo práctico:**
+
+`tusitio.com/contacto?utm_source=linkedin&utm_medium=social&utm_campaign=auditoria-marzo-2026`
+
+Cuando un usuario llega con esos parámetros y rellena el formulario, tu JavaScript debe capturar esos valores de la URL y guardarlos en los campos ocultos del formulario. Así, cuando el lead entre en el CRM, llevará consigo la etiqueta de origen.
+
+**Errores frecuentes que rompen la atribución:**
+
+- Usar nombres inconsistentes: `Google` en una campaña y `google` en otra. GA4 los trata como fuentes distintas.
+- Etiquetar tráfico orgánico con UTMs. Si alguien llega desde una búsqueda orgánica en Google, no necesita UTM: GA4 ya lo clasifica correctamente. Los UTMs son para campañas activas.
+- Olvidar las mayúsculas: mantén todo en minúsculas por convención.
+
+---
+
+## 4. Configura la atribución en GA4
+
+GA4 te permite medir el recorrido completo desde la primera visita hasta el envío del formulario. Pero necesitas configurar eventos y conversiones con criterio.
+
+**Eventos mínimos para un embudo de contacto:**
+
+1. `page_view` en la página del formulario (automático con medición mejorada).
+2. `form_start` — cuando el usuario interactúa con el primer campo. GA4 lo registra automáticamente si tienes activa la medición mejorada.
+3. `form_submit` — cuando el formulario se envía correctamente (tras validación).
+4. `generate_lead` — evento recomendado por Google para marcar la conversión de contacto. Puedes enviarlo con `gtag` o `dataLayer.push` desde la página de confirmación.
+
+**Marcar `generate_lead` como conversión:**
+
+En GA4, ve a Administrar → Eventos → marca `generate_lead` como conversión. A partir de ese momento, todos los informes de adquisición te mostrarán qué fuentes, medios y campañas generan leads reales, no solo visitas.
+
+**Vincular GA4 con tu CRM (sin complicación):**
+
+No necesitas una integración bidireccional para empezar. El camino más simple es:
+
+1. Capturar el `client_id` de GA4 en un campo oculto del formulario.
+2. Almacenarlo como campo personalizado en el CRM junto al lead.
+3. Cuando el lead se convierta en cliente, puedes cruzar ese `client_id` con los datos de GA4 para cerrar el ciclo de atribución.
+
+Esto no requiere infraestructura compleja. Un script de unas pocas líneas en tu formulario y un campo extra en el CRM.
+
+---
+
+## 5. Envía el lead al CRM limpio y trazable
+
+Hay tres formas habituales de conectar formulario y CRM, ordenadas de menor a mayor complejidad:
+
+**Opción A — Webhook o API directa.** Tu formulario envía los datos a un endpoint de tu CRM mediante `fetch` o una función serverless. Es la opción más fiable si tu CRM tiene API REST documentada (Salesforce, HubSpot, Pipedrive y la mayoría de CRMs modernos la tienen).
+
+**Opción B — Plataforma intermedia.** Herramientas como Zapier, Make o n8n recogen el envío del formulario (vía webhook) y lo envían al CRM con un mapeo visual de campos. Es rápido de configurar, pero añade una dependencia externa y un coste mensual.
+
+**Opción C — Email + importación manual.** El formulario envía un email y alguien lo introduce a mano en el CRM. Es el método más frecuente en pymes y el que más datos pierde. Si este es tu caso actual, cualquiera de las dos opciones anteriores supone una mejora significativa.
+
+**Independientemente de la opción, asegúrate de:**
+
+- Mapear cada campo del formulario a su campo equivalente en el CRM antes de conectar nada.
+- Incluir los campos ocultos (UTMs, referrer, timestamp) en el envío.
+- Validar en servidor antes de enviar al CRM: un email mal formado o un campo vacío corrompería el registro.
+- Registrar un log de cada envío (con timestamp y respuesta del CRM) para detectar fallos silenciosos.
+
+---
+
+## 6. Verifica el flujo completo
+
+Una integración que no se verifica es una integración que puede estar fallando sin que nadie lo sepa. Antes de dar por cerrada la conexión web → CRM, recorre esta checklist:
+
+**Checklist de verificación web → CRM:**
+
+- Envía un lead de prueba desde cada formulario de tu web (contacto, auditoría, descarga, etc.).
+- Comprueba que el lead aparece en el CRM con todos los campos mapeados correctamente.
+- Verifica que los UTMs llegan al CRM: envía el formulario desde una URL con parámetros de prueba y confírmalo en el registro del CRM.
+- Abre GA4 → Tiempo real y confirma que el evento `generate_lead` se dispara al enviar.
+- Revisa GA4 → Informes → Adquisición → Adquisición de tráfico: comprueba que tu fuente/medio de prueba aparece vinculada a la conversión.
+- Prueba el flujo con consentimiento denegado (si usas Consent Mode v2) y confirma que el lead sigue llegando al CRM aunque GA4 modele los datos.
+- Documenta el mapeo de campos (campo formulario → campo CRM) y guárdalo donde tu equipo pueda consultarlo.
+
+Si algún punto falla, tienes un dato específico para investigar. Si todos pasan, tienes un flujo trazable de principio a fin.
+
+---
+
+## 7. Qué cambia según tu CRM
+
+El flujo descrito funciona con cualquier CRM que acepte datos vía API o webhook. Las diferencias están en los detalles de implementación:
+
+**Salesforce:** los leads se crean como objetos `Lead` o `Contact` vía la REST API. Puedes usar campos personalizados para almacenar UTMs y `client_id`. Si ya tienes Web-to-Lead configurado, puedes añadir campos ocultos al formulario HTML que genera Salesforce, aunque la API directa ofrece más control.
+
+**HubSpot:** su API de formularios permite enviar datos con campos personalizados y tracking automático si usas su script de analítica. También admite webhooks en los flujos de trabajo, lo que facilita automatizaciones posteriores.
+
+**CRMs ligeros (Pipedrive, Zoho, Monday CRM):** todos tienen API REST documentada. La implementación es similar: un `POST` con los campos del lead en JSON. Las plataformas intermedias como Zapier suelen tener conectores nativos para estos CRMs.
+
+**Sin CRM todavía:** si estás valorando implementar uno, este flujo es exactamente lo que deberías exigir como requisito mínimo. Un CRM que no pueda recibir leads desde tu web con campos de atribución no te va a dar la visibilidad que necesitas.
+
+---
+
+## Resumen: un flujo medible en cinco decisiones
+
+1. **Campos del formulario** pensados para el CRM, no solo para el usuario.
+2. **UTMs** en todas las campañas activas, con convención consistente.
+3. **Eventos de GA4** configurados y `generate_lead` marcado como conversión.
+4. **Conexión formulario → CRM** con todos los campos mapeados (incluidos los ocultos).
+5. **Verificación** con leads de prueba antes de asumir que funciona.
+
+Con estas cinco decisiones, cada lead que entre en tu CRM llevará la trazabilidad completa: de dónde vino, por qué página entró, qué campaña lo trajo y cuándo lo hizo. Eso es lo que convierte una web en una herramienta de negocio medible.
