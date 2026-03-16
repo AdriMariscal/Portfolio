@@ -1,0 +1,129 @@
+---
+title: "Next.js vs Astro: criterios de rendimiento para elegir framework en 2026"
+description: Comparativa técnica entre Next.js 16 y Astro 5 según Core Web
+  Vitals, bundle, hidratación y coste de hosting. Matriz de decisión por caso de
+  uso.
+tags:
+  - nextjs
+  - astro
+  - performance
+  - core-web-vitals
+  - seo
+date: 2026-03-05T12:32:00.000+01:00
+published: true
+draft: false
+image: https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1260&h=750&dpr=2
+imageAlt: Pantalla de monitor mostrando líneas de código de programación con
+  sintaxis resaltada sobre fondo oscuro
+robots: max-snippet:-1, max-image-preview:large
+---
+Elegir framework es una decisión de arquitectura, no de preferencia. Next.js y Astro resuelven problemas distintos y, cuando se evalúan desde el rendimiento, las diferencias son medibles. Este artículo parte de casos de uso concretos —blog estático, SaaS con autenticación, landing de producto y e-commerce— para comparar métricas reales: Core Web Vitals, tamaño de bundle, modelo de hidratación y coste de infraestructura.
+
+El enfoque no es "Astro siempre gana" ni "Next.js es más completo". Es: **cuándo cada opción es la correcta y por qué**, con datos que puedas reproducir.
+
+## 1. Estado de cada framework en marzo de 2026
+
+Ambos frameworks han madurado de forma significativa en los últimos meses.
+
+**Next.js 16** (estable desde octubre de 2025, con 16.1 en diciembre) consolida el App Router y los React Server Components como modelo principal. Las novedades relevantes para rendimiento son los Cache Components con la directiva `"use cache"`, la deduplicación de layouts en prefetch, Turbopack estable para desarrollo y las View Transitions heredadas de React 19.2. El Partial Prerendering (PPR) sigue en experimental, pero ya permite mezclar contenido estático y dinámico en la misma ruta.
+
+**Astro 5** es la versión estable actual. La versión 6, en beta desde enero de 2026, llega con un servidor de desarrollo rediseñado sobre la Environment API de Vite y soporte nativo para Cloudflare Workers mediante el runtime `workerd`. En enero de 2026, Cloudflare adquirió Astro Technology Company: el framework sigue siendo MIT y open source, pero ahora cuenta con el respaldo de una infraestructura de CDN global. Esto no es menor si evalúas estabilidad a largo plazo.
+
+## 2. Arquitectura y JavaScript en cliente
+
+La diferencia fundamental entre ambos está en cuánto JavaScript llega al navegador por defecto.
+
+**Astro** sigue un modelo static-first: genera HTML puro en build time y solo envía JS al cliente cuando un componente lo solicita explícitamente mediante directivas como `client:load` o `client:visible`. Esto es lo que se conoce como Islands Architecture: la página es estática y solo las "islas" interactivas se hidratan de forma aislada.
+
+**Next.js** con App Router y React Server Components ha reducido bastante el JS en cliente respecto a versiones anteriores, pero el runtime de React y la lógica de hidratación siguen estando presentes. Incluso en páginas donde todo se renderiza en servidor, el bundle incluye el framework base necesario para reconciliar el DOM.
+
+En la práctica, un sitio de contenido equivalente muestra diferencias claras:
+
+- **Astro**: bundle inicial típico entre 0 y 15 KB de JS (solo si hay islas interactivas).
+- **Next.js 16 (App Router, RSC)**: bundle inicial típico entre 70 y 100 KB de JS comprimido, incluyendo el runtime de React.
+
+Esos 70-100 KB no son una cifra dramática en conexiones rápidas, pero en móviles con 3G o en mercados con redes más lentas, la diferencia en Time to Interactive es medible.
+
+## 3. Core Web Vitals: qué dice cada arquitectura
+
+Los Core Web Vitals —LCP, INP y CLS— son la métrica que Google usa para evaluar experiencia de usuario en datos de campo (CrUX). Revisemos cómo influye la arquitectura de cada framework en cada una.
+
+### LCP (Largest Contentful Paint)
+
+Ambos frameworks pueden alcanzar un LCP excelente si se aplican buenas prácticas: imágenes optimizadas, preload del recurso LCP, y respuesta rápida del servidor. La diferencia está en el baseline:
+
+- **Astro** genera HTML estático que se sirve directamente desde CDN. El tiempo hasta el primer byte (TTFB) tiende a ser muy bajo, y como no hay JS bloqueante, el navegador renderiza el LCP element casi inmediatamente.
+- **Next.js** con SSG o ISR también puede servir desde CDN, pero el JS del framework añade una capa de parsing que retrasa ligeramente el render. Con SSR puro, el LCP depende del tiempo de ejecución del servidor.
+
+### INP (Interaction to Next Paint)
+
+INP mide la latencia de las interacciones del usuario a lo largo de toda la visita. Aquí la cantidad de JS en el hilo principal es determinante.
+
+- **Astro**: menos JS en el hilo principal significa menos competencia por recursos. Las islas se hidratan de forma independiente, sin bloquear el hilo principal global.
+- **Next.js**: React Server Components ayudan a reducir el JS en cliente, pero la reconciliación del DOM y los Server Actions pueden generar trabajo en el hilo principal que impacte INP si no se optimiza.
+
+### CLS (Cumulative Layout Shift)
+
+CLS depende más del diseño que del framework. Ambos ofrecen herramientas de optimización de imágenes que reservan espacio y minimizan layout shifts. En la práctica, no hay diferencia arquitectónica significativa aquí.
+
+## 4. Estrategias de renderizado comparadas
+
+Cada framework ofrece distintos modos de renderizado. La clave es entender cuál necesitas realmente.
+
+**Astro** ofrece SSG por defecto, SSR opcional (con adaptadores para Node, Netlify, Cloudflare, Vercel) y, con la versión 6, Server Islands que permiten diferir componentes dinámicos sin renunciar al shell estático. El patrón habitual es: 90% estático, 10% dinámico vía islands.
+
+**Next.js 16** ofrece SSG, SSR, ISR (Incremental Static Regeneration), Streaming SSR con Suspense, y PPR experimental. El modelo es más granular pero también más complejo de configurar correctamente. El App Router permite decidir por ruta si una página es estática o dinámica.
+
+Si tu proyecto es mayoritariamente contenido estático con poca interactividad, Astro es más eficiente porque no hay coste de complejidad arquitectónica. Si necesitas mezclar contenido estático con rutas dinámicas, autenticación, o lógica de servidor compleja, Next.js tiene herramientas más maduras.
+
+## 5. Coste de hosting e infraestructura
+
+Este punto se subestima. El modelo de rendering condiciona directamente cuánto pagas de hosting.
+
+**Sitio estático (Astro SSG)**: se despliega en cualquier CDN estática. En Netlify o Cloudflare Pages, el coste puede ser literalmente 0 €/mes para tráfico moderado. No hay servidor que mantener, no hay cold starts, no hay ejecución por petición.
+
+**Sitio con SSR (Next.js o Astro SSR)**: cada petición ejecuta código en servidor. En Vercel, el modelo de pricing se basa en ejecuciones de serverless functions. En Netlify, en invocaciones de Edge/Serverless Functions. El coste escala con el tráfico, y los cold starts pueden afectar TTFB.
+
+**Modelo híbrido (ISR en Next.js)**: reduce el número de ejecuciones al cachear páginas durante un intervalo configurable. Es un buen compromiso para sitios con contenido que cambia periódicamente pero no en cada petición.
+
+Para un blog, un portfolio o una landing: la opción estática es casi siempre la más rentable. Para un SaaS o un e-commerce con carrito y sesiones, el coste de SSR es necesario y justificado.
+
+## 6. Ecosistema y experiencia de desarrollo
+
+**Next.js** tiene la ventaja del ecosistema React: cualquier librería de React funciona, hay miles de paquetes compatibles, y la comunidad es masiva. Vercel, como empresa detrás del framework, ofrece una integración nativa con su plataforma que simplifica despliegues. La curva de aprendizaje es más pronunciada con App Router y RSC.
+
+**Astro** es agnóstico de framework de UI: puedes usar componentes de React, Vue, Svelte o Solid dentro del mismo proyecto. Esto es útil si tu equipo tiene experiencia diversa o si migras desde otro stack. La sintaxis de los componentes `.astro` es similar a HTML, lo que reduce la barrera de entrada.
+
+Desde enero de 2026, la adquisición de Astro por Cloudflare le da un respaldo empresarial que antes no tenía. El framework ya no depende únicamente de financiación por venture capital.
+
+## 7. Matriz de decisión por caso de uso
+
+| Caso de uso | Framework recomendado | Justificación |
+|---|---|---|
+| Blog / documentación | **Astro** | Contenido estático, 0 JS por defecto, LCP y TTFB excelentes en CDN, coste mínimo |
+| Landing de producto / marketing | **Astro** | Velocidad de carga es prioridad, pocas interacciones, optimización SEO nativa |
+| Portfolio + blog técnico | **Astro** | SSG con Markdown/MDX integrado, islands para componentes interactivos puntuales |
+| SaaS con auth y dashboard | **Next.js** | Necesidad de SSR, sesiones, API routes, lógica de servidor compleja |
+| E-commerce con carrito y checkout | **Next.js** | ISR para catálogo, SSR para personalización, Server Actions para mutaciones |
+| App con interactividad compleja (chat, real-time) | **Next.js** | Full React en cliente, WebSockets, estado global, lógica de UI densa |
+| Sitio multiframework (migración gradual) | **Astro** | Permite mezclar React, Vue y Svelte en la misma página |
+
+## 8. Cuándo la decisión no es tan clara
+
+Hay zonas grises donde ambos podrían funcionar. Dos ejemplos:
+
+**Blog con sección de miembros**: la parte pública es contenido estático (Astro gana), pero el área de miembros necesita autenticación y contenido dinámico. Astro puede resolver esto con SSR parcial o Server Islands en la v6. Next.js lo resuelve de forma nativa con middleware y RSC. Depende de cuánto peso tiene la parte dinámica.
+
+**Landing de producto con formulario complejo y A/B testing**: la landing en sí es estática, pero el formulario y la lógica de experimentación requieren JS en cliente. Astro con una isla React puede ser suficiente. Si la complejidad de la experimentación crece, Next.js ofrece más control del ciclo de vida del request.
+
+En estos casos, la pregunta no es "qué framework es mejor" sino "qué porcentaje de mi proyecto es contenido estático y qué porcentaje necesita servidor".
+
+## 9. Conclusión: el framework correcto depende del problema
+
+Next.js y Astro no compiten en el mismo espacio exacto. Next.js es un framework de aplicaciones web con capacidades de sitio estático. Astro es un framework de sitios web con capacidades de aplicación dinámica. La zona de solapamiento existe, pero los centros de gravedad son distintos.
+
+Si tu prioridad es **rendimiento de carga, SEO y coste mínimo de infraestructura**, y tu contenido es mayoritariamente estático, Astro ofrece un baseline difícil de superar sin esfuerzo adicional.
+
+Si tu prioridad es **interactividad compleja, lógica de servidor integrada y ecosistema React**, Next.js sigue siendo la opción más completa y madura.
+
+La peor decisión es elegir framework por popularidad o inercia. Mide tus Core Web Vitals, estima tu coste de hosting y evalúa cuánto JS necesitas realmente en el cliente. Los datos te dirán qué framework encaja mejor.
