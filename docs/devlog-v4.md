@@ -5,7 +5,7 @@ Regla: todas las versiones MINOR se registran; PATCH solo cuando aporte.
 
 ## v4.30.0 — 2026-03-15
 - T-030 [DX]: Recolocar referencia a Salesforce: de stat de hero a About/Services.
-  - Patch v4.30.1 — Hotfix: Decap CMS /admin devolvía 404 en config.yml; añadido `<link rel="cms-config-url">` explícito apuntando a `/admin/config.yml`. CSP del admin ampliada (fonts.googleapis.com, unpkg.com, ingesteer.services-prod.nsvcs.net) para evitar bloqueos de recursos.
+  - Patch v4.30.1 — Hotfix: Decap CMS /admin devolvía 404 en config.yml; añadido `<link rel="cms-config-url">` explícito apuntando a `/admin/config.yml`. CSP del admin ampliada (fonts.googleapis.com, unpkg.com, ingesteer.services-prod.nsvcs.net) para evitar bloqueos de recursos. Patch v4.30.2 — Añadido `'unsafe-eval'` a script-src del admin (Decap CMS/AJV compila validadores de schema en runtime).
 - Hero del Home: sustituido stat "10+ Años con Salesforce" por "48–72h Tiempo de entrega informe" (alineado con guía §1 y §5).
 - Referencia a Salesforce movida a /about (Trayectoria) y /services (capacidades adicionales) de forma selectiva.
 - Las 3 estadísticas del hero refuerzan posicionamiento performance-first: tiempo de entrega, proyectos propios, Lighthouse medio.
