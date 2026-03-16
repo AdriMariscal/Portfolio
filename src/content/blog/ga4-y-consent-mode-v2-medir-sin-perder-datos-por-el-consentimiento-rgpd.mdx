@@ -1,0 +1,160 @@
+---
+title: "GA4 y Consent Mode v2: medir sin perder datos por el consentimiento RGPD"
+description: Cómo funciona Google Consent Mode v2, qué datos modela GA4 sin
+  cookies y cómo implementarlo en Astro para cumplir RGPD sin renunciar a
+  métricas.
+tags:
+  - ga4
+  - analytics
+  - rgpd
+  - pymes
+  - seo
+  - datos
+  - github-actions
+date: 2026-02-24T10:32:00.000+01:00
+published: true
+draft: false
+image: https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=80
+imageAlt: Portátil mostrando gráficos de analítica de rendimiento con métricas y
+  curvas de datos en pantalla
+robots: max-snippet:-1, max-image-preview:large
+---
+Si tienes una web en Europa y usas Google Analytics 4, hay un problema que probablemente ya te afecta aunque no lo veas en tus informes: cada vez que un visitante rechaza las cookies analíticas, GA4 deja de registrar su sesión completa. No es un bug; es el funcionamiento esperado del RGPD. La pregunta es cuántos datos estás perdiendo y si estás haciendo algo para recuperarlos.
+
+Este artículo cierra el ciclo de GA4 en el blog explicando qué es Google Consent Mode v2, cómo se configura en un proyecto con Astro y gtag.js (sin GTM), qué modela GA4 con los datos de usuarios que no consienten, y cómo distinguir una pérdida de datos normal de una que indica un problema de implementación.
+
+## 1. El problema silencioso: consentimiento y pérdida de datos
+
+Desde marzo de 2024, Google exige Consent Mode v2 a cualquier web que use sus productos publicitarios o analíticos y reciba tráfico del Espacio Económico Europeo. Sin una implementación correcta, GA4 pierde información de todos los usuarios que rechazan cookies, y en muchos sitios europeos eso supone entre un 30 % y un 60 % del tráfico.
+
+Lo que ocurre a nivel técnico es sencillo: si `analytics_storage` está en `denied`, GA4 no escribe cookies de analítica, no asocia eventos a un identificador persistente y no puede distinguir si diez páginas vistas corresponden a diez personas o a una sola recargando la página. Sin intervención, esos usuarios desaparecen de tus informes como si no existieran.
+
+## 2. Qué es Consent Mode v2 y qué parámetros controla
+
+Consent Mode es una API de JavaScript que comunica las decisiones de consentimiento del usuario a los tags de Google. La versión 2 añade dos parámetros a los dos originales:
+
+- **`analytics_storage`**: controla si GA4 puede almacenar cookies de analítica.
+- **`ad_storage`**: controla el almacenamiento de cookies publicitarias.
+- **`ad_user_data`** (v2): gobierna el uso de datos personales para publicidad.
+- **`ad_personalization`** (v2): controla el remarketing y la publicidad personalizada.
+
+Cuando un usuario rechaza el consentimiento, el comportamiento de los tags depende del modo de implementación elegido.
+
+## 3. Modo Básico vs. Modo Avanzado
+
+Esta distinción es clave y afecta directamente a la calidad de tus datos:
+
+**Modo Básico:** los tags de Google no se disparan hasta que el usuario acepta. Si rechaza, no se envía nada. Cumples el RGPD, pero GA4 no recibe señales de esos usuarios y no puede aplicar modelado de comportamiento. Tu informe refleja solo el tráfico consentido.
+
+**Modo Avanzado:** los tags se cargan siempre, pero cuando el consentimiento está denegado envían pings sin cookies y sin identificadores persistentes. Estos pings contienen información limitada (URL de la página, user-agent, timestamp) pero anónima, y son la materia prima que GA4 necesita para aplicar su modelado por aprendizaje automático.
+
+Para la mayoría de webs que necesitan datos accionables sin violar la normativa, el modo avanzado es la opción recomendada. Es el que permite a GA4 estimar lo que no puede observar directamente.
+
+## 4. Qué datos modela GA4 y cuáles no
+
+Cuando hay suficiente tráfico consentido, GA4 aplica modelado conductual (behavioral modeling) para estimar métricas de usuarios que rechazaron cookies. El modelo aprende del comportamiento de usuarios similares que sí consintieron y extrapola.
+
+Métricas que GA4 puede modelar: usuarios activos diarios, sesiones, tasa de eventos clave, páginas por sesión y similares. El modelado se aplica en los informes estándar de GA4 cuando seleccionas la identidad de informe "Blended" (combinada).
+
+Métricas y funciones que no soportan datos modelados: exploraciones de embudos detalladas, segmentos de audiencia para exportación, datos en BigQuery y la API de datos en crudo. En estos contextos, trabajas solo con datos observados.
+
+El modelado no es estimación genérica. Google entrena un modelo específico para tu propiedad GA4 usando tus propios datos de usuarios consentidos. Si tu tráfico consentido es demasiado bajo, el modelo no se activa y GA4 simplemente no muestra datos modelados, en lugar de mostrar estimaciones poco fiables.
+
+## 5. Requisitos para que el modelado se active
+
+GA4 exige tres condiciones simultáneas para activar el behavioral modeling:
+
+1. Consent Mode implementado en todas las páginas (modo avanzado).
+2. Al menos 1.000 eventos diarios con `analytics_storage='denied'` durante 7 días consecutivos.
+3. Al menos 1.000 usuarios diarios con `analytics_storage='granted'` en 7 de los últimos 28 días.
+
+Para una pyme con tráfico moderado (menos de 500 visitas diarias), alcanzar estos umbrales puede llevar semanas o no alcanzarse. En ese caso, el modo avanzado sigue siendo preferible al básico: envías señales a Google que alimentan el modelado de conversiones en Google Ads, aunque el behavioral modeling de GA4 no se active.
+
+## 6. Implementación con gtag.js en Astro (sin GTM)
+
+Si tu stack es Astro con gtag.js cargado directamente (sin Google Tag Manager), la implementación sigue este patrón. El orden de ejecución es crítico: los valores por defecto de consentimiento deben establecerse antes de que se cargue el tag de GA4.
+
+~~~html
+<!-- 1. Consent defaults: ANTES de cualquier tag de Google -->
+<script is:inline>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+
+  gtag('consent', 'default', {
+    'analytics_storage': 'denied',
+    'ad_storage': 'denied',
+    'ad_user_data': 'denied',
+    'ad_personalization': 'denied'
+  });
+</script>
+
+<!-- 2. Tag de GA4 (se carga siempre, modo avanzado) -->
+<script
+  async
+  src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"
+></script>
+<script is:inline>
+  gtag('js', new Date());
+  gtag('config', 'G-XXXXXXXXXX');
+</script>
+~~~
+
+Cuando el usuario interactúa con tu banner de cookies y acepta la analítica, tu CMP o tu banner custom debe llamar al comando `update`:
+
+~~~js
+gtag('consent', 'update', {
+  'analytics_storage': 'granted'
+});
+~~~
+
+Puntos importantes para Astro:
+
+- Usa `is:inline` en los scripts de consentimiento para que Astro no los procese ni los difieras. Deben ejecutarse de forma síncrona en el `<head>`.
+- Si usas Partytown para mover scripts a un Web Worker, asegúrate de que el forwarding de `dataLayer.push` y `gtag` esté configurado.
+- El banner de cookies debe persistir la elección del usuario (en `localStorage` o cookie funcional) y repetir el `update` en cada carga de página si el usuario ya consintió previamente.
+
+## 7. Verificación: cómo saber que funciona
+
+Después de implementar, verifica con estos tres pasos:
+
+**En el navegador:** instala la extensión Tag Assistant de Google. Navega a tu web, rechaza cookies y comprueba que el tag de GA4 se dispara con `analytics_storage: denied`. Si no ves el tag, estás en modo básico sin quererlo.
+
+**En GA4:** ve a Administrar → Flujo de datos → tu flujo web. En la sección de señales de consentimiento, GA4 te indica si detecta pings con consentimiento denegado. Este diagnóstico puede tardar 48–72 horas en actualizarse.
+
+**En tu pipeline de CI/CD:** si despliegas con GitHub Actions, puedes añadir un test de Playwright o Cypress que abra la web, rechace cookies y verifique que la petición a `google-analytics.com/g/collect` incluye el parámetro `gcs=` con el estado de consentimiento correcto. Un check automatizado evita que una refactorización rompa el flujo de consentimiento sin que nadie lo detecte.
+
+~~~yaml
+# Ejemplo simplificado para GitHub Actions
+- name: Verificar Consent Mode
+  run: npx playwright test tests/consent-mode.spec.ts
+~~~
+
+## 8. Qué porcentaje de pérdida es normal y cuándo preocuparse
+
+No existe un número universal, pero sí rangos orientativos para webs europeas con banner de consentimiento funcional:
+
+- **Tasa de rechazo del 30–50 %**: rango habitual en Europa. Depende del diseño del banner, del sector y de la confianza que transmita la web.
+- **Tasa de rechazo superior al 70 %**: revisa el diseño del banner. Banners que dificultan aceptar (botones ocultos, textos confusos) provocan rechazos artificialmente altos.
+- **Tasa de rechazo inferior al 10 %**: sospecha. Un banner que no bloquea cookies realmente o que precarga consentimiento no cumple el RGPD y genera un falso positivo de datos completos.
+
+Para calcular tu tasa de pérdida, compara el total de sesiones que muestra tu servidor (logs, CDN analytics, o una herramienta sin cookies como la analítica de Netlify) con las sesiones reportadas en GA4. La diferencia es tu gap de consentimiento.
+
+Con Consent Mode v2 en modo avanzado y modelado activo, GA4 debería recuperar entre un 50 % y un 70 % de ese gap en métricas agregadas. Si el modelado no se activa (por tráfico insuficiente), tu informe de GA4 reflejará solo el tráfico consentido: tenlo en cuenta al tomar decisiones basadas en esos datos.
+
+## 9. Checklist de implementación
+
+Antes de dar por cerrada la configuración, comprueba estos puntos:
+
+1. El comando `gtag('consent', 'default', {...})` se ejecuta antes del snippet de GA4.
+2. Todos los parámetros v2 (`ad_user_data`, `ad_personalization`) están incluidos en el default.
+3. Tu banner llama a `gtag('consent', 'update', {...})` al aceptar y persiste la elección.
+4. Tag Assistant confirma que GA4 se dispara con `analytics_storage: denied` cuando rechazas cookies.
+5. En GA4, el diagnóstico de consentimiento muestra señales activas (esperar 48–72 h tras despliegue).
+6. Tu identidad de informes en GA4 está configurada como "Blended" para ver datos modelados.
+7. Has comparado sesiones de GA4 con una fuente independiente (logs, CDN) para estimar el gap real.
+
+## Conclusión
+
+Consent Mode v2 no es opcional para webs europeas que usen GA4, pero implementarlo bien es la diferencia entre perder un tercio de tus datos y tener informes con una aproximación razonable de la realidad. El modo avanzado con gtag.js es directo de implementar en Astro, no requiere GTM, y combinado con el modelado conductual de GA4 te devuelve visibilidad sobre usuarios que de otro modo serían invisibles.
+
+Si ya has configurado GA4 con eventos clave y un embudo de conversión medido, el consentimiento era la pieza que faltaba para que esos datos reflejen a todo tu tráfico, no solo al que acepta cookies.
