@@ -1,0 +1,184 @@
+---
+title: Métricas clave para saber si tu MVP funciona (sin herramientas caras)
+description: Define las 3-4 métricas que deciden si tu MVP merece más inversión.
+  Plantilla semanal, umbrales claros y configuración en GA4 o alternativas
+  gratuitas.
+tags:
+  - desarrollo
+  - mvp
+  - pymes
+  - analytics
+  - ga4
+  - negocio
+date: 2026-03-17T18:48:00.000+01:00
+published: true
+draft: false
+image: https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=80
+imageAlt: Pantalla de portátil mostrando un dashboard de analítica con gráficas
+  de rendimiento y métricas en tiempo real
+robots: max-snippet:-1, max-image-preview:large
+---
+Tu MVP ya está en producción. El dominio apunta, los formularios responden y el primer usuario ha entrado. Ahora llega la pregunta que más negocios pequeños esquivan: **¿cómo sé si esto funciona?**
+
+Este artículo cierra la serie que empezó con la guía para crear tu MVP paso a paso, pasó por el checklist de alcance y estimación, continuó con el modelo de datos y terminó con la puesta en producción. Ahora toca medir, interpretar y decidir.
+
+El enfoque es pragmático: nada de plataformas de 200 €/mes, nada de dashboards con 40 gráficas que nadie mira. Solo las 3-4 señales que realmente deciden si tu MVP merece más inversión.
+
+---
+
+## 1. Por qué medir mal es peor que no medir
+
+Instalar GA4 y mirar "usuarios activos" cada mañana no es medir. Es ruido. El problema más frecuente en MVPs de pymes no es la falta de datos, sino el exceso de métricas sin criterio de decisión asociado.
+
+Cada métrica que incluyas en tu cuadro de mando debe responder a una pregunta concreta:
+
+- **¿El usuario llega y hace lo que esperamos?** → Activación.
+- **¿Vuelve?** → Retención básica.
+- **¿Cuánto nos cuesta cada usuario?** → Coste de adquisición.
+- **¿Cuánto tarda en completar la tarea clave?** → Tiempo en tarea.
+
+Si una métrica no conecta con una decisión (pivotar, iterar o escalar), sobra.
+
+---
+
+## 2. Las cuatro métricas mínimas de un MVP
+
+### 2.1 Tasa de activación
+
+La activación mide el porcentaje de usuarios nuevos que completan la acción principal del producto. No es "visitar la home"; es la primera acción que demuestra que el usuario entiende la propuesta de valor.
+
+**Ejemplos según el tipo de MVP:**
+
+- Herramienta online: el usuario genera su primer resultado (QR, informe, cálculo).
+- SaaS con registro: el usuario completa el onboarding y usa la función principal.
+- Marketplace: el usuario publica su primer anuncio o hace su primera búsqueda cualificada.
+
+**Cómo medirla:** un evento personalizado en GA4, Plausible o Umami que se dispare cuando se completa esa acción.
+
+**Umbral orientativo:** por debajo del 20-25 % de activación sobre usuarios nuevos, hay un problema de propuesta de valor o de UX en el primer contacto.
+
+### 2.2 Retención básica (semana 1)
+
+No necesitas cohortes complejas en un MVP. La pregunta es simple: de los usuarios que se activaron esta semana, ¿cuántos vuelven la semana siguiente?
+
+**Cómo medirla:** en GA4, compara usuarios activos de la semana actual con los que repiten de la semana anterior. En Plausible o Umami, revisa las visitas recurrentes (returning visitors) como aproximación.
+
+**Umbral orientativo:** una retención semana 1 por debajo del 10-15 % indica que el producto no resuelve el problema con suficiente frecuencia o intensidad. Por encima del 25-30 %, hay tracción real.
+
+### 2.3 Coste por usuario (CAC simplificado)
+
+Aunque no estés invirtiendo en publicidad, tu MVP tiene costes: hosting, dominio, horas de desarrollo, herramientas. Divide el gasto mensual total entre los usuarios activados del mismo periodo.
+
+**Ejemplo:** si gastas 120 € al mes (hosting + herramientas) y activas 40 usuarios, tu coste por usuario activado es 3 €. Si tu modelo de negocio no puede generar más de 3 € de valor por usuario, necesitas o reducir costes o aumentar el valor percibido.
+
+**Cómo medirla:** no requiere herramienta de analítica. Una hoja de cálculo con gastos mensuales y el dato de activación basta.
+
+### 2.4 Tiempo en tarea clave
+
+Mide cuánto tarda un usuario en completar la acción principal del MVP. Un tiempo excesivo indica fricción en la UX o falta de claridad. Un tiempo muy bajo puede indicar que la tarea es trivial y el usuario no percibe valor.
+
+**Cómo medirla:** dos eventos en GA4 (inicio de tarea y fin de tarea) y calcula la diferencia. En alternativas sin cookies como Umami, puedes registrar ambos eventos y calcular la mediana en un script sencillo o directamente en los logs del backend.
+
+**Umbral orientativo:** depende del dominio, pero si el 50 % de los usuarios abandona la tarea antes de completarla, hay un cuello de botella claro.
+
+---
+
+## 3. Herramientas gratuitas o de bajo coste
+
+No necesitas una plataforma de analítica de producto de pago para validar un MVP. Estas opciones cubren lo esencial:
+
+**GA4 (Google Analytics 4):** gratuito, potente, con eventos personalizados y exploración de embudos. La curva de aprendizaje es real, pero para 4-5 eventos es manejable. Requiere consentimiento bajo RGPD; Consent Mode v2 modela los datos no consentidos.
+
+**Plausible:** ligero, respetuoso con la privacidad, sin cookies. Plan gratuito limitado, pero suficiente para un MVP con poco tráfico. Los eventos personalizados (goals) permiten medir activación.
+
+**Umami:** open source y autoalojable. Sin cookies, compatible con RGPD por diseño. Eventos personalizados disponibles. Si tu MVP ya tiene servidor propio, el coste adicional es mínimo.
+
+**Logs del backend:** la fuente más infravalorada. Si tu MVP tiene API o servidor (Node, Python, cualquier stack), cada petición autenticada ya contiene datos de uso. Un script que cuente usuarios únicos por semana y acciones completadas aporta más que muchos dashboards.
+
+**Hoja de cálculo (sí, otra vez):** para el coste por usuario y el cuadro de mando semanal, un Google Sheet o LibreOffice Calc es suficiente. No hace falta automatizarlo en la fase de validación.
+
+---
+
+## 4. Plantilla de cuadro de mando semanal
+
+Actualiza estos 6 indicadores cada lunes. Cinco minutos, no más.
+
+| # | Indicador | Fuente | Semana anterior | Semana actual | Tendencia |
+|---|-----------|--------|-----------------|---------------|-----------|
+| 1 | Usuarios nuevos | GA4 / Plausible / Umami | — | — | ↑ ↓ = |
+| 2 | Tasa de activación (%) | Evento personalizado | — | — | ↑ ↓ = |
+| 3 | Retención semana 1 (%) | Returning visitors o cohorte simple | — | — | ↑ ↓ = |
+| 4 | Tiempo medio en tarea clave | Eventos inicio/fin | — | — | ↑ ↓ = |
+| 5 | Coste mensual acumulado (€) | Hoja de cálculo | — | — | ↑ ↓ = |
+| 6 | Coste por usuario activado (€) | Indicador 5 / Indicador 2 | — | — | ↑ ↓ = |
+
+Puedes añadir un séptimo indicador específico de tu negocio (tasa de conversión a pago, NPS simplificado, tickets de soporte), pero no más de siete en total. La restricción es deliberada: si no cabe en una tabla de 7 filas, probablemente no es una señal de validación.
+
+---
+
+## 5. Pivotar, iterar o escalar: criterios con umbrales
+
+El cuadro de mando solo es útil si tiene reglas de decisión asociadas. Estos son umbrales orientativos que puedes adaptar a tu contexto:
+
+**Señal de pivotar (cambiar la propuesta o el segmento):**
+
+- Activación por debajo del 15 % durante 3 semanas consecutivas.
+- Retención semana 1 por debajo del 5 %.
+- Ningún usuario repite la tarea clave en un mes.
+
+Pivotar no significa tirar el código. Significa cambiar la hipótesis de valor: a quién sirves, qué problema resuelves o cómo lo resuelves.
+
+**Señal de iterar (mejorar lo que ya existe):**
+
+- Activación entre el 15-30 %: la propuesta conecta, pero la experiencia tiene fricción.
+- Retención semana 1 entre el 10-25 %: los usuarios vuelven, pero no todos.
+- Tiempo en tarea clave por encima de lo razonable: la UX necesita pulido.
+
+Iterar significa priorizar mejoras concretas (onboarding, flujo principal, rendimiento) sin cambiar la dirección del producto.
+
+**Señal de escalar (invertir más recursos):**
+
+- Activación por encima del 30 % sostenida.
+- Retención semana 1 por encima del 25 %.
+- Coste por usuario activado con margen respecto al valor que genera.
+- Usuarios que piden funcionalidades nuevas (señal cualitativa).
+
+Escalar no significa gastar más en marketing. Significa que las métricas justifican invertir en infraestructura, funcionalidades o adquisición porque el producto ya demuestra tracción.
+
+---
+
+## 6. Checklist: configurar eventos básicos en GA4
+
+Si eliges GA4 como herramienta principal, estos son los pasos mínimos para tener los 4 indicadores cubiertos:
+
+1. **Crea una propiedad GA4** y añade el snippet de medición con Consent Mode v2 configurado.
+2. **Define el evento de activación.** En GA4 → Administrar → Eventos → Crear evento. Ejemplo: `mvp_activation` que se dispare cuando el usuario completa la acción principal. Si usas Astro, puedes dispararlo con `gtag('event', 'mvp_activation')` tras la acción.
+3. **Define los eventos de inicio y fin de tarea.** Dos eventos: `task_start` y `task_complete`. La diferencia de timestamps te da el tiempo en tarea.
+4. **Marca el evento de activación como conversión.** En GA4, ve a Administrar → Conversiones y activa `mvp_activation`. Esto te permite filtrar y segmentar por usuarios activados.
+5. **Configura una exploración de embudo.** En GA4 → Explorar → Exploración de embudo. Pasos: visita → inicio de tarea → activación. Esto te muestra dónde abandonan.
+6. **Revisa los informes de retención.** GA4 tiene un informe de retención predeterminado en Informes → Retención. Para un MVP basta con la vista semanal.
+7. **Crea una audiencia de "usuarios activados".** En GA4 → Administrar → Audiencias. Condición: usuarios que hayan disparado `mvp_activation`. Útil para comparar comportamiento de activados vs. no activados.
+
+Si prefieres Plausible o Umami, los pasos son más sencillos: configura goals o eventos personalizados equivalentes. La lógica es la misma; solo cambia la interfaz.
+
+---
+
+## 7. Errores frecuentes al medir un MVP
+
+**Medir demasiado pronto.** Si tienes 10 usuarios, las métricas no son estadísticamente significativas. Espera a tener al menos 50-100 usuarios antes de tomar decisiones basadas en porcentajes.
+
+**Confundir vanity metrics con señales reales.** Páginas vistas, sesiones y tiempo en sitio no te dicen si el producto funciona. La activación y la retención sí.
+
+**No definir umbrales antes de medir.** Si decides el umbral después de ver los datos, caerás en el sesgo de confirmación. Define qué significa "suficiente" antes de mirar el dashboard.
+
+**Automatizar antes de validar.** No construyas un pipeline de datos automatizado para un MVP que puede pivotar en dos semanas. La hoja de cálculo manual es tu aliada hasta que las métricas justifiquen la inversión en automatización.
+
+**Ignorar la señal cualitativa.** Los números dicen qué pasa; los usuarios dicen por qué. Complementa el cuadro de mando con 3-5 conversaciones directas al mes con usuarios reales. Un formulario de feedback de una sola pregunta abierta es suficiente.
+
+---
+
+## Conclusión
+
+Medir un MVP no requiere presupuesto, sino criterio. Cuatro métricas, una tabla semanal de 6-7 filas y reglas de decisión claras separan al negocio que valida del que improvisa.
+
+Si tu MVP ya está en producción y aún no tienes estos indicadores configurados, empieza hoy: un evento de activación, una revisión semanal de retención y una hoja de cálculo con los costes. Con eso ya tienes más visibilidad que la mayoría de MVPs en su primer mes.
