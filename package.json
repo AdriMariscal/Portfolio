@@ -41,7 +41,7 @@
     }
   },
   "devDependencies": {
-    "@astrojs/markdown-remark": "^6.3.9",
+    "@astrojs/markdown-remark": "^7.0.0",
     "@axe-core/cli": "^4.11.1",
     "@axe-core/playwright": "^4.11.1",
     "@lhci/cli": "^0.15.1",
